@@ -218,7 +218,14 @@ class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProvider
         part('head_back'),
         ClipPath(
           clipper: _EyesClipper(rig, s),
-          child: Transform.translate(offset: Offset(rig.look('pupilPx') * _look * s, 0), child: part('pupils')),
+          child: Stack(children: [
+            // Each pupil moves from its resting spot to the same spot in its own eye
+            for (final (i, side) in [(0, 'left'), (1, 'right')])
+              Transform.translate(
+                offset: Offset((rig.look('pupilReach') * _look - rig.pupilRest[i] * _look.abs()) * s, 0),
+                child: part('pupil_$side'),
+              ),
+          ]),
         ),
         shown(_eye == _Eye.half, part('lids_half')),
         shown(_eye == _Eye.closed, part('lids_closed')),

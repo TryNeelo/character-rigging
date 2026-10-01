@@ -16,7 +16,7 @@
     "talkNodSmoothing": 0.18
   },
   "look": {
-    "pupilPx": 8,
+    "pupilReach": 11,
     "headDegrees": 2.5,
     "headPx": 2,
     "smoothing": 0.12

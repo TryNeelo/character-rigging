@@ -31,6 +31,9 @@ dots = sorted((float(m[0]), float(m[1])) for m in
               re.findall(r'<circle cx="([\d.]+)" cy="([\d.]+)" r="4" fill="#F006D8"/>', src))
 assert len(dots) == 2, dots
 HEAD_PIVOT = (278.7, 392)  # base of the neck, where the chin meets the collar
+# How far each pupil sits from its eye's centre at rest (x). The art has them turned slightly
+# inward, so looking sideways moves each pupil a different amount to the same spot.
+PUPIL_REST = (8.2, -7.8)
 
 def sleeve_cap(sleeve, dot):
     """Round cap for a sleeve: a circle on the sleeve's centre line, as wide as the
@@ -111,7 +114,9 @@ head = (f'<g id="head" class="part" data-pivot="{HEAD_PIVOT[0]} {HEAD_PIVOT[1]}"
         + els[0] + els[42]                                      # ear roots, behind the head
         + els[43] + els[44]                                     # head fur
         + J(45, 49)                                             # eye patches, eye whites
-        + '<g clip-path="url(#clip-eyes)"><g id="pupils">' + els[49] + els[50] + '</g></g>'  # pupils stay inside the eyes when they move
+        + '<g id="pupils" clip-path="url(#clip-eyes)">'                 # pupils stay inside the eyes when they move
+        + f'<g id="pupil-left" data-rest="{PUPIL_REST[0]}">' + els[49] + '</g>'
+        + f'<g id="pupil-right" data-rest="{PUPIL_REST[1]}">' + els[50] + '</g></g>'
         + eyelids
         + J(51, 55)                                             # ears
         + '<g id="brows">' + els[55] + els[56] + '</g>'
@@ -172,7 +177,8 @@ part('arm_left', strip_wrapper(arms[:arms.index('</g>') + 4]))
 part('arm_right', strip_wrapper(arms[arms.index('</g>') + 4:]))
 part('body', els[17] + J(18, 42))
 part('head_back', els[0] + els[42] + els[43] + els[44] + J(45, 49))
-part('pupils', els[49] + els[50])
+part('pupil_left', els[49])
+part('pupil_right', els[50])
 part('lids_half', lids('half'), eye_clips)
 part('lids_closed', lids('closed'), eye_clips)
 part('head_front', J(51, 55) + els[55] + els[56] + els[57])

@@ -273,7 +273,8 @@ button { font: inherit; cursor: pointer; }
   $('pivotsOn').addEventListener('change', e => dots.setAttribute('display', e.target.checked ? 'inline' : 'none'));
 
   const pose = { head: 0, look: 0, armL: 0, armR: 0 };
-  const pupils = $('pupils');
+  // Each pupil moves from where it rests in the art to the same spot in its eye
+  const pupils = [$('pupil-left'), $('pupil-right')].map(el => ({ el, rest: +el.dataset.rest }));
   // Looking: -1 is the screen's left, 1 the screen's right. Pupils slide, the head turns slightly.
   const LOOK = S.look;
   let look = 0, lookTarget = 0;
@@ -298,7 +299,7 @@ button { font: inherit; cursor: pointer; }
     const swing = idle ? Math.sin(t * 2 * Math.PI / I.breathSeconds + 0.6) * I.armSwingDegrees : 0; // arms follow the breath
     nod += (((raf && idle) ? OPEN[current] : 0) - nod) * I.talkNodSmoothing;
     look += (Math.max(-1, Math.min(1, lookTarget + pose.look)) - look) * LOOK.smoothing;
-    pupils.setAttribute('transform', `translate(${(LOOK.pupilPx * look).toFixed(2)} 0)`);
+    pupils.forEach(p => p.el.setAttribute('transform', `translate(${(LOOK.pupilReach * look - p.rest * Math.abs(look)).toFixed(2)} 0)`));
     upper.setAttribute('transform', `translate(0 ${(-I.breathPx * (1 + breath)).toFixed(2)})`);
     dots.setAttribute('transform', upper.getAttribute('transform'));
     head.setAttribute('transform', `translate(${(LOOK.headPx * look).toFixed(2)} ${(-I.talkNodPx * nod).toFixed(2)}) rotate(${(pose.head + sway - I.talkNodDegrees * nod + LOOK.headDegrees * look).toFixed(2)} ${HP[0]} ${HP[1]})`);

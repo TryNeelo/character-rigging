@@ -82,7 +82,7 @@ Timing is 40 ms half, 80 ms closed, 50 ms half. Blinks happen at random every 2.
 
 **Scenes.** The preview places Nova in a frame by setting the SVG's `viewBox`. Framing presets are vertical ranges in artboard units (full body, knees up, waist up, close-up); the crop is aligned to the bottom of the frame, and Nova can stand left, centre or right.
 
-**Markers.** `cues.json` can carry a `markers` list next to the mouth cues. `{"time", "type": "event", "name"}` sends an event to the app at that moment, for example to highlight the shops. `{"time", "end", "type": "look", "direction": "left" | "right"}` turns Nova's eyes and head toward that side of the screen; the pupils slide up to 8 px, the head turns 2.5°. The preview shows markers under the timeline and pops up each event as it fires.
+**Markers.** `cues.json` can carry a `markers` list next to the mouth cues. `{"time", "type": "event", "name"}` sends an event to the app at that moment, for example to highlight the shops. `{"time", "end", "type": "look", "direction": "left" | "right"}` turns Nova's eyes and head toward that side of the screen; each pupil moves from its resting spot to the same spot in its own eye (so the far pupil travels further), and the head turns 2.5°. The preview shows markers under the timeline and pops up each event as it fires.
 
 **Not rigged yet.** Legs, elbows, separate paws, ears, gaze (`pupils`) and brow expressions.
 

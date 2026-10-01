@@ -32,7 +32,11 @@
     269.183
    ]
   ],
-  "radius": 24.654
+  "radius": 24.654,
+  "pupilRest": [
+   8.2,
+   -7.8
+  ]
  },
  "framing": {
   "full": {
@@ -71,7 +75,7 @@
   "talkNodSmoothing": 0.18
  },
  "look": {
-  "pupilPx": 8,
+  "pupilReach": 11,
   "headDegrees": 2.5,
   "headPx": 2,
   "smoothing": 0.12

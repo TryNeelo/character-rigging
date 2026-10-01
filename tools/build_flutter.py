@@ -27,7 +27,8 @@ rig = {
     'anchor': {'x': 278, 'y': 837},
     'pivots': {'head': pivot('head'), 'armLeft': pivot('arm-left'), 'armRight': pivot('arm-right')},
     'eyes': {'centers': [[float(x), float(y)] for x, y in re.findall(r'cx="([\d.]+)" cy="([\d.]+)"', eyes)],
-             'radius': 24.654},
+             'radius': 24.654,
+             'pupilRest': [float(v) for v in re.findall(r'id="pupil-(?:left|right)" data-rest="([-\d.]+)"', rigged)]},
     **settings,
 }
 json.dump(rig, open(os.path.join(ASSETS, 'rig.json'), 'w'), indent=1)
