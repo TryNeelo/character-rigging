@@ -83,8 +83,8 @@ button { font: inherit; cursor: pointer; }
 .playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--rust); left: 0; pointer-events: none; }
 .marks { position: relative; height: 46px; margin-top: 4px; }
 .mark { position: absolute; top: 0; font-family: var(--font-mono); font-size: 11px; font-weight: 700; white-space: nowrap; color: var(--rust); border-left: 2px solid var(--rust); padding-left: 4px; line-height: 20px; }
-.mark.arm { top: 22px; }
-.mark.look, .mark.arm { color: var(--accent); border: 0; background: var(--chip); border-radius: 4px; padding: 0 4px; overflow: hidden; text-overflow: ellipsis; }
+.mark.arm, .mark.expression { top: 22px; }
+.mark.look, .mark.arm, .mark.expression { color: var(--accent); border: 0; background: var(--chip); border-radius: 4px; padding: 0 4px; overflow: hidden; text-overflow: ellipsis; }
 .mark.fired { background: var(--rust); color: #fff; border-radius: 4px; }
 .toast { position: absolute; left: 50%; top: 12px; translate: -50% 0; background: var(--rust); color: #fff; font-family: var(--font-mono); font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; transition: opacity .3s; }
 .toast[hidden] { display: block; opacity: 0; }
@@ -161,12 +161,14 @@ button { font: inherit; cursor: pointer; }
 
       <section>
         <h2>Pose and idle</h2>
-        <p>Arms stay behind the outfit and rotate at the shoulder; the head turns at the base of the neck. Idle adds slow breathing and a slight sway, plus a small nod while he talks.</p>
+        <p>Arms stay behind the outfit and rotate at the shoulder; the head turns at the base of the neck. Idle adds slow breathing and a slight sway, plus a small nod and brow lifts on stressed words while he talks.</p>
         <div class="fields">
           <label class="slider"><span>Head tilt</span><input type="range" id="poseHead" min="-10" max="10" step="0.5" value="0"><output for="poseHead" id="poseHeadOut">0°</output></label>
           <label class="slider"><span>Eyes look</span><input type="range" id="poseLook" min="-1" max="1" step="0.1" value="0"><output for="poseLook" id="poseLookOut">0</output></label>
           <label class="slider"><span>Left arm</span><input type="range" id="poseArmL" min="-12" max="180" step="1" value="0"><output for="poseArmL" id="poseArmLOut">0°</output></label>
           <label class="slider"><span>Right arm</span><input type="range" id="poseArmR" min="-12" max="180" step="1" value="0"><output for="poseArmR" id="poseArmROut">0°</output></label>
+          <div class="field"><span>Brows</span>
+            <div class="seg-ctl" role="group" aria-label="Brow expression" id="browCtl"></div></div>
           <div class="row">
             <label class="toggle"><input type="checkbox" id="idleOn" checked><span>Idle motion</span></label>
             <label class="toggle"><input type="checkbox" id="pivotsOn"><span>Show pivots</span></label>
@@ -218,7 +220,10 @@ button { font: inherit; cursor: pointer; }
   // Shared with the Flutter component: tools/rig_settings.json
   const S = %%SETTINGS%%;
   // Markers: {time, type: "event", name} fires an app event; {time, end, type: "look", direction} turns Nova's gaze;
-  // {time, end, type: "arm", side, degrees} raises an arm (side = the screen side it's on) and lowers it at end.
+  // {time, end, type: "arm", side, degrees} raises an arm (side = the screen side it's on) and lowers it at end;
+  // {time, end, type: "expression", name} sets the brows (happy, surprised, concerned).
+  // Emphasis: stressed moments found in the audio (tools/build_emphasis.py); the brows lift briefly on each.
+  const emphasis = %%EMPHASIS%%;
   const markers = %%MARKERS%%;
   const DURATION = cues[cues.length - 1].end;
 
@@ -304,13 +309,39 @@ button { font: inherit; cursor: pointer; }
   const LOOK = S.look;
   let look = 0, lookTarget = 0;
   let raise = { left: 0, right: 0 }, raiseTarget = { left: 0, right: 0 };
+  // Brows: a quick lift on each stressed moment while talking, plus an expression (from the line or the test control)
+  const B = S.brows;
+  const browEls = ['left', 'right'].map(side => ({ el: $(`brow-${side}`), side, p: pivot($(`brow-${side}`)) }));
+  let lineExpression = null, testExpression = null, brow = { lift: 0, tilt: 0 };
+  const ease = k => k * k * (3 - 2 * k);
+  function autoLift(t) {
+    let v = 0;
+    for (const e of emphasis) {
+      const d = t - e.time;
+      let k = 0;
+      if (d >= -B.autoRiseSeconds && d < 0) k = 1 + d / B.autoRiseSeconds;
+      else if (d >= 0 && d < B.autoHoldSeconds) k = 1;
+      else if (d >= B.autoHoldSeconds && d < B.autoHoldSeconds + B.autoFallSeconds) k = 1 - (d - B.autoHoldSeconds) / B.autoFallSeconds;
+      v = Math.max(v, ease(k) * e.strength);
+    }
+    return v;
+  }
   // Slider ids are prefixed so they never collide with part ids in the SVG (#head)
   const SLIDERS = { head: 'poseHead', look: 'poseLook', armL: 'poseArmL', armR: 'poseArmR' };
   Object.entries(SLIDERS).forEach(([k, id]) => {
     const input = $(id), out = $(id + 'Out');
     input.addEventListener('input', () => { pose[k] = +input.value; out.textContent = k === 'look' ? input.value : `${input.value}°`; });
   });
+  // Brow test control: Auto follows the line; the others hold an expression
+  const browBtns = ['auto', ...Object.keys(B.expressions)].map(name => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = name[0].toUpperCase() + name.slice(1);
+    b.setAttribute('aria-pressed', name === 'auto');
+    b.addEventListener('click', () => { testExpression = name === 'auto' ? null : name; browBtns.forEach(x => x.setAttribute('aria-pressed', x === b)); });
+    $('browCtl').appendChild(b); return b;
+  });
   $('resetPose').addEventListener('click', () => {
+    testExpression = null; browBtns.forEach((x, i) => x.setAttribute('aria-pressed', i === 0));
     Object.entries(SLIDERS).forEach(([k, id]) => { pose[k] = 0; $(id).value = 0; $(id + 'Out').textContent = k === 'look' ? '0' : '0°'; });
   });
 
@@ -326,6 +357,13 @@ button { font: inherit; cursor: pointer; }
     nod += (((raf && idle) ? OPEN[current] : 0) - nod) * I.talkNodSmoothing;
     look += (Math.max(-1, Math.min(1, lookTarget + pose.look)) - look) * LOOK.smoothing;
     for (const side of ['left', 'right']) raise[side] += (raiseTarget[side] - raise[side]) * S.gesture.smoothing;
+    const expr = B.expressions[testExpression || lineExpression] || { liftPx: 0, tiltDegrees: 0 };
+    brow.lift += (expr.liftPx - brow.lift) * B.smoothing;
+    brow.tilt += (expr.tiltDegrees - brow.tilt) * B.smoothing;
+    const lift = brow.lift + ((raf && idle) ? autoLift(audio.currentTime) * B.autoLiftPx : 0);
+    // Positive tilt raises the inner ends: the screen-left brow turns anticlockwise, the right one clockwise
+    browEls.forEach(b => b.el.setAttribute('transform',
+      `translate(0 ${(-lift).toFixed(2)}) rotate(${((b.side === 'left' ? -1 : 1) * brow.tilt).toFixed(2)} ${b.p[0]} ${b.p[1]})`));
     pupils.forEach(p => p.el.setAttribute('transform', `translate(${(LOOK.pupilReach * look - p.rest * Math.abs(look)).toFixed(2)} 0)`));
     upper.setAttribute('transform', `translate(0 ${(-I.breathPx * (1 + breath)).toFixed(2)})`);
     dots.setAttribute('transform', upper.getAttribute('transform'));
@@ -423,7 +461,8 @@ button { font: inherit; cursor: pointer; }
     el.style.left = `${mk.time / DURATION * 100}%`;
     if (mk.type !== 'event') {
       el.style.width = `${(mk.end - mk.time) / DURATION * 100}%`;
-      el.textContent = mk.type === 'look' ? `look ${mk.direction}` : `${mk.side} arm ${mk.degrees}°`;
+      el.textContent = mk.type === 'look' ? `look ${mk.direction}`
+        : mk.type === 'arm' ? `${mk.side} arm ${mk.degrees}°` : `${mk.name} brows`;
     }
     else el.textContent = mk.name;
     el.title = mk.note || '';
@@ -446,6 +485,8 @@ button { font: inherit; cursor: pointer; }
     const lk = markers.find(mk => mk.type === 'look' && t >= mk.time && t < mk.end);
     lookTarget = lk ? (lk.direction === 'right' ? 1 : -1) : 0;
     raiseTarget = { left: 0, right: 0 };
+    const ex = markers.find(mk => mk.type === 'expression' && t >= mk.time && t < mk.end);
+    lineExpression = ex ? ex.name : null;
     markers.forEach(mk => { if (mk.type === 'arm' && t >= mk.time && t < mk.end) raiseTarget[mk.side] = mk.degrees; });
     const idx = cues.findIndex(c => t >= c.start && t < c.end);
     if (idx !== lastSeg) {
@@ -463,7 +504,7 @@ button { font: inherit; cursor: pointer; }
     if (lastSeg >= 0) segEls[lastSeg].classList.remove('on');
     lastSeg = -1;
     $('playhead').style.left = '0%';
-    lookTarget = 0; lastT = -1; raiseTarget = { left: 0, right: 0 };
+    lookTarget = 0; lastT = -1; raiseTarget = { left: 0, right: 0 }; lineExpression = null;
     markEls.forEach(el => el.classList.remove('fired'));
     $('play').textContent = 'Play with sound';
     setMouth('smile');

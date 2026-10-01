@@ -63,6 +63,7 @@ Dispose the controller with your screen (`nova.dispose()`).
 | `events` | Stream of `NovaEvent(name, lineId, time)` from the line's markers. `line_end` arrives when a line finishes. |
 | `isSpeaking`, `line`, `time` | Current state. |
 | `look` | Where Nova looks when no line is directing him: `NovaLook.left`, `ahead`, `right`. |
+| `expression` | Brows to hold (`'happy'`, `'surprised'`, `'concerned'`), or null to follow the line. |
 
 ## The widget
 
@@ -86,14 +87,18 @@ The timing file holds the mouth shapes and the markers:
 "markers": [
   { "time": 0.56, "type": "event", "name": "show_logo" },
   { "time": 2.28, "end": 3.70, "type": "look", "direction": "right" },
-  { "time": 2.28, "end": 3.70, "type": "arm", "side": "right", "degrees": 32 }
+  { "time": 2.28, "end": 3.70, "type": "arm", "side": "right", "degrees": 32 },
+  { "time": 0.04, "end": 1.09, "type": "expression", "name": "happy" }
 ]
 ```
 
 - `event` markers become `NovaEvent`s in your app. The names are agreed per scene.
 - `look` markers turn Nova's eyes and head toward the screen's left or right between
   `time` and `end`. `arm` markers raise the arm on that side of the screen, then lower it
-  at `end`. You don't need to do anything with these; the widget handles them.
+  at `end`. `expression` markers set his brows: `happy`, `surprised` or `concerned`. You
+  don't need to do anything with these; the widget handles them.
+- His brows also lift briefly on the stressed words of each line (the `emphasis` list,
+  found from the audio when the line is packaged).
 
 The audio is the clock, so slow devices and speed changes stay in sync.
 

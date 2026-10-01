@@ -1,9 +1,29 @@
 {
   "framing": {
-    "full":  { "label": "Full body", "top": 20, "bottom": 855, "width": 370 },
-    "knees": { "label": "Knees up",  "top": 20, "bottom": 730, "width": 370 },
-    "waist": { "label": "Waist up",  "top": 20, "bottom": 600, "width": 370 },
-    "close": { "label": "Close-up",  "top": 30, "bottom": 440, "width": 345 }
+    "full": {
+      "label": "Full body",
+      "top": 20,
+      "bottom": 855,
+      "width": 370
+    },
+    "knees": {
+      "label": "Knees up",
+      "top": 20,
+      "bottom": 730,
+      "width": 370
+    },
+    "waist": {
+      "label": "Waist up",
+      "top": 20,
+      "bottom": 600,
+      "width": 370
+    },
+    "close": {
+      "label": "Close-up",
+      "top": 30,
+      "bottom": 440,
+      "width": 345
+    }
   },
   "idle": {
     "breathSeconds": 4.2,
@@ -33,6 +53,43 @@
     "doubleChance": 0.15,
     "doubleGapMs": 140
   },
-  "mouthOpenness": { "X": 0, "A": 0, "B": 0.3, "C": 0.7, "D": 1, "E": 0.6, "F": 0.4, "G": 0.3, "H": 0.6, "smile": 0.2 },
-  "outline": { "widthPx": 8, "blur": 5, "shadowBlur": 8, "shadowOpacity": 0.25 }
+  "mouthOpenness": {
+    "X": 0,
+    "A": 0,
+    "B": 0.3,
+    "C": 0.7,
+    "D": 1,
+    "E": 0.6,
+    "F": 0.4,
+    "G": 0.3,
+    "H": 0.6,
+    "smile": 0.2
+  },
+  "outline": {
+    "widthPx": 8,
+    "blur": 5,
+    "shadowBlur": 8,
+    "shadowOpacity": 0.25
+  },
+  "brows": {
+    "autoLiftPx": 3.5,
+    "autoRiseSeconds": 0.08,
+    "autoHoldSeconds": 0.1,
+    "autoFallSeconds": 0.3,
+    "smoothing": 0.12,
+    "expressions": {
+      "surprised": {
+        "liftPx": 9,
+        "tiltDegrees": 2
+      },
+      "happy": {
+        "liftPx": 5,
+        "tiltDegrees": -6
+      },
+      "concerned": {
+        "liftPx": 2,
+        "tiltDegrees": 6
+      }
+    }
+  }
 }

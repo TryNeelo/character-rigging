@@ -9,6 +9,7 @@ import glob, os, re, subprocess, sys, zipfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 run = lambda *a: subprocess.run([sys.executable, *a], cwd=ROOT, check=True)
 run('tools/build_rig.py')
+run('tools/build_emphasis.py')
 for d in sorted(glob.glob(os.path.join(ROOT, 'dialogue', '*', 'cues.json'))):
     run('tools/build_preview.py', os.path.basename(os.path.dirname(d)))
 run('tools/build_flutter.py')

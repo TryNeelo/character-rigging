@@ -64,7 +64,7 @@ enum _Eye { open, half, closed }
 class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProviderStateMixin {
   NovaRig? _rig;
   late final Ticker _ticker;
-  double _t = 0, _nod = 0, _look = 0, _raiseLeft = 0, _raiseRight = 0;
+  double _t = 0, _nod = 0, _look = 0, _raiseLeft = 0, _raiseRight = 0, _browLift = 0, _browTilt = 0;
   _Eye _eye = _Eye.open;
   Timer? _blinkTimer;
   final _random = math.Random();
@@ -111,7 +111,33 @@ class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProvider
       _look += (lookTarget - _look) * rig.look('smoothing');
       _raiseLeft += (armLeft - _raiseLeft) * rig.gesture('smoothing');
       _raiseRight += (armRight - _raiseRight) * rig.gesture('smoothing');
+      final (lift, tilt) = rig.browExpressions[c.expression ?? c.line?.expressionAt(c.time)] ?? (0.0, 0.0);
+      _browLift += (lift - _browLift) * rig.brows('smoothing');
+      _browTilt += (tilt - _browTilt) * rig.brows('smoothing');
     });
+  }
+
+  /// Brow lift from stressed moments in the line: a quick rise, a hold, a slower fall.
+  double _autoBrowLift(NovaRig rig) {
+    final c = widget.controller;
+    final line = c.line;
+    if (line == null || !widget.idle) return 0;
+    final t = c.time, rise = rig.brows('autoRiseSeconds'), hold = rig.brows('autoHoldSeconds');
+    final fall = rig.brows('autoFallSeconds');
+    var v = 0.0;
+    for (final (time, strength) in line.emphasis) {
+      final d = t - time;
+      var k = 0.0;
+      if (d >= -rise && d < 0) {
+        k = 1 + d / rise;
+      } else if (d >= 0 && d < hold) {
+        k = 1;
+      } else if (d >= hold && d < hold + fall) {
+        k = 1 - (d - hold) / fall;
+      }
+      v = math.max(v, k * k * (3 - 2 * k) * strength);
+    }
+    return v * rig.brows('autoLiftPx');
   }
 
   // ---- Blinks: half lid, closed, half lid, open ----
@@ -217,6 +243,7 @@ class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProvider
     final swing = idle * math.sin(_t * 2 * math.pi / breathSec + 0.6) * rig.idle('armSwingDegrees');
     final upperY = idle * -rig.idle('breathPx') * (1 + breath);
     final shape = _shape;
+    final browLift = _browLift + _autoBrowLift(rig);
     final outfitId = rig.outfits.containsKey(widget.outfit) ? widget.outfit! : rig.defaultOutfit;
     final outfit = rig.outfits[outfitId]!;
 
@@ -240,7 +267,14 @@ class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProvider
         ),
         shown(_eye == _Eye.half, part('lids_half')),
         shown(_eye == _Eye.closed, part('lids_closed')),
-        part('head_front'),
+        part('ears'),
+        // Positive tilt raises the inner ends: the screen-left brow turns anticlockwise, the right one clockwise
+        for (final (side, pivot, sign) in [('left', rig.browLeftPivot, -1.0), ('right', rig.browRightPivot, 1.0)])
+          Transform(
+            transform: Matrix4.translationValues(0, -browLift * s, 0)..multiply(rotateAbout(pivot, sign * _browTilt)),
+            child: part('brow_$side'),
+          ),
+        part('muzzle'),
         for (final m in _mouths) shown(m == shape, part('mouth_$m')),
         part('nose'),
         part('hat_$outfitId'),

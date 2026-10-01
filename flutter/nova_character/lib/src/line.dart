@@ -14,7 +14,8 @@ class NovaCue {
 
 /// A moment in a line. Either an app event (`type: "event"`, with a [name]) or something
 /// Nova does from [time] to [end]: `type: "look"` toward [direction] "left" or "right" of
-/// the screen, or `type: "arm"` raising the arm on the screen's [side] by [degrees].
+/// the screen, `type: "arm"` raising the arm on the screen's [side] by [degrees], or
+/// `type: "expression"` setting his brows to [name] ("happy", "surprised", "concerned").
 class NovaMarker {
   const NovaMarker(
       {required this.time, required this.type, this.end, this.name, this.direction, this.side, this.degrees});
@@ -38,11 +39,15 @@ class NovaMarker {
 
 /// A dialogue line (or a whole scene): its audio, mouth timing and markers.
 class NovaLine {
-  NovaLine._(this.id, this.audio, this.duration, this.cues, this.markers);
+  NovaLine._(this.id, this.audio, this.duration, this.cues, this.markers, this.emphasis);
   final String id, audio;
   final double duration;
   final List<NovaCue> cues;
   final List<NovaMarker> markers;
+
+  /// Stressed moments found in the audio, as (time in seconds, strength 0 to 1).
+  /// Nova's brows lift briefly on each.
+  final List<(double, double)> emphasis;
 
   /// Asset key of this line's audio file.
   String get audioAsset => novaAsset('lines/$id/$audio');
@@ -57,7 +62,11 @@ class NovaLine {
           for (final c in j['cues'] as List)
             NovaCue((c['start'] as num).toDouble(), (c['end'] as num).toDouble(), c['shape'] as String)
         ],
-        [for (final m in j['markers'] as List) NovaMarker.fromJson(m as Map<String, dynamic>)]);
+        [for (final m in j['markers'] as List) NovaMarker.fromJson(m as Map<String, dynamic>)],
+        [
+          for (final e in (j['emphasis'] as List?) ?? [])
+            ((e['time'] as num).toDouble(), (e['strength'] as num).toDouble())
+        ]);
   }
 
   /// Mouth shape at [t] seconds, or null outside the line.
@@ -78,6 +87,14 @@ class NovaLine {
       }
     }
     return (left, right);
+  }
+
+  /// Brow expression at [t] seconds ("happy", "surprised", "concerned"), or null.
+  String? expressionAt(double t) {
+    for (final m in markers) {
+      if (m.type == 'expression' && t >= m.time && t < (m.end ?? m.time)) return m.name;
+    }
+    return null;
   }
 
   /// Look direction at [t] seconds: -1 screen left, 1 screen right, 0 straight ahead.

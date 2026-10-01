@@ -36,6 +36,13 @@ HEAD_PIVOT = (278.7, 392)  # base of the neck, where the chin meets the collar
 # inward, so looking sideways moves each pupil a different amount to the same spot.
 PUPIL_REST = (8.2, -7.8)
 
+def centre(shape):
+    """Centre of a path's bounding box, rounded: where a brow tilts from."""
+    n = [float(v) for v in re.findall(r'-?\d+\.?\d*', re.search(r'd="([^"]*)"', shape).group(1))]
+    return round((min(n[0::2]) + max(n[0::2])) / 2, 1), round((min(n[1::2]) + max(n[1::2])) / 2, 1)
+# Brows by screen side: in the export, the screen-right brow comes first (55), then the left (56).
+BROWS = {'left': els[56], 'right': els[55]}
+
 def sleeve_cap(sleeve, dot):
     """Round cap for a sleeve: a circle on the sleeve's centre line, as wide as the
     sleeve, centred where the pivot dot projects onto that line."""
@@ -168,7 +175,8 @@ head = (f'<g id="head" class="part" data-pivot="{HEAD_PIVOT[0]} {HEAD_PIVOT[1]}"
         + f'<g id="pupil-right" data-rest="{PUPIL_REST[1]}">' + els[50] + '</g></g>'
         + eyelids
         + J(51, 55)                                             # ears
-        + '<g id="brows">' + els[55] + els[56] + '</g>'
+        + '<g id="brows">' + ''.join(f'<g id="brow-{side}" data-pivot="{centre(b)[0]} {centre(b)[1]}">{b}</g>'
+                                     for side, b in BROWS.items()) + '</g>'
         + els[57]                                               # muzzle
         + mouth                                                 # replaces the drawn smile (58, 59)
         + els[60] + els[61]                                     # nose
@@ -228,7 +236,10 @@ part('pupil_left', els[49])
 part('pupil_right', els[50])
 part('lids_half', lids('half'), eye_clips)
 part('lids_closed', lids('closed'), eye_clips)
-part('head_front', J(51, 55) + els[55] + els[56] + els[57])
+part('ears', J(51, 55))
+part('brow_left', BROWS['left'])
+part('brow_right', BROWS['right'])
+part('muzzle', els[57])
 for k, b in shapes:
     used = ''.join(c for c in CLIPS if f'url(#{c.split(chr(34))[1]})' in b)
     part(f'mouth_{k}', f'<g transform="{OFF}">{b}</g>', used)

@@ -146,5 +146,36 @@
   "blur": 5,
   "shadowBlur": 8,
   "shadowOpacity": 0.25
+ },
+ "brows": {
+  "autoLiftPx": 3.5,
+  "autoRiseSeconds": 0.08,
+  "autoHoldSeconds": 0.1,
+  "autoFallSeconds": 0.3,
+  "smoothing": 0.12,
+  "expressions": {
+   "surprised": {
+    "liftPx": 9,
+    "tiltDegrees": 2
+   },
+   "happy": {
+    "liftPx": 5,
+    "tiltDegrees": -6
+   },
+   "concerned": {
+    "liftPx": 2,
+    "tiltDegrees": 6
+   }
+  },
+  "pivots": {
+   "left": [
+    230.4,
+    229.2
+   ],
+   "right": [
+    327.8,
+    229.0
+   ]
+  }
  }
 }

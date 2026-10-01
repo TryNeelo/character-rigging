@@ -42,6 +42,7 @@ rig = {
              'pupilRest': [float(v) for v in re.findall(r'id="pupil-(?:left|right)" data-rest="([-\d.]+)"', rigged)]},
     **settings,
 }
+rig['brows']['pivots'] = {side: pivot(f'brow-{side}') for side in ('left', 'right')}
 json.dump(rig, open(os.path.join(ASSETS, 'rig.json'), 'w'), indent=1)
 
 lines = []
@@ -53,8 +54,11 @@ for d in sorted(glob.glob(os.path.join(ROOT, 'dialogue', '*', 'cues.json'))):
     os.makedirs(out)
     shutil.copy(mp3s[0], os.path.join(out, 'audio.mp3'))
     cues = [{'start': c['start'], 'end': c['end'], 'shape': c['value']} for c in src['mouthCues']]
+    emph = os.path.join(os.path.dirname(d), 'emphasis.json')
     json.dump({'id': line, 'audio': 'audio.mp3', 'duration': cues[-1]['end'], 'cues': cues,
-               'markers': src.get('markers', [])}, open(os.path.join(out, 'timing.json'), 'w'), indent=1)
+               'markers': src.get('markers', []),
+               'emphasis': json.load(open(emph)) if os.path.exists(emph) else []},
+              open(os.path.join(out, 'timing.json'), 'w'), indent=1)
     lines.append(line)
 
 pub = os.path.join(PKG, 'pubspec.yaml')

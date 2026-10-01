@@ -79,6 +79,17 @@ class NovaRig {
   double blink(String key) => _num(_j['blink'][key]);
   double gesture(String key) => _num(_j['gesture'][key]);
   double outline(String key) => _num(_j['outline'][key]);
+  double brows(String key) => _num(_j['brows'][key]);
+
+  /// Brow expressions by name: (lift in canvas units, tilt in degrees; positive raises the inner ends).
+  late final Map<String, (double, double)> browExpressions = {
+    for (final e in (_j['brows']['expressions'] as Map<String, dynamic>).entries)
+      e.key: (_num(e.value['liftPx']), _num(e.value['tiltDegrees']))
+  };
+
+  /// Where each brow (by screen side) tilts from.
+  late final Offset browLeftPivot = _offset(_j['brows']['pivots']['left']);
+  late final Offset browRightPivot = _offset(_j['brows']['pivots']['right']);
 
   static Future<NovaRig>? _loading;
 

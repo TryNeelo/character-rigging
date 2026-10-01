@@ -193,6 +193,13 @@
    "note": "Sample: on \"Neelo\""
   },
   {
+   "time": 0.04,
+   "end": 1.09,
+   "type": "expression",
+   "name": "happy",
+   "note": "Sample: happy brows through \"Welcome to Neelo\""
+  },
+  {
    "time": 2.28,
    "end": 3.7,
    "type": "look",

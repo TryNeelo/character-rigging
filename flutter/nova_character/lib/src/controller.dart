@@ -50,6 +50,7 @@ class NovaController extends ChangeNotifier {
   NovaLine? _line;
   double _lastTime = -1;
   NovaLook _look = NovaLook.ahead;
+  String? _expression;
 
   /// Events from the playing line's markers, as they happen.
   Stream<NovaEvent> get events => _events.stream;
@@ -66,6 +67,13 @@ class NovaController extends ChangeNotifier {
   NovaLook get look => _look;
   set look(NovaLook v) {
     _look = v;
+    notifyListeners();
+  }
+
+  /// A brow expression to hold ("happy", "surprised", "concerned"), or null to follow the line.
+  String? get expression => _expression;
+  set expression(String? v) {
+    _expression = v;
     notifyListeners();
   }
 
