@@ -238,8 +238,8 @@ button { font: inherit; cursor: pointer; }
     const s = Math.min(fh / (f.bottom - f.top), fw / f.width);
     const vw = fw / s, vh = fh / s;
     let vx = ANCHOR_X - vw / 2;
-    if (scene.align === 'left') vx = Math.min(vx, ANCHOR_X - f.width / 2);
-    if (scene.align === 'right') vx = Math.max(vx, ANCHOR_X + f.width / 2 - vw);
+    if (scene.align === 'left') vx = Math.max(vx, ANCHOR_X - f.width / 2);
+    if (scene.align === 'right') vx = Math.min(vx, ANCHOR_X + f.width / 2 - vw);
     svg.setAttribute('viewBox', `${vx.toFixed(1)} ${(f.bottom - vh).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`);
     $('frame').style.setProperty('--ar', fw / fh);
     // Position only matters when the frame is wider than the framing needs

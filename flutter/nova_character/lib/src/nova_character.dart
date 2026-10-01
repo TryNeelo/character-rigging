@@ -156,8 +156,8 @@ class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProvider
       final s = math.min(fh / (f.bottom - f.top), fw / f.width);
       final vw = fw / s, vh = fh / s;
       var vx = rig.anchorX - vw / 2;
-      if (widget.align == NovaAlign.left) vx = math.min(vx, rig.anchorX - f.width / 2);
-      if (widget.align == NovaAlign.right) vx = math.max(vx, rig.anchorX + f.width / 2 - vw);
+      if (widget.align == NovaAlign.left) vx = math.max(vx, rig.anchorX - f.width / 2);
+      if (widget.align == NovaAlign.right) vx = math.min(vx, rig.anchorX + f.width / 2 - vw);
       final vy = f.bottom - vh;
 
       return ClipRect(
