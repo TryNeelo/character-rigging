@@ -16,6 +16,7 @@
  "outfits": {
   "hoodie": {
    "label": "Hoodie",
+   "hatBack": false,
    "pivots": {
     "armLeft": [
      194.4,
@@ -29,6 +30,21 @@
   },
   "aviator": {
    "label": "Aviator",
+   "hatBack": false,
+   "pivots": {
+    "armLeft": [
+     194.2,
+     432.9
+    ],
+    "armRight": [
+     357.4,
+     434.4
+    ]
+   }
+  },
+  "construction": {
+   "label": "Construction",
+   "hatBack": true,
    "pivots": {
     "armLeft": [
      194.2,

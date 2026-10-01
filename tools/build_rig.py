@@ -114,6 +114,10 @@ OUTFITS = {
     'aviator': dict(label='Aviator', file='Nova-outfit_2.svg', count=97, legs=R(0, 16),
                     arm_left=(16, 17, R(18, 21)), arm_right=(21, 22, R(23, 26)),
                     body=R(26, 33) + R(35, 59), hat=R(80, 97)),
+    # The hard hat's brim has a back piece that sits behind the head (hat_back).
+    'construction': dict(label='Construction', file='Nova-outfit_3.svg', count=62, legs=R(1, 15),
+                         arm_left=(15, 16, []), arm_right=(17, 18, []), body=R(19, 25) + R(52, 62),
+                         hat=R(48, 52), hat_back=[0]),
 }
 DEFAULT_OUTFIT = 'hoodie'
 CAP = f'<g transform="{OFF}">' + ''.join(old[54:59]) + '</g>'  # the original cap, in its own coordinates
@@ -128,6 +132,7 @@ for name, o in OUTFITS.items():
     o['legs_svg'] = pick(o['legs'])
     o['body_svg'] = pick(o['body'])
     o['hat_svg'] = CAP if o['hat'] == 'cap' else pick(o['hat'])
+    o['hat_back_svg'] = pick(o.get('hat_back', []))
     for side, dot in (('left', odots[0]), ('right', odots[1])):
         fur, sleeve, extras = o[f'arm_{side}']
         o[f'arm_{side}_svg'], o[f'pivot_{side}'] = arm(oels[fur], oels[sleeve], [oels[i] for i in extras], dot)
@@ -144,6 +149,7 @@ def per_outfit(key, pivot=None):
         out += f'<g class="outfit" data-outfit="{name}" data-label="{o["label"]}"{attrs}{hide}>{o[key]}</g>'
     return out
 hat = '<g id="hat">' + per_outfit('hat_svg') + '</g>'
+hat_back = '<g id="hat-back">' + per_outfit('hat_back_svg') + '</g>'
 
 # ---- parts, back to front. Index = position in the flat export (0-based). ----
 J = lambda a, b: ''.join(els[a:b])
@@ -153,6 +159,7 @@ arms = ''.join(f'<g id="arm-{side}" class="part" data-pivot="{d["pivot_" + side]
                + per_outfit(f'arm_{side}_svg', f'pivot_{side}') + '</g>' for side in ('left', 'right'))
 body = '<g id="body">' + per_outfit('body_svg') + '</g>'                    # shorts, neck, shirt, jacket
 head = (f'<g id="head" class="part" data-pivot="{HEAD_PIVOT[0]} {HEAD_PIVOT[1]}">'
+        + hat_back                                              # any part of the hat behind the head
         + els[0] + els[42]                                      # ear roots, behind the head
         + els[43] + els[44]                                     # head fur
         + J(45, 49)                                             # eye patches, eye whites
@@ -213,8 +220,9 @@ def lids(state):
             out += f'<g clip-path="url(#clip-eye-{side})">' + closed_g.replace(' style="display:none"', '') + '</g>'
     return f'<g transform="{OFF}">{out}</g>'
 for name, o in OUTFITS.items():
-    for k in ('legs', 'arm_left', 'arm_right', 'body', 'hat'):
-        part(f'{k}_{name}', o[f'{k}_svg'], o.get('defs', '') if k == 'hat' else '')
+    for k in ('legs', 'arm_left', 'arm_right', 'body', 'hat', 'hat_back'):
+        if o[f'{k}_svg']:
+            part(f'{k}_{name}', o[f'{k}_svg'], o.get('defs', '') if k.startswith('hat') else '')
 part('head_back', els[0] + els[42] + els[43] + els[44] + J(45, 49))
 part('pupil_left', els[49])
 part('pupil_right', els[50])

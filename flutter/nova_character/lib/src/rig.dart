@@ -23,8 +23,12 @@ class NovaFramingSpec {
 
 /// An outfit: its name and the shoulder pivots its sleeves give.
 class NovaOutfitSpec {
-  const NovaOutfitSpec({required this.label, required this.armLeftPivot, required this.armRightPivot});
+  const NovaOutfitSpec(
+      {required this.label, required this.armLeftPivot, required this.armRightPivot, this.hatBack = false});
   final String label;
+
+  /// Whether the hat has a piece behind the head (hat_back_<id>.svg), like a hard hat's brim.
+  final bool hatBack;
   final Offset armLeftPivot, armRightPivot;
 }
 
@@ -42,7 +46,8 @@ class NovaRig {
             e.key: NovaOutfitSpec(
                 label: e.value['label'] as String,
                 armLeftPivot: _offset(e.value['pivots']['armLeft']),
-                armRightPivot: _offset(e.value['pivots']['armRight']))
+                armRightPivot: _offset(e.value['pivots']['armRight']),
+                hatBack: e.value['hatBack'] as bool? ?? false)
         },
         eyeCenters = [for (final c in _j['eyes']['centers'] as List) _offset(c)],
         eyeRadius = _num(_j['eyes']['radius']),

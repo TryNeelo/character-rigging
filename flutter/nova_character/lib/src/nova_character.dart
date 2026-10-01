@@ -225,6 +225,7 @@ class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProvider
         ..multiply(rotateAbout(rig.headPivot,
             sway - rig.idle('talkNodDegrees') * _nod + rig.look('headDegrees') * _look)),
       child: Stack(children: [
+        if (outfit.hatBack) part('hat_back_$outfitId'),
         part('head_back'),
         ClipPath(
           clipper: _EyesClipper(rig, s),

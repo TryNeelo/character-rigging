@@ -30,6 +30,7 @@ rig = {
     # Parts that change with the outfit: legs_<id>, arm_left_<id>, arm_right_<id>, body_<id>, hat_<id>
     'outfits': {
         o: {'label': label,
+            'hatBack': os.path.exists(os.path.join(ROOT, 'art', 'parts', f'hat_back_{o}.svg')),
             'pivots': {side: [float(v) for v in re.search(
                 rf'<g id="arm-{css}".*?data-outfit="{o}"[^>]*data-pivot="([^"]+)"', rigged, re.S).group(1).split()]
                 for side, css in (('armLeft', 'left'), ('armRight', 'right'))}}

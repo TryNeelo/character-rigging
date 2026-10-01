@@ -8,6 +8,7 @@ This folder is the single source for Nova's character rig: the artwork, the lip-
 art/
   Nova-outfit_1.svg             Full-body Figma export, outfit 1 (Hoodie). Never edited. The two magenta dots mark the shoulder pivots.
   Nova-outfit_2.svg             Full-body Figma export, outfit 2 (Aviator). Never edited. Same head, pivot dots and canvas.
+  Nova-outfit_3.svg             Full-body Figma export, outfit 3 (Construction). Never edited. Its hard hat has a back piece behind the head.
   Nova-rigged.svg               Current rig, built from Nova-outfit_1.svg: grouped parts, hat, eyelids and mouth shapes.
   Character.svg                 First flat Figma export (waist up, with hat). Never edited. Source of the hat and smile.
   Character-rigged.svg          First rig, kept for the prototyping project. Built by an earlier build_rig.py (see git history).
@@ -48,7 +49,7 @@ tools/
 
 The arms always stay behind the outfit. The shoulder pivots come from the magenta dots in the source art, moved onto each sleeve's centre line. Each sleeve gets a round cap there (a circle as wide as the sleeve, in the sleeve colour), so the arm can rotate up to 180° without its flat top showing. If the art is redrawn with this cap, the generated one can go.
 
-**Outfits.** Nova's head, face, blinks and mouths are shared. Each outfit supplies its own legs, arms, body and hat, listed by shape position in `OUTFITS` in `tools/build_rig.py`. In the rig, each of those parts holds one `.outfit` group per outfit (`data-outfit="hoodie"`, `"aviator"`), and only the chosen one is shown. Each outfit's sleeves get their own round caps and shoulder pivots. To add an outfit: export it on the same 556 × 837 canvas with the same head and pivot dots, add it to `OUTFITS`, and rebuild.
+**Outfits.** Nova's head, face, blinks and mouths are shared. Each outfit supplies its own legs, arms, body and hat (plus, optionally, a hat piece that sits behind the head, like the hard hat's brim), listed by shape position in `OUTFITS` in `tools/build_rig.py`. In the rig, each of those parts holds one `.outfit` group per outfit (`data-outfit="hoodie"`, `"aviator"`), and only the chosen one is shown. Each outfit's sleeves get their own round caps and shoulder pivots. To add an outfit: export it on the same 556 × 837 canvas with the same head and pivot dots, add it to `OUTFITS`, and rebuild.
 
 **Hat, eyes and mouth.** The head in the outfit 1 art is the original head moved by (+54, −168.13) at the same scale, so the original hat, eyelids and mouth shapes are reused in their original coordinates inside a `translate(54 -168.129)` group.
 
