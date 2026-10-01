@@ -198,7 +198,7 @@ button { font: inherit; cursor: pointer; }
 
       <section>
         <h2>Pose and idle</h2>
-        <p>Arms stay behind the outfit and rotate at the shoulder; the head turns at the base of the neck. Idle adds slow breathing and a slight sway, plus a small nod and brow lifts on stressed words while he talks.</p>
+        <p>Arms stay behind the outfit and rotate at the shoulder; the head turns at the base of the neck. Idle adds slow breathing and a slight sway, plus a small nod, a slight tilt and a brow lift on each stressed word while he talks.</p>
         <div class="fields">
           <label class="slider"><span>Head tilt</span><input type="range" id="poseHead" min="-10" max="10" step="0.5" value="0"><output for="poseHead" id="poseHeadOut">0°</output></label>
           <label class="slider"><span>Eyes look</span><input type="range" id="poseLook" min="-1" max="1" step="0.1" value="0"><output for="poseLook" id="poseLookOut">0</output></label>
@@ -255,7 +255,7 @@ button { font: inherit; cursor: pointer; }
   // Cues from Rhubarb Lip Sync: {start, end, value}
   const cues = [{"start": 0.0, "end": 0.04, "value": "X"}, {"start": 0.04, "end": 0.14, "value": "F"}, {"start": 0.14, "end": 0.3, "value": "C"}, {"start": 0.3, "end": 0.35, "value": "B"}, {"start": 0.35, "end": 0.38, "value": "C"}, {"start": 0.38, "end": 0.45, "value": "A"}, {"start": 0.45, "end": 0.5, "value": "B"}, {"start": 0.5, "end": 0.56, "value": "F"}, {"start": 0.56, "end": 0.74, "value": "B"}, {"start": 0.74, "end": 0.79, "value": "H"}, {"start": 0.79, "end": 0.92, "value": "E"}, {"start": 0.92, "end": 1.09, "value": "F"}, {"start": 1.09, "end": 1.33, "value": "X"}, {"start": 1.33, "end": 1.41, "value": "C"}, {"start": 1.41, "end": 1.46, "value": "B"}, {"start": 1.46, "end": 1.54, "value": "A"}, {"start": 1.54, "end": 1.59, "value": "B"}, {"start": 1.59, "end": 1.7, "value": "E"}, {"start": 1.7, "end": 1.75, "value": "F"}, {"start": 1.75, "end": 1.81, "value": "G"}, {"start": 1.81, "end": 2.0, "value": "C"}, {"start": 2.0, "end": 2.28, "value": "X"}, {"start": 2.28, "end": 2.32, "value": "H"}, {"start": 2.32, "end": 2.38, "value": "C"}, {"start": 2.38, "end": 2.5, "value": "B"}, {"start": 2.5, "end": 2.6, "value": "C"}, {"start": 2.6, "end": 2.66, "value": "B"}, {"start": 2.66, "end": 2.75, "value": "C"}, {"start": 2.75, "end": 2.88, "value": "B"}, {"start": 2.88, "end": 3.02, "value": "E"}, {"start": 3.02, "end": 3.3, "value": "B"}, {"start": 3.3, "end": 3.44, "value": "D"}, {"start": 3.44, "end": 3.51, "value": "B"}, {"start": 3.51, "end": 3.63, "value": "C"}, {"start": 3.63, "end": 3.7, "value": "B"}, {"start": 3.7, "end": 3.76, "value": "X"}];
   // Shared with the Flutter component: tools/rig_settings.json
-  const S = {"framing": {"full": {"label": "Full body", "top": 20, "bottom": 855, "width": 370}, "knees": {"label": "Knees up", "top": 20, "bottom": 730, "width": 370}, "waist": {"label": "Waist up", "top": 20, "bottom": 600, "width": 370}, "close": {"label": "Close-up", "top": 30, "bottom": 440, "width": 345}}, "idle": {"breathSeconds": 4.2, "breathPx": 0.8, "swaySeconds": 7.3, "swayDegrees": 0.8, "armSwingDegrees": 1.2, "talkNodPx": 1.4, "talkNodDegrees": 0.8, "talkNodSmoothing": 0.18}, "look": {"pupilReach": 11, "headDegrees": 2.5, "headPx": 2, "smoothing": 0.12}, "gesture": {"smoothing": 0.1}, "blink": {"halfMs": 40, "closedMs": 80, "halfAgainMs": 50, "minGapMs": 2500, "maxGapMs": 5500, "doubleChance": 0.15, "doubleGapMs": 140}, "mouthOpenness": {"X": 0, "A": 0, "B": 0.3, "C": 0.7, "D": 1, "E": 0.6, "F": 0.4, "G": 0.3, "H": 0.6, "smile": 0.2}, "outline": {"widthPx": 8, "blur": 5, "shadowBlur": 8, "shadowOpacity": 0.25}, "brows": {"autoLiftPx": 3.5, "autoRiseSeconds": 0.08, "autoHoldSeconds": 0.1, "autoFallSeconds": 0.3, "smoothing": 0.12, "expressions": {"surprised": {"liftPx": 9, "tiltDegrees": 2}, "happy": {"liftPx": 5, "tiltDegrees": -6}, "concerned": {"liftPx": 2, "tiltDegrees": 6}}}};
+  const S = {"framing": {"full": {"label": "Full body", "top": 20, "bottom": 855, "width": 370}, "knees": {"label": "Knees up", "top": 20, "bottom": 730, "width": 370}, "waist": {"label": "Waist up", "top": 20, "bottom": 600, "width": 370}, "close": {"label": "Close-up", "top": 30, "bottom": 440, "width": 345}}, "idle": {"breathSeconds": 4.2, "breathPx": 0.8, "swaySeconds": 7.3, "swayDegrees": 0.8, "armSwingDegrees": 1.2}, "look": {"pupilReach": 11, "headDegrees": 2.5, "headPx": 2, "smoothing": 0.12}, "gesture": {"smoothing": 0.1}, "blink": {"halfMs": 40, "closedMs": 80, "halfAgainMs": 50, "minGapMs": 2500, "maxGapMs": 5500, "doubleChance": 0.15, "doubleGapMs": 140}, "outline": {"widthPx": 8, "blur": 5, "shadowBlur": 8, "shadowOpacity": 0.25}, "brows": {"autoLiftPx": 3.5, "autoRiseSeconds": 0.08, "autoHoldSeconds": 0.1, "autoFallSeconds": 0.3, "smoothing": 0.12, "expressions": {"surprised": {"liftPx": 9, "tiltDegrees": 2}, "happy": {"liftPx": 5, "tiltDegrees": -6}, "concerned": {"liftPx": 2, "tiltDegrees": 6}}}, "talk": {"nodPx": 2, "tiltDegrees": 1.2, "riseSeconds": 0.14, "holdSeconds": 0.06, "fallSeconds": 0.5}};
   // Markers: {time, type: "event", name} fires an app event; {time, end, type: "look", direction} turns Nova's gaze;
   // {time, end, type: "arm", side, degrees} raises an arm (side = the screen side it's on) and lowers it at end;
   // {time, end, type: "expression", name} sets the brows (happy, surprised, concerned).
@@ -350,18 +350,27 @@ button { font: inherit; cursor: pointer; }
   const B = S.brows;
   const browEls = ['left', 'right'].map(side => ({ el: $(`brow-${side}`), side, p: pivot($(`brow-${side}`)) }));
   let lineExpression = null, testExpression = null, brow = { lift: 0, tilt: 0 };
-  const ease = k => k * k * (3 - 2 * k);
+  // A smooth bump around a stressed moment, d seconds after it: quick rise, short hold, slower fall
+  function bump(d, rise, hold, fall) {
+    let k = 0;
+    if (d >= -rise && d < 0) k = 1 + d / rise;
+    else if (d >= 0 && d < hold) k = 1;
+    else if (d >= hold && d < hold + fall) k = 1 - (d - hold) / fall;
+    return k * k * (3 - 2 * k);
+  }
   function autoLift(t) {
-    let v = 0;
-    for (const e of emphasis) {
-      const d = t - e.time;
-      let k = 0;
-      if (d >= -B.autoRiseSeconds && d < 0) k = 1 + d / B.autoRiseSeconds;
-      else if (d >= 0 && d < B.autoHoldSeconds) k = 1;
-      else if (d >= B.autoHoldSeconds && d < B.autoHoldSeconds + B.autoFallSeconds) k = 1 - (d - B.autoHoldSeconds) / B.autoFallSeconds;
-      v = Math.max(v, ease(k) * e.strength);
-    }
-    return v;
+    return Math.max(0, ...emphasis.map(e => bump(t - e.time, B.autoRiseSeconds, B.autoHoldSeconds, B.autoFallSeconds) * e.strength));
+  }
+  // Talking head: a small nod on each stressed word, with a slight tilt that alternates side to side
+  const TK = S.talk;
+  function talkHead(t) {
+    let dip = 0, tilt = 0;
+    emphasis.forEach((e, i) => {
+      const k = bump(t - e.time, TK.riseSeconds, TK.holdSeconds, TK.fallSeconds) * e.strength;
+      dip = Math.max(dip, k);
+      tilt += (i % 2 ? -1 : 1) * k;
+    });
+    return { dip: dip * TK.nodPx, tilt: tilt * TK.tiltDegrees };
   }
   // Slider ids are prefixed so they never collide with part ids in the SVG (#head)
   const SLIDERS = { head: 'poseHead', look: 'poseLook', armL: 'poseArmL', armR: 'poseArmR' };
@@ -382,16 +391,13 @@ button { font: inherit; cursor: pointer; }
     Object.entries(SLIDERS).forEach(([k, id]) => { pose[k] = 0; $(id).value = 0; $(id + 'Out').textContent = k === 'look' ? '0' : '0°'; });
   });
 
-  // How open each mouth shape is, for the small nod while talking
-  const OPEN = S.mouthOpenness, I = S.idle;
-  let nod = 0;
+  const I = S.idle;
   function animate(now) {
     const t = now / 1000;
     const idle = $('idleOn').checked;
     const breath = idle ? Math.sin(t * 2 * Math.PI / I.breathSeconds) : 0;
     const sway = idle ? Math.sin(t * 2 * Math.PI / I.swaySeconds) * I.swayDegrees : 0;
     const swing = idle ? Math.sin(t * 2 * Math.PI / I.breathSeconds + 0.6) * I.armSwingDegrees : 0; // arms follow the breath
-    nod += (((raf && idle) ? OPEN[current] : 0) - nod) * I.talkNodSmoothing;
     look += (Math.max(-1, Math.min(1, lookTarget + pose.look)) - look) * LOOK.smoothing;
     for (const side of ['left', 'right']) raise[side] += (raiseTarget[side] - raise[side]) * S.gesture.smoothing;
     const expr = B.expressions[testExpression || lineExpression] || { liftPx: 0, tiltDegrees: 0 };
@@ -404,7 +410,8 @@ button { font: inherit; cursor: pointer; }
     pupils.forEach(p => p.el.setAttribute('transform', `translate(${(LOOK.pupilReach * look - p.rest * Math.abs(look)).toFixed(2)} 0)`));
     upper.setAttribute('transform', `translate(0 ${(-I.breathPx * (1 + breath)).toFixed(2)})`);
     dots.setAttribute('transform', upper.getAttribute('transform'));
-    head.setAttribute('transform', `translate(${(LOOK.headPx * look).toFixed(2)} ${(-I.talkNodPx * nod).toFixed(2)}) rotate(${(pose.head + sway - I.talkNodDegrees * nod + LOOK.headDegrees * look).toFixed(2)} ${HP[0]} ${HP[1]})`);
+    const talk = (raf && idle) ? talkHead(audio.currentTime) : { dip: 0, tilt: 0 };
+    head.setAttribute('transform', `translate(${(LOOK.headPx * look).toFixed(2)} ${talk.dip.toFixed(2)}) rotate(${(pose.head + sway + talk.tilt + LOOK.headDegrees * look).toFixed(2)} ${HP[0]} ${HP[1]})`);
     armL.setAttribute('transform', `rotate(${(pose.armL + raise.left + swing).toFixed(2)} ${LP[0]} ${LP[1]})`);
     armR.setAttribute('transform', `rotate(${(-pose.armR - raise.right - swing).toFixed(2)} ${RP[0]} ${RP[1]})`);
     requestAnimationFrame(animate);

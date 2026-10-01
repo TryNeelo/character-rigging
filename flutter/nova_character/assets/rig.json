@@ -106,10 +106,7 @@
   "breathPx": 0.8,
   "swaySeconds": 7.3,
   "swayDegrees": 0.8,
-  "armSwingDegrees": 1.2,
-  "talkNodPx": 1.4,
-  "talkNodDegrees": 0.8,
-  "talkNodSmoothing": 0.18
+  "armSwingDegrees": 1.2
  },
  "look": {
   "pupilReach": 11,
@@ -128,18 +125,6 @@
   "maxGapMs": 5500,
   "doubleChance": 0.15,
   "doubleGapMs": 140
- },
- "mouthOpenness": {
-  "X": 0,
-  "A": 0,
-  "B": 0.3,
-  "C": 0.7,
-  "D": 1,
-  "E": 0.6,
-  "F": 0.4,
-  "G": 0.3,
-  "H": 0.6,
-  "smile": 0.2
  },
  "outline": {
   "widthPx": 8,
@@ -177,5 +162,12 @@
     229.0
    ]
   }
+ },
+ "talk": {
+  "nodPx": 2,
+  "tiltDegrees": 1.2,
+  "riseSeconds": 0.14,
+  "holdSeconds": 0.06,
+  "fallSeconds": 0.5
  }
 }

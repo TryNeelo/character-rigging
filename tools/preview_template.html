@@ -161,7 +161,7 @@ button { font: inherit; cursor: pointer; }
 
       <section>
         <h2>Pose and idle</h2>
-        <p>Arms stay behind the outfit and rotate at the shoulder; the head turns at the base of the neck. Idle adds slow breathing and a slight sway, plus a small nod and brow lifts on stressed words while he talks.</p>
+        <p>Arms stay behind the outfit and rotate at the shoulder; the head turns at the base of the neck. Idle adds slow breathing and a slight sway, plus a small nod, a slight tilt and a brow lift on each stressed word while he talks.</p>
         <div class="fields">
           <label class="slider"><span>Head tilt</span><input type="range" id="poseHead" min="-10" max="10" step="0.5" value="0"><output for="poseHead" id="poseHeadOut">0°</output></label>
           <label class="slider"><span>Eyes look</span><input type="range" id="poseLook" min="-1" max="1" step="0.1" value="0"><output for="poseLook" id="poseLookOut">0</output></label>
@@ -313,18 +313,27 @@ button { font: inherit; cursor: pointer; }
   const B = S.brows;
   const browEls = ['left', 'right'].map(side => ({ el: $(`brow-${side}`), side, p: pivot($(`brow-${side}`)) }));
   let lineExpression = null, testExpression = null, brow = { lift: 0, tilt: 0 };
-  const ease = k => k * k * (3 - 2 * k);
+  // A smooth bump around a stressed moment, d seconds after it: quick rise, short hold, slower fall
+  function bump(d, rise, hold, fall) {
+    let k = 0;
+    if (d >= -rise && d < 0) k = 1 + d / rise;
+    else if (d >= 0 && d < hold) k = 1;
+    else if (d >= hold && d < hold + fall) k = 1 - (d - hold) / fall;
+    return k * k * (3 - 2 * k);
+  }
   function autoLift(t) {
-    let v = 0;
-    for (const e of emphasis) {
-      const d = t - e.time;
-      let k = 0;
-      if (d >= -B.autoRiseSeconds && d < 0) k = 1 + d / B.autoRiseSeconds;
-      else if (d >= 0 && d < B.autoHoldSeconds) k = 1;
-      else if (d >= B.autoHoldSeconds && d < B.autoHoldSeconds + B.autoFallSeconds) k = 1 - (d - B.autoHoldSeconds) / B.autoFallSeconds;
-      v = Math.max(v, ease(k) * e.strength);
-    }
-    return v;
+    return Math.max(0, ...emphasis.map(e => bump(t - e.time, B.autoRiseSeconds, B.autoHoldSeconds, B.autoFallSeconds) * e.strength));
+  }
+  // Talking head: a small nod on each stressed word, with a slight tilt that alternates side to side
+  const TK = S.talk;
+  function talkHead(t) {
+    let dip = 0, tilt = 0;
+    emphasis.forEach((e, i) => {
+      const k = bump(t - e.time, TK.riseSeconds, TK.holdSeconds, TK.fallSeconds) * e.strength;
+      dip = Math.max(dip, k);
+      tilt += (i % 2 ? -1 : 1) * k;
+    });
+    return { dip: dip * TK.nodPx, tilt: tilt * TK.tiltDegrees };
   }
   // Slider ids are prefixed so they never collide with part ids in the SVG (#head)
   const SLIDERS = { head: 'poseHead', look: 'poseLook', armL: 'poseArmL', armR: 'poseArmR' };
@@ -345,16 +354,13 @@ button { font: inherit; cursor: pointer; }
     Object.entries(SLIDERS).forEach(([k, id]) => { pose[k] = 0; $(id).value = 0; $(id + 'Out').textContent = k === 'look' ? '0' : '0°'; });
   });
 
-  // How open each mouth shape is, for the small nod while talking
-  const OPEN = S.mouthOpenness, I = S.idle;
-  let nod = 0;
+  const I = S.idle;
   function animate(now) {
     const t = now / 1000;
     const idle = $('idleOn').checked;
     const breath = idle ? Math.sin(t * 2 * Math.PI / I.breathSeconds) : 0;
     const sway = idle ? Math.sin(t * 2 * Math.PI / I.swaySeconds) * I.swayDegrees : 0;
     const swing = idle ? Math.sin(t * 2 * Math.PI / I.breathSeconds + 0.6) * I.armSwingDegrees : 0; // arms follow the breath
-    nod += (((raf && idle) ? OPEN[current] : 0) - nod) * I.talkNodSmoothing;
     look += (Math.max(-1, Math.min(1, lookTarget + pose.look)) - look) * LOOK.smoothing;
     for (const side of ['left', 'right']) raise[side] += (raiseTarget[side] - raise[side]) * S.gesture.smoothing;
     const expr = B.expressions[testExpression || lineExpression] || { liftPx: 0, tiltDegrees: 0 };
@@ -367,7 +373,8 @@ button { font: inherit; cursor: pointer; }
     pupils.forEach(p => p.el.setAttribute('transform', `translate(${(LOOK.pupilReach * look - p.rest * Math.abs(look)).toFixed(2)} 0)`));
     upper.setAttribute('transform', `translate(0 ${(-I.breathPx * (1 + breath)).toFixed(2)})`);
     dots.setAttribute('transform', upper.getAttribute('transform'));
-    head.setAttribute('transform', `translate(${(LOOK.headPx * look).toFixed(2)} ${(-I.talkNodPx * nod).toFixed(2)}) rotate(${(pose.head + sway - I.talkNodDegrees * nod + LOOK.headDegrees * look).toFixed(2)} ${HP[0]} ${HP[1]})`);
+    const talk = (raf && idle) ? talkHead(audio.currentTime) : { dip: 0, tilt: 0 };
+    head.setAttribute('transform', `translate(${(LOOK.headPx * look).toFixed(2)} ${talk.dip.toFixed(2)}) rotate(${(pose.head + sway + talk.tilt + LOOK.headDegrees * look).toFixed(2)} ${HP[0]} ${HP[1]})`);
     armL.setAttribute('transform', `rotate(${(pose.armL + raise.left + swing).toFixed(2)} ${LP[0]} ${LP[1]})`);
     armR.setAttribute('transform', `rotate(${(-pose.armR - raise.right - swing).toFixed(2)} ${RP[0]} ${RP[1]})`);
     requestAnimationFrame(animate);

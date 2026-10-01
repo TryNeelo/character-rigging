@@ -64,7 +64,7 @@ enum _Eye { open, half, closed }
 class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProviderStateMixin {
   NovaRig? _rig;
   late final Ticker _ticker;
-  double _t = 0, _nod = 0, _look = 0, _raiseLeft = 0, _raiseRight = 0, _browLift = 0, _browTilt = 0;
+  double _t = 0, _look = 0, _raiseLeft = 0, _raiseRight = 0, _browLift = 0, _browTilt = 0;
   _Eye _eye = _Eye.open;
   Timer? _blinkTimer;
   final _random = math.Random();
@@ -104,10 +104,8 @@ class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProvider
     final lineLook = c.line?.lookAt(c.time) ?? 0;
     final lookTarget = lineLook != 0 ? lineLook : c.look.value;
     final (armLeft, armRight) = c.line?.armsAt(c.time) ?? (0.0, 0.0);
-    final open = (c.isSpeaking && widget.idle) ? (rig.mouthOpenness[_shape] ?? 0) : 0.0;
     setState(() {
       _t = elapsed.inMicroseconds / 1e6;
-      _nod += (open - _nod) * rig.idle('talkNodSmoothing');
       _look += (lookTarget - _look) * rig.look('smoothing');
       _raiseLeft += (armLeft - _raiseLeft) * rig.gesture('smoothing');
       _raiseRight += (armRight - _raiseRight) * rig.gesture('smoothing');
@@ -117,27 +115,45 @@ class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProvider
     });
   }
 
-  /// Brow lift from stressed moments in the line: a quick rise, a hold, a slower fall.
+  /// A smooth bump around a stressed moment, [d] seconds after it: quick rise, short hold, slower fall.
+  static double _bump(double d, double rise, double hold, double fall) {
+    var k = 0.0;
+    if (d >= -rise && d < 0) {
+      k = 1 + d / rise;
+    } else if (d >= 0 && d < hold) {
+      k = 1;
+    } else if (d >= hold && d < hold + fall) {
+      k = 1 - (d - hold) / fall;
+    }
+    return k * k * (3 - 2 * k);
+  }
+
+  /// Brow lift from stressed moments in the line.
   double _autoBrowLift(NovaRig rig) {
     final c = widget.controller;
     final line = c.line;
     if (line == null || !widget.idle) return 0;
-    final t = c.time, rise = rig.brows('autoRiseSeconds'), hold = rig.brows('autoHoldSeconds');
-    final fall = rig.brows('autoFallSeconds');
     var v = 0.0;
     for (final (time, strength) in line.emphasis) {
-      final d = t - time;
-      var k = 0.0;
-      if (d >= -rise && d < 0) {
-        k = 1 + d / rise;
-      } else if (d >= 0 && d < hold) {
-        k = 1;
-      } else if (d >= hold && d < hold + fall) {
-        k = 1 - (d - hold) / fall;
-      }
-      v = math.max(v, k * k * (3 - 2 * k) * strength);
+      v = math.max(v, _bump(c.time - time, rig.brows('autoRiseSeconds'), rig.brows('autoHoldSeconds'),
+              rig.brows('autoFallSeconds')) * strength);
     }
     return v * rig.brows('autoLiftPx');
+  }
+
+  /// Talking head: a small nod on each stressed word, with a slight tilt that alternates
+  /// side to side. Returns (dip down in canvas units, tilt in degrees).
+  (double, double) _talkHead(NovaRig rig) {
+    final c = widget.controller;
+    final line = c.line;
+    if (line == null || !widget.idle) return (0, 0);
+    var dip = 0.0, tilt = 0.0;
+    for (final (i, (time, strength)) in line.emphasis.indexed) {
+      final k = _bump(c.time - time, rig.talk('riseSeconds'), rig.talk('holdSeconds'), rig.talk('fallSeconds')) * strength;
+      dip = math.max(dip, k);
+      tilt += (i.isOdd ? -1 : 1) * k;
+    }
+    return (dip * rig.talk('nodPx'), tilt * rig.talk('tiltDegrees'));
   }
 
   // ---- Blinks: half lid, closed, half lid, open ----
@@ -244,13 +260,13 @@ class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProvider
     final upperY = idle * -rig.idle('breathPx') * (1 + breath);
     final shape = _shape;
     final browLift = _browLift + _autoBrowLift(rig);
+    final (dip, talkTilt) = _talkHead(rig);
     final outfitId = rig.outfits.containsKey(widget.outfit) ? widget.outfit! : rig.defaultOutfit;
     final outfit = rig.outfits[outfitId]!;
 
     final head = Transform(
-      transform: Matrix4.translationValues(rig.look('headPx') * _look * s, -rig.idle('talkNodPx') * _nod * s, 0)
-        ..multiply(rotateAbout(rig.headPivot,
-            sway - rig.idle('talkNodDegrees') * _nod + rig.look('headDegrees') * _look)),
+      transform: Matrix4.translationValues(rig.look('headPx') * _look * s, dip * s, 0)
+        ..multiply(rotateAbout(rig.headPivot, sway + talkTilt + rig.look('headDegrees') * _look)),
       child: Stack(children: [
         if (outfit.hatBack) part('hat_back_$outfitId'),
         part('head_back'),

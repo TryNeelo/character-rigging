@@ -55,9 +55,6 @@ class NovaRig {
         framing = {
           for (final e in (_j['framing'] as Map<String, dynamic>).entries)
             e.key: NovaFramingSpec.fromJson(e.value as Map<String, dynamic>)
-        },
-        mouthOpenness = {
-          for (final e in (_j['mouthOpenness'] as Map<String, dynamic>).entries) e.key: _num(e.value)
         };
 
   final Map<String, dynamic> _j;
@@ -72,9 +69,10 @@ class NovaRig {
   /// How far each pupil (left, right) sits from its eye's centre at rest, in canvas units.
   final List<double> pupilRest;
   final Map<String, NovaFramingSpec> framing;
-  final Map<String, double> mouthOpenness;
+
 
   double idle(String key) => _num(_j['idle'][key]);
+  double talk(String key) => _num(_j['talk'][key]);
   double look(String key) => _num(_j['look'][key]);
   double blink(String key) => _num(_j['blink'][key]);
   double gesture(String key) => _num(_j['gesture'][key]);
