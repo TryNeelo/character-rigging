@@ -164,8 +164,8 @@
   }
  },
  "talk": {
-  "nodPx": 2,
-  "tiltDegrees": 1.2,
+  "nodPx": 1.3,
+  "tiltDegrees": 0.8,
   "riseSeconds": 0.14,
   "holdSeconds": 0.06,
   "fallSeconds": 0.5

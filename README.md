@@ -82,7 +82,7 @@ Timing is 40 ms half, 80 ms closed, 50 ms half. Blinks happen at random every 2.
 
 **Playback.** The player reads the audio's current time on every frame, finds the cue covering that moment and shows its mouth. Because the audio is the clock, half-speed playback and slow devices stay in sync. When the line ends, the mouth returns to the smile.
 
-**Idle motion.** Subtle and always on unless switched off: one breath every 4.2 s (`upper` rises up to 1.6 px), a ±0.8° head sway every 7.3 s, and the arms swing ±1.2° with the breath. While a line plays, the head gives a small nod (2 px) on each stressed word, with a slight tilt (about 1°) that alternates side to side, and stays still in pauses. Stressed words come from tools/build_emphasis.py; settings are under "talk" in tools/rig_settings.json.
+**Idle motion.** Subtle and always on unless switched off: one breath every 4.2 s (`upper` rises up to 1.6 px), a ±0.8° head sway every 7.3 s, and the arms swing ±1.2° with the breath. While a line plays, the head gives a small nod (1.3 px) on each stressed word, with a slight tilt (about 0.8°) that alternates side to side, and stays still in pauses. Stressed words come from tools/build_emphasis.py; settings are under "talk" in tools/rig_settings.json.
 
 **Scenes.** The preview places Nova in a frame by setting the SVG's `viewBox`. Framing presets are vertical ranges in artboard units (full body, knees up, waist up, close-up); the crop is aligned to the bottom of the frame, and Nova can stand left, centre or right.
 
