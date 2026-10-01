@@ -208,6 +208,7 @@ button { font: inherit; cursor: pointer; }
             <div class="seg-ctl" role="group" aria-label="Brow expression" id="browCtl"></div></div>
           <div class="row">
             <label class="toggle"><input type="checkbox" id="idleOn" checked><span>Idle motion</span></label>
+            <label class="toggle"><input type="checkbox" id="browLiftsOn" checked><span>Brow lifts on stressed words</span></label>
             <label class="toggle"><input type="checkbox" id="pivotsOn"><span>Show pivots</span></label>
             <button class="btn ghost" id="resetPose">Reset pose</button>
           </div>
@@ -403,7 +404,7 @@ button { font: inherit; cursor: pointer; }
     const expr = B.expressions[testExpression || lineExpression] || { liftPx: 0, tiltDegrees: 0 };
     brow.lift += (expr.liftPx - brow.lift) * B.smoothing;
     brow.tilt += (expr.tiltDegrees - brow.tilt) * B.smoothing;
-    const lift = brow.lift + ((raf && idle) ? autoLift(audio.currentTime) * B.autoLiftPx : 0);
+    const lift = brow.lift + ((raf && idle && $('browLiftsOn').checked) ? autoLift(audio.currentTime) * B.autoLiftPx : 0);
     // Positive tilt raises the inner ends: the screen-left brow turns anticlockwise, the right one clockwise
     browEls.forEach(b => b.el.setAttribute('transform',
       `translate(0 ${(-lift).toFixed(2)}) rotate(${((b.side === 'left' ? -1 : 1) * brow.tilt).toFixed(2)} ${b.p[0]} ${b.p[1]})`));
