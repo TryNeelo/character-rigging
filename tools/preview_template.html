@@ -1,12 +1,15 @@
-<title>Bear Lip-Sync Rig</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nova Character Rig</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
-/* Layout: character stage on the left, rig controls on the right; stacks to one column on phones */
+/* Layout: scene frame on the left, rig controls on the right; stacks to one column on phones */
 :root {
   --bg: #EDF2F1;
   --surface: #FFFFFF;
   --stage: #D6E8E6;
+  --scene: #C3DEDB;
   --fg: #1F2A3F;
   --muted: #5B6B78;
   --line: #CCDAD8;
@@ -20,45 +23,54 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #121923; --surface: #1A2330; --stage: #213041; --fg: #E4ECEB; --muted: #9AABB6;
+    --bg: #121923; --surface: #1A2330; --stage: #213041; --scene: #2A3D50; --fg: #E4ECEB; --muted: #9AABB6;
     --line: #2C3A4B; --accent: #6CCBC5; --accent-ink: #0E1A22; --rust: #E58A6E; --chip: #24313F;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #121923; --surface: #1A2330; --stage: #213041; --fg: #E4ECEB; --muted: #9AABB6;
+  --bg: #121923; --surface: #1A2330; --stage: #213041; --scene: #2A3D50; --fg: #E4ECEB; --muted: #9AABB6;
   --line: #2C3A4B; --accent: #6CCBC5; --accent-ink: #0E1A22; --rust: #E58A6E; --chip: #24313F;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
-.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 48px; display: grid; gap: 24px; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5; margin: 0; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 48px; display: grid; gap: 24px; }
 header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
 header h1 { font-family: var(--font-display); font-weight: 700; font-size: 2rem; line-height: 1.1; margin: 0; text-wrap: balance; }
 header p { margin: 6px 0 0; color: var(--muted); max-width: 62ch; }
 .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 24px; align-items: start; }
 @media (max-width: 760px) { .grid { grid-template-columns: minmax(0, 1fr); } }
 
-.stage { background: var(--stage); border-radius: 20px; padding: 16px; display: grid; gap: 12px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); }
+.stage { background: var(--stage); border-radius: 20px; padding: 16px; display: grid; gap: 12px; justify-items: center; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); }
 @media (max-width: 760px) { .stage { position: static; } }
-.stage svg { width: 100%; height: auto; max-height: 62vh; display: block; }
-.readout { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
+.frame { aspect-ratio: var(--ar, 0.46); width: min(100%, calc(64vh * var(--ar, 0.46))); background: var(--scene); border-radius: 12px; overflow: hidden; position: relative; }
+.frame svg { width: 100%; height: 100%; display: block; }
+.frame .size { position: absolute; right: 8px; top: 6px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.readout { justify-self: stretch; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
 .readout .now { font-family: var(--font-mono); font-weight: 700; color: var(--fg); background: var(--surface); border-radius: 8px; padding: 2px 10px; font-variant-numeric: tabular-nums; }
 
 .panel { display: grid; gap: 22px; min-width: 0; }
 section h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; margin: 0 0 4px; }
 section > p { margin: 0 0 12px; color: var(--muted); font-size: 14px; max-width: 60ch; }
 .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.field { display: grid; gap: 6px; }
+.field > span { font-size: 13px; font-weight: 700; color: var(--muted); }
+.fields { display: grid; gap: 14px; }
 
 button { font: inherit; cursor: pointer; }
 .btn { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 999px; padding: 9px 18px; font-weight: 700; }
 .btn.ghost { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 1.5px var(--line); }
-.theme { display: inline-flex; gap: 2px; padding: 3px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; flex: none; }
-.theme button { border: 0; background: transparent; color: var(--muted); border-radius: 999px; padding: 5px 12px; font-size: 13px; font-weight: 700; }
-.theme button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
-.btn:focus-visible, .shape:focus-visible, .theme button:focus-visible, .toggle input:focus-visible + span { outline: 3px solid var(--rust); outline-offset: 2px; }
+.seg-ctl { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; }
+.seg-ctl button { border: 0; background: transparent; color: var(--muted); border-radius: 999px; padding: 5px 12px; font-size: 13px; font-weight: 700; }
+.seg-ctl button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.theme { flex: none; }
+.btn:focus-visible, .shape:focus-visible, .seg-ctl button:focus-visible, .toggle input:focus-visible + span, input[type=range]:focus-visible { outline: 3px solid var(--rust); outline-offset: 2px; }
 .toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; user-select: none; }
 .toggle input { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; }
+.slider { display: grid; grid-template-columns: 7.5em minmax(0, 1fr) 3.5em; align-items: center; gap: 10px; font-size: 14px; }
+.slider input { width: 100%; accent-color: var(--accent); margin: 0; }
+.slider output { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
 
 .strip-wrap { overflow-x: auto; border-radius: 12px; }
 .strip { position: relative; display: flex; height: 52px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
@@ -66,7 +78,6 @@ button { font: inherit; cursor: pointer; }
 .seg:last-child { border-right: 0; }
 .seg.x { background: repeating-linear-gradient(135deg, transparent 0 5px, var(--chip) 5px 7px); }
 .seg.on { background: var(--accent); color: var(--accent-ink); }
-#bear.no-teeth .teeth { display: none; }
 .playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--rust); left: 0; pointer-events: none; }
 .scale { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11px; color: var(--muted); padding: 4px 2px 0; font-variant-numeric: tabular-nums; }
 
@@ -80,7 +91,6 @@ button { font: inherit; cursor: pointer; }
 
 .notes { font-size: 13.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; display: grid; gap: 6px; }
 .notes p { margin: 0; max-width: 65ch; }
-.notes code { font-family: var(--font-mono); font-size: 12.5px; background: var(--chip); padding: 1px 5px; border-radius: 4px; color: var(--fg); }
 </style>
 <script>
 // Theme: "auto" follows the system setting; light/dark set data-theme on <html>. Saved per browser.
@@ -94,10 +104,10 @@ button { font: inherit; cursor: pointer; }
 <div class="wrap">
   <header>
     <div>
-      <h1>Bear Lip-Sync Rig</h1>
-      <p>Blinking eyes and nine mouth shapes, now driven by the Nova onboarding line. Mouth timing comes from Rhubarb Lip Sync reading the audio directly.</p>
+      <h1>Nova Character Rig</h1>
+      <p>Full-body Nova in outfit 1, placed in a frame of your choice. Lip-sync, blinks, subtle idle motion and posable head and arms.</p>
     </div>
-    <div class="theme" role="group" aria-label="Color theme">
+    <div class="seg-ctl theme" role="group" aria-label="Color theme">
       <button type="button" data-theme-opt="auto">Auto</button>
       <button type="button" data-theme-opt="light">Light</button>
       <button type="button" data-theme-opt="dark">Dark</button>
@@ -106,11 +116,25 @@ button { font: inherit; cursor: pointer; }
 
   <div class="grid">
     <div class="stage">
-      %%SVG%%
+      <div class="frame" id="frame"><span class="size" id="frameSize"></span>%%SVG%%</div>
       <div class="readout"><span>Mouth now: <span class="now" id="now">smile</span></span><span id="status">Idle, blinking</span></div>
     </div>
 
     <div class="panel">
+      <section>
+        <h2>Scene</h2>
+        <p>Nova is drawn once, full body, and each scene decides the frame, the crop and where he stands. Crops are cut at the bottom of the frame.</p>
+        <div class="fields">
+          <div class="field"><span>Frame</span>
+            <div class="seg-ctl" role="group" aria-label="Frame size" id="frameCtl"></div></div>
+          <div class="field"><span>Framing</span>
+            <div class="seg-ctl" role="group" aria-label="Framing" id="framingCtl"></div></div>
+          <div class="field"><span>Position</span>
+            <div class="seg-ctl" role="group" aria-label="Position" id="alignCtl"></div></div>
+          <div class="row"><label class="toggle"><input type="checkbox" id="outlineOn" checked><span>White outline</span></label></div>
+        </div>
+      </section>
+
       <section>
         <h2>Onboarding dialogue 1</h2>
         <p>%%NCUES%% mouth cues over %%DUR%% seconds. Each block below is one shape, sized by how long it's held. Half speed slows the audio too, so you can check each change.</p>
@@ -120,7 +144,21 @@ button { font: inherit; cursor: pointer; }
           <button class="btn" id="play">Play with sound</button>
           <label class="toggle"><input type="checkbox" id="slow"><span>Half speed</span></label>
           <label class="toggle"><input type="checkbox" id="loop"><span>Loop</span></label>
-          <label class="toggle"><input type="checkbox" id="teethOn"><span>Show teeth</span></label>
+        </div>
+      </section>
+
+      <section>
+        <h2>Pose and idle</h2>
+        <p>Arms stay behind the outfit and rotate at the shoulder; the head turns at the base of the neck. Idle adds slow breathing and a slight sway, plus a small nod while he talks.</p>
+        <div class="fields">
+          <label class="slider"><span>Head tilt</span><input type="range" id="poseHead" min="-10" max="10" step="0.5" value="0"><output for="poseHead" id="poseHeadOut">0°</output></label>
+          <label class="slider"><span>Left arm</span><input type="range" id="poseArmL" min="-12" max="180" step="1" value="0"><output for="poseArmL" id="poseArmLOut">0°</output></label>
+          <label class="slider"><span>Right arm</span><input type="range" id="poseArmR" min="-12" max="180" step="1" value="0"><output for="poseArmR" id="poseArmROut">0°</output></label>
+          <div class="row">
+            <label class="toggle"><input type="checkbox" id="idleOn" checked><span>Idle motion</span></label>
+            <label class="toggle"><input type="checkbox" id="pivotsOn"><span>Show pivots</span></label>
+            <button class="btn ghost" id="resetPose">Reset pose</button>
+          </div>
         </div>
       </section>
 
@@ -136,13 +174,13 @@ button { font: inherit; cursor: pointer; }
 
       <section>
         <h2>Mouth shapes</h2>
-        <p>Click a shape to hold it on the bear. Letters match the lip-sync tool's naming. Teeth always show here, and only appear in the dialogue when Show teeth is on.</p>
+        <p>Click a shape to hold it. Letters match the lip-sync tool's naming.</p>
         <div class="shapes" id="shapes"></div>
       </section>
 
       <div class="notes">
-        <p><strong>Not moving yet:</strong> head and body stay still, and the white outline is unchanged.</p>
-        <p><strong>Timing source:</strong> Rhubarb Lip Sync reading the audio, then hand-fixed against the audio. The pauses now rest the mouth, and "to", "Let's" and "started" open on their vowels. See the line log in the README for each fix.</p>
+        <p><strong>Rig:</strong> outfit 1 art with the original hat, eyes and mouth shapes. Each sleeve has a round cap at the shoulder, so the arm can rotate all the way up without its flat top showing.</p>
+        <p><strong>Timing source:</strong> Rhubarb Lip Sync reading the audio, then hand-fixed against the audio. See the line log in the README for each fix.</p>
       </div>
     </div>
   </div>
@@ -154,7 +192,7 @@ button { font: inherit; cursor: pointer; }
     ['smile','Smile','Original idle face'],
     ['X','Rest','Pauses, silence'],
     ['A','Closed','M, B, P'],
-    ['B','Teeth','S, T, K, EE'],
+    ['B','Narrow','S, T, K, EE'],
     ['C','Open','EH, AE'],
     ['D','Wide','AA as in "father"'],
     ['E','Round','AO, ER'],
@@ -167,13 +205,102 @@ button { font: inherit; cursor: pointer; }
   const DURATION = cues[cues.length - 1].end;
 
   const $ = id => document.getElementById(id);
-  const bear = document.getElementById('bear');
-  const applyTeeth = () => bear.classList.toggle('no-teeth', !$('teethOn').checked);
+  const svg = $('nova');
+  svg.removeAttribute('width'); svg.removeAttribute('height');
+
+  // ---- Scene: frame size, framing preset, position ----
+  // Framing presets are ranges in character units (artboard 556 x 837, feet at y 837, centre x 278).
+  const ANCHOR_X = 278;
+  const FRAMES = { phone: ['Phone', 390, 844], square: ['Square', 600, 600], wide: ['Landscape', 960, 540], avatar: ['Avatar', 160, 160] };
+  const FRAMING = {
+    full:  ['Full body', { top: 20, bottom: 855, width: 480 }],
+    knees: ['Knees up',  { top: 20, bottom: 730, width: 460 }],
+    waist: ['Waist up',  { top: 20, bottom: 600, width: 440 }],
+    close: ['Close-up',  { top: 30, bottom: 440, width: 380 }]
+  };
+  const ALIGN = { left: 'Left', center: 'Center', right: 'Right' };
+  const scene = { frame: 'phone', framing: 'full', align: 'center' };
+
+  function layout() {
+    const [, fw, fh] = FRAMES[scene.frame];
+    const f = FRAMING[scene.framing][1];
+    const s = Math.min(fh / (f.bottom - f.top), fw / f.width);
+    const vw = fw / s, vh = fh / s;
+    let vx = ANCHOR_X - vw / 2;
+    if (scene.align === 'left') vx = Math.min(vx, ANCHOR_X - f.width / 2);
+    if (scene.align === 'right') vx = Math.max(vx, ANCHOR_X + f.width / 2 - vw);
+    svg.setAttribute('viewBox', `${vx.toFixed(1)} ${(f.bottom - vh).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`);
+    $('frame').style.setProperty('--ar', fw / fh);
+    $('frameSize').textContent = `${fw} × ${fh}`;
+  }
+  function segControl(el, options, key) {
+    const btns = Object.entries(options).map(([k, v]) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.textContent = Array.isArray(v) ? v[0] : v;
+      b.addEventListener('click', () => { scene[key] = k; btns.forEach(x => x.setAttribute('aria-pressed', x === b)); layout(); });
+      b.setAttribute('aria-pressed', scene[key] === k);
+      el.appendChild(b); return b;
+    });
+  }
+  segControl($('frameCtl'), FRAMES, 'frame');
+  segControl($('framingCtl'), FRAMING, 'framing');
+  segControl($('alignCtl'), ALIGN, 'align');
+  const character = $('character');
+  $('outlineOn').addEventListener('change', e => {
+    if (e.target.checked) character.setAttribute('filter', 'url(#outline)'); else character.removeAttribute('filter');
+  });
+
+  // ---- Pose and idle ----
+  const pivot = el => el.dataset.pivot.split(' ').map(Number);
+  const upper = $('upper'), head = $('head'), armL = $('arm-left'), armR = $('arm-right');
+  const HP = pivot(head), LP = pivot(armL), RP = pivot(armR);
+  const NS = 'http://www.w3.org/2000/svg';
+  const dots = document.createElementNS(NS, 'g');
+  dots.setAttribute('display', 'none');
+  [HP, LP, RP].forEach(([x, y]) => {
+    const c = document.createElementNS(NS, 'circle');
+    c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', 5);
+    c.setAttribute('fill', '#F006D8'); c.setAttribute('stroke', '#fff'); c.setAttribute('stroke-width', 2);
+    dots.appendChild(c);
+  });
+  svg.appendChild(dots);
+  $('pivotsOn').addEventListener('change', e => dots.setAttribute('display', e.target.checked ? 'inline' : 'none'));
+
+  const pose = { head: 0, armL: 0, armR: 0 };
+  // Slider ids are prefixed so they never collide with part ids in the SVG (#head)
+  const SLIDERS = { head: 'poseHead', armL: 'poseArmL', armR: 'poseArmR' };
+  Object.entries(SLIDERS).forEach(([k, id]) => {
+    const input = $(id), out = $(id + 'Out');
+    input.addEventListener('input', () => { pose[k] = +input.value; out.textContent = `${input.value}°`; });
+  });
+  $('resetPose').addEventListener('click', () => {
+    Object.entries(SLIDERS).forEach(([k, id]) => { pose[k] = 0; $(id).value = 0; $(id + 'Out').textContent = '0°'; });
+  });
+
+  // How open each mouth shape is, for the small nod while talking
+  const OPEN = { X: 0, A: 0, B: 0.3, C: 0.7, D: 1, E: 0.6, F: 0.4, G: 0.3, H: 0.6, smile: 0.2 };
+  let nod = 0;
+  function animate(now) {
+    const t = now / 1000;
+    const idle = $('idleOn').checked;
+    const breath = idle ? Math.sin(t * 2 * Math.PI / 4.2) : 0;          // one breath every 4.2 s
+    const sway = idle ? Math.sin(t * 2 * Math.PI / 7.3) * 0.8 : 0;      // ±0.8° head sway
+    const swing = idle ? Math.sin(t * 2 * Math.PI / 4.2 + 0.6) * 1.2 : 0; // arms follow the breath
+    nod += (((raf && idle) ? OPEN[current] : 0) - nod) * 0.18;
+    upper.setAttribute('transform', `translate(0 ${(-0.8 - 0.8 * breath).toFixed(2)})`);
+    dots.setAttribute('transform', upper.getAttribute('transform'));
+    head.setAttribute('transform', `translate(0 ${(-1.4 * nod).toFixed(2)}) rotate(${(pose.head + sway - 0.8 * nod).toFixed(2)} ${HP[0]} ${HP[1]})`);
+    armL.setAttribute('transform', `rotate(${(pose.armL + swing).toFixed(2)} ${LP[0]} ${LP[1]})`);
+    armR.setAttribute('transform', `rotate(${(-pose.armR - swing).toFixed(2)} ${RP[0]} ${RP[1]})`);
+    requestAnimationFrame(animate);
+  }
+
+  // ---- Mouth ----
   const mouths = {};
-  document.querySelectorAll('#bear .mouth').forEach(g => { mouths[g.id.replace('mouth-', '')] = g; });
-  const lids = document.querySelectorAll('#bear .lid');
-  const closedEyes = document.querySelectorAll('#bear .eye-closed');
-  const OPEN = -51.3, HALF = -15;
+  document.querySelectorAll('#nova .mouth').forEach(g => { mouths[g.id.replace('mouth-', '')] = g; });
+  const lids = document.querySelectorAll('#nova .lid');
+  const closedEyes = document.querySelectorAll('#nova .eye-closed');
+  const OPEN_Y = -51.3, HALF = -15;
 
   let current = 'smile';
   function setMouth(v) {
@@ -187,7 +314,7 @@ button { font: inherit; cursor: pointer; }
 
   // Eyes: three-state lid (open, half, closed)
   function setEye(state) {
-    const y = state === 'half' ? HALF : OPEN;
+    const y = state === 'half' ? HALF : OPEN_Y;
     lids.forEach(l => l.setAttribute('transform', `translate(0 ${y})`));
     closedEyes.forEach(e => e.style.display = state === 'closed' ? '' : 'none');
   }
@@ -229,7 +356,6 @@ button { font: inherit; cursor: pointer; }
     b.addEventListener('click', () => {
       stop();
       shapeBtns.forEach(x => x.setAttribute('aria-pressed', x === b));
-      bear.classList.remove('no-teeth');
       setMouth(v);
       $('status').textContent = `Holding ${name.toLowerCase()}`;
     });
@@ -278,12 +404,10 @@ button { font: inherit; cursor: pointer; }
     if ($('loop').checked) { setMouth('X'); setTimeout(() => { if (raf) { audio.currentTime = 0; audio.play(); } }, 600); }
     else stop();
   });
-  $('teethOn').addEventListener('change', () => { if (raf) applyTeeth(); });
   $('slow').addEventListener('change', () => { audio.playbackRate = $('slow').checked ? 0.5 : 1; });
   $('play').addEventListener('click', async () => {
     if (raf) return stop();
     shapeBtns.forEach(x => x.setAttribute('aria-pressed', 'false'));
-    applyTeeth();
     audio.currentTime = 0;
     audio.playbackRate = $('slow').checked ? 0.5 : 1;
     if ('preservesPitch' in audio) audio.preservesPitch = true;
@@ -304,7 +428,9 @@ button { font: inherit; cursor: pointer; }
   themeBtns.forEach(b => b.addEventListener('click', () => setTheme(b.dataset.themeOpt)));
   setTheme(document.documentElement.dataset.theme || 'auto');
 
+  layout();
   setEye('open');
   scheduleBlink();
+  requestAnimationFrame(animate);
 })();
 </script>

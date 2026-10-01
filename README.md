@@ -6,8 +6,10 @@ This folder is the single source for Nova's character rig: the artwork, the lip-
 
 ```
 art/
-  Character.svg                 Original flat Figma export. Never edited.
-  Character-rigged.svg          Rigged version: eyelids and mouth shapes added.
+  Nova-outfit_1.svg             Full-body Figma export, outfit 1. Never edited. The two magenta dots mark the shoulder pivots.
+  Nova-rigged.svg               Current rig, built from Nova-outfit_1.svg: grouped parts, hat, eyelids and mouth shapes.
+  Character.svg                 First flat Figma export (waist up, with hat). Never edited. Source of the hat and smile.
+  Character-rigged.svg          First rig, kept for the prototyping project. Built by an earlier build_rig.py (see git history).
   mouth-shapes-reference.png    Sheet of all mouth shapes, in order X A B C D E F G H, smile.
 dialogue/
   <line_name>/
@@ -18,14 +20,30 @@ dialogue/
 preview/
   <line_name>.html              Self-contained player for one line. Open in any browser.
 tools/
-  build_rig.py                  Rebuilds art/Character-rigged.svg from art/Character.svg.
+  build_rig.py                  Rebuilds art/Nova-rigged.svg from art/Nova-outfit_1.svg and art/Character.svg.
   build_preview.py              Builds preview/<line_name>.html for one line.
   preview_template.html         Page template the preview builder fills in.
 ```
 
 ## How the rig works
 
-The rigged SVG is the original artwork with extra layers. Nothing in the original drawing was moved or redrawn, and the white sticker outline is unchanged.
+`art/Nova-rigged.svg` is the outfit 1 artwork regrouped into parts. Nothing in the drawing was moved or redrawn. The artboard is 556 × 837; Nova stands centred at x = 278 with his feet on the bottom edge (y = 837), which is the anchor scenes place him by.
+
+**Parts.** Back to front. Each movable part has `class="part"` and its pivot in `data-pivot`.
+
+| Id | Holds | Pivot |
+|---|---|---|
+| `legs` | Legs and shoes | Not posed yet |
+| `upper` | Everything below; moves for breathing | None (moves up and down) |
+| `arm-left`, `arm-right` | Fur arm, sleeve and a round sleeve cap | Shoulder: (194.4, 432.8) and (359.7, 433.5) |
+| `pants`, `torso` | Shorts; hood, neck, shirt and jacket | Move with `upper` |
+| `head` | Ears, face, `pupils`, `brows`, eyelids, mouth and `hat` | Base of the neck, (278.7, 392) |
+
+The arms always stay behind the outfit. The shoulder pivots come from the magenta dots in the source art, moved onto each sleeve's centre line. Each sleeve gets a round cap there (a circle as wide as the sleeve, in the sleeve colour), so the arm can rotate up to 180° without its flat top showing. If the art is redrawn with this cap, the generated one can go.
+
+**Hat, eyes and mouth.** The head in the outfit 1 art is the original head moved by (+54, −168.13) at the same scale, so the original hat, eyelids and mouth shapes are reused in their original coordinates inside a `translate(54 -168.129)` group.
+
+**Outline.** `#character` carries `filter="url(#outline)"`: a white edge about 8 px wide grown from the silhouette, plus the original soft shadow. Because it is generated, it follows any pose. Remove the attribute to turn it off.
 
 **Mouth.** All mouth shapes sit in one group, `#mouth`. Each shape is a child group with the id `mouth-<letter>`, and exactly one is visible at a time. The letters follow Rhubarb Lip Sync's naming, so its output plugs in directly.
 
@@ -34,7 +52,7 @@ The rigged SVG is the original artwork with extra layers. Nothing in the origina
 | `mouth-smile` | Smile | Original idle face, shown when Nova isn't speaking |
 | `mouth-X` | Rest | Pauses and silence within a line |
 | `mouth-A` | Closed | M, B, P |
-| `mouth-B` | Teeth | S, T, K, EE and most consonants |
+| `mouth-B` | Narrow | S, T, K, EE and most consonants |
 | `mouth-C` | Open | EH, AE |
 | `mouth-D` | Wide | AA as in "father" |
 | `mouth-E` | Round | AO, ER |
@@ -42,7 +60,7 @@ The rigged SVG is the original artwork with extra layers. Nothing in the origina
 | `mouth-G` | Bite | F, V |
 | `mouth-H` | Tongue up | L |
 
-**Teeth.** Shapes B, D, G and H include cream teeth, each tagged `class="teeth"`. Current decision: teeth are hidden during dialogue (the preview adds `no-teeth` to the SVG, which hides every `.teeth` element) and shown only when inspecting a single shape. The toothless versions still read clearly.
+**Teeth.** Removed in this version. Shapes B, D, G and H have no teeth and still read clearly.
 
 **Eyes.** Each eye has a lid group clipped to the eye white. A blink runs through three frames:
 
@@ -54,7 +72,11 @@ Timing is 40 ms half, 80 ms closed, 50 ms half. Blinks happen at random every 2.
 
 **Playback.** The player reads the audio's current time on every frame, finds the cue covering that moment and shows its mouth. Because the audio is the clock, half-speed playback and slow devices stay in sync. When the line ends, the mouth returns to the smile.
 
-**Not rigged yet.** Head and body movement, the outline (it's one merged shape, so head motion would expose it) and outfit swaps.
+**Idle motion.** Subtle and always on unless switched off: one breath every 4.2 s (`upper` rises up to 1.6 px), a ±0.8° head sway every 7.3 s, and the arms swing ±1.2° with the breath. While a line plays, the head lifts and tips slightly with how open the mouth is.
+
+**Scenes.** The preview places Nova in a frame by setting the SVG's `viewBox`. Framing presets are vertical ranges in artboard units (full body, knees up, waist up, close-up); the crop is aligned to the bottom of the frame, and Nova can stand left, centre or right.
+
+**Not rigged yet.** Legs, elbows, separate paws, ears, gaze (`pupils`) and brow expressions.
 
 ## Adding a new dialogue line
 
@@ -74,8 +96,10 @@ Giving Rhubarb the script text (step 3) usually improves accuracy a lot. The fir
 
 ## Decisions so far
 
-- The white outline stays as is. Motion is limited to blinks and mouth for now.
-- Teeth are hidden in dialogue but kept as an option.
+- Full-body art from outfit 1 replaces the first waist-up rig. The original hat, eyes and mouth shapes are kept.
+- The white outline is generated in code and can be turned off.
+- Teeth are removed.
+- Arms stay behind the outfit. Idle motion stays subtle.
 - Nova will be drawn live in the app from these layers (audio plus cue file per line), not played as pre-rendered video. New lines only need new audio and cues; the character never has to be re-animated.
 
 ## Planned: outfits
@@ -84,4 +108,5 @@ To let Nova change outfits without breaking the rig, the artwork will need to be
 
 - A complete base body under the clothes (currently the hoodie is the torso).
 - Every part drawn on the same artboard size and position, with a fixed layer order per slot.
-- The white outline and drop shadow generated in code around whatever outfit is worn, instead of drawn as one fixed shape.
+- The white outline and drop shadow generated in code around whatever outfit is worn (done in outfit 1).
+- Figma exports with "Include 'id' attribute" ticked, so parts arrive grouped and named instead of being found by their order.
