@@ -1,0 +1,310 @@
+<title>Bear Lip-Sync Rig</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: character stage on the left, rig controls on the right; stacks to one column on phones */
+:root {
+  --bg: #EDF2F1;
+  --surface: #FFFFFF;
+  --stage: #D6E8E6;
+  --fg: #1F2A3F;
+  --muted: #5B6B78;
+  --line: #CCDAD8;
+  --accent: #2F7F7B;
+  --accent-ink: #FFFFFF;
+  --rust: #A8442A;
+  --chip: #E3EEEC;
+  --font-display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Nunito Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121923; --surface: #1A2330; --stage: #213041; --fg: #E4ECEB; --muted: #9AABB6;
+    --line: #2C3A4B; --accent: #6CCBC5; --accent-ink: #0E1A22; --rust: #E58A6E; --chip: #24313F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121923; --surface: #1A2330; --stage: #213041; --fg: #E4ECEB; --muted: #9AABB6;
+  --line: #2C3A4B; --accent: #6CCBC5; --accent-ink: #0E1A22; --rust: #E58A6E; --chip: #24313F;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 48px; display: grid; gap: 24px; }
+header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+header h1 { font-family: var(--font-display); font-weight: 700; font-size: 2rem; line-height: 1.1; margin: 0; text-wrap: balance; }
+header p { margin: 6px 0 0; color: var(--muted); max-width: 62ch; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 24px; align-items: start; }
+@media (max-width: 760px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+.stage { background: var(--stage); border-radius: 20px; padding: 16px; display: grid; gap: 12px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); }
+@media (max-width: 760px) { .stage { position: static; } }
+.stage svg { width: 100%; height: auto; max-height: 62vh; display: block; }
+.readout { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
+.readout .now { font-family: var(--font-mono); font-weight: 700; color: var(--fg); background: var(--surface); border-radius: 8px; padding: 2px 10px; font-variant-numeric: tabular-nums; }
+
+.panel { display: grid; gap: 22px; min-width: 0; }
+section h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; margin: 0 0 4px; }
+section > p { margin: 0 0 12px; color: var(--muted); font-size: 14px; max-width: 60ch; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+button { font: inherit; cursor: pointer; }
+.btn { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 999px; padding: 9px 18px; font-weight: 700; }
+.btn.ghost { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 1.5px var(--line); }
+.theme { display: inline-flex; gap: 2px; padding: 3px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; flex: none; }
+.theme button { border: 0; background: transparent; color: var(--muted); border-radius: 999px; padding: 5px 12px; font-size: 13px; font-weight: 700; }
+.theme button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.btn:focus-visible, .shape:focus-visible, .theme button:focus-visible, .toggle input:focus-visible + span { outline: 3px solid var(--rust); outline-offset: 2px; }
+.toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; user-select: none; }
+.toggle input { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; }
+
+.strip-wrap { overflow-x: auto; border-radius: 12px; }
+.strip { position: relative; display: flex; height: 52px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.seg { border-right: 1px solid var(--line); display: grid; place-items: center; font-family: var(--font-mono); font-weight: 700; font-size: 12px; color: var(--muted); overflow: hidden; }
+.seg:last-child { border-right: 0; }
+.seg.x { background: repeating-linear-gradient(135deg, transparent 0 5px, var(--chip) 5px 7px); }
+.seg.on { background: var(--accent); color: var(--accent-ink); }
+#bear.no-teeth .teeth { display: none; }
+.playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--rust); left: 0; pointer-events: none; }
+.scale { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11px; color: var(--muted); padding: 4px 2px 0; font-variant-numeric: tabular-nums; }
+
+.shapes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.shape { text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; color: var(--fg); }
+.shape .k { grid-row: span 2; font-family: var(--font-mono); font-weight: 700; font-size: 1.25rem; color: var(--accent); align-self: center; min-width: 1.4em; }
+.shape .n { font-weight: 700; font-size: 13.5px; }
+.shape .s { font-size: 12.5px; color: var(--muted); }
+.shape[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.shape.live { background: var(--chip); }
+
+.notes { font-size: 13.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; display: grid; gap: 6px; }
+.notes p { margin: 0; max-width: 65ch; }
+.notes code { font-family: var(--font-mono); font-size: 12.5px; background: var(--chip); padding: 1px 5px; border-radius: 4px; color: var(--fg); }
+</style>
+<script>
+// Theme: "auto" follows the system setting; light/dark set data-theme on <html>. Saved per browser.
+(() => {
+  let t = 'auto';
+  try { t = localStorage.getItem('rig-theme') || 'auto'; } catch (e) {}
+  if (t !== 'auto') document.documentElement.dataset.theme = t;
+})();
+</script>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Bear Lip-Sync Rig</h1>
+      <p>Blinking eyes and nine mouth shapes, now driven by the Nova onboarding line. Mouth timing comes from Rhubarb Lip Sync reading the audio directly.</p>
+    </div>
+    <div class="theme" role="group" aria-label="Color theme">
+      <button type="button" data-theme-opt="auto">Auto</button>
+      <button type="button" data-theme-opt="light">Light</button>
+      <button type="button" data-theme-opt="dark">Dark</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="stage">
+      %%SVG%%
+      <div class="readout"><span>Mouth now: <span class="now" id="now">smile</span></span><span id="status">Idle, blinking</span></div>
+    </div>
+
+    <div class="panel">
+      <section>
+        <h2>Onboarding dialogue 1</h2>
+        <p>%%NCUES%% mouth cues over %%DUR%% seconds. Each block below is one shape, sized by how long it's held. Half speed slows the audio too, so you can check each change.</p>
+        <audio id="audio" preload="auto" src="%%AUDIO%%"></audio>
+        <div class="strip-wrap"><div class="strip" id="strip"><div class="playhead" id="playhead"></div></div><div class="scale" id="scale"></div></div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn" id="play">Play with sound</button>
+          <label class="toggle"><input type="checkbox" id="slow"><span>Half speed</span></label>
+          <label class="toggle"><input type="checkbox" id="loop"><span>Loop</span></label>
+          <label class="toggle"><input type="checkbox" id="teethOn"><span>Show teeth</span></label>
+        </div>
+      </section>
+
+      <section>
+        <h2>Eyes</h2>
+        <p>Random blinks every 2.5 to 5.5 seconds, with an occasional double blink.</p>
+        <div class="row">
+          <label class="toggle"><input type="checkbox" id="blinkOn" checked><span>Auto blink</span></label>
+          <button class="btn ghost" id="blinkNow">Blink now</button>
+          <button class="btn ghost" id="holdClosed" aria-pressed="false">Hold closed</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>Mouth shapes</h2>
+        <p>Click a shape to hold it on the bear. Letters match the lip-sync tool's naming. Teeth always show here, and only appear in the dialogue when Show teeth is on.</p>
+        <div class="shapes" id="shapes"></div>
+      </section>
+
+      <div class="notes">
+        <p><strong>Not moving yet:</strong> head and body stay still, and the white outline is unchanged.</p>
+        <p><strong>Timing source:</strong> the audio alone, with no script, plus one hand fix: the long hold at 2.35 to 2.88s now opens on its two syllables. Adding the exact script lets the timing tool line shapes up with the real words, which usually tightens the result.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const SHAPES = [
+    ['smile','Smile','Original idle face'],
+    ['X','Rest','Pauses, silence'],
+    ['A','Closed','M, B, P'],
+    ['B','Teeth','S, T, K, EE'],
+    ['C','Open','EH, AE'],
+    ['D','Wide','AA as in "father"'],
+    ['E','Round','AO, ER'],
+    ['F','Pucker','OO, OW, W'],
+    ['G','Bite','F, V'],
+    ['H','Tongue up','L']
+  ];
+  // Cues from Rhubarb Lip Sync: {start, end, value}
+  const cues = %%CUES%%;
+  const DURATION = cues[cues.length - 1].end;
+
+  const $ = id => document.getElementById(id);
+  const bear = document.getElementById('bear');
+  const applyTeeth = () => bear.classList.toggle('no-teeth', !$('teethOn').checked);
+  const mouths = {};
+  document.querySelectorAll('#bear .mouth').forEach(g => { mouths[g.id.replace('mouth-', '')] = g; });
+  const lids = document.querySelectorAll('#bear .lid');
+  const closedEyes = document.querySelectorAll('#bear .eye-closed');
+  const OPEN = -51.3, HALF = -15;
+
+  let current = 'smile';
+  function setMouth(v) {
+    if (v === current || !mouths[v]) return;
+    mouths[current].style.display = 'none';
+    mouths[v].style.display = '';
+    current = v;
+    $('now').textContent = v;
+    shapeBtns.forEach(b => b.classList.toggle('live', b.dataset.v === v));
+  }
+
+  // Eyes: three-state lid (open, half, closed)
+  function setEye(state) {
+    const y = state === 'half' ? HALF : OPEN;
+    lids.forEach(l => l.setAttribute('transform', `translate(0 ${y})`));
+    closedEyes.forEach(e => e.style.display = state === 'closed' ? '' : 'none');
+  }
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  let held = false, blinking = false, blinkTimer = null;
+  async function blink() {
+    if (held || blinking) return;
+    blinking = true;
+    setEye('half'); await wait(40);
+    setEye('closed'); await wait(80);
+    setEye('half'); await wait(50);
+    if (!held) setEye('open');
+    blinking = false;
+  }
+  function scheduleBlink() {
+    clearTimeout(blinkTimer);
+    if (!$('blinkOn').checked) return;
+    blinkTimer = setTimeout(async () => {
+      await blink();
+      if (Math.random() < 0.15) { await wait(140); await blink(); }
+      scheduleBlink();
+    }, 2500 + Math.random() * 3000);
+  }
+  $('blinkOn').addEventListener('change', scheduleBlink);
+  $('blinkNow').addEventListener('click', blink);
+  $('holdClosed').addEventListener('click', e => {
+    held = !held;
+    e.currentTarget.setAttribute('aria-pressed', held);
+    e.currentTarget.textContent = held ? 'Open eyes' : 'Hold closed';
+    setEye(held ? 'closed' : 'open');
+  });
+
+  // Shape gallery
+  const shapeBtns = SHAPES.map(([v, name, sounds]) => {
+    const b = document.createElement('button');
+    b.className = 'shape'; b.dataset.v = v; b.type = 'button';
+    b.setAttribute('aria-pressed', v === 'smile');
+    b.innerHTML = `<span class="k">${v === 'smile' ? '☺' : v}</span><span class="n">${name}</span><span class="s">${sounds}</span>`;
+    b.addEventListener('click', () => {
+      stop();
+      shapeBtns.forEach(x => x.setAttribute('aria-pressed', x === b));
+      bear.classList.remove('no-teeth');
+      setMouth(v);
+      $('status').textContent = `Holding ${name.toLowerCase()}`;
+    });
+    $('shapes').appendChild(b);
+    return b;
+  });
+  shapeBtns.find(b => b.dataset.v === 'smile').classList.add('live');
+
+  // Dialogue playback, clocked by the audio element
+  const audio = $('audio');
+  const segEls = cues.map(c => {
+    const s = document.createElement('div');
+    s.className = 'seg' + (c.value === 'X' ? ' x' : '');
+    s.style.flex = `${c.end - c.start} 0 0`;
+    if ((c.end - c.start) >= 0.09) s.textContent = c.value;
+    s.title = `${c.value}  ${c.start.toFixed(2)}–${c.end.toFixed(2)}s`;
+    $('strip').insertBefore(s, $('playhead'));
+    return s;
+  });
+  for (let k = 0; k <= Math.floor(DURATION); k++) { const t = document.createElement('span'); t.textContent = k + 's'; $('scale').appendChild(t); }
+  $('scale').lastChild.textContent = DURATION.toFixed(1) + 's';
+  let raf = null, lastSeg = -1;
+  function frame() {
+    const t = audio.currentTime;
+    const idx = cues.findIndex(c => t >= c.start && t < c.end);
+    if (idx !== lastSeg) {
+      if (lastSeg >= 0) segEls[lastSeg].classList.remove('on');
+      if (idx >= 0) { segEls[idx].classList.add('on'); setMouth(cues[idx].value); }
+      lastSeg = idx;
+    }
+    $('playhead').style.left = `${Math.min(t / DURATION, 1) * 100}%`;
+    raf = requestAnimationFrame(frame);
+  }
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = null;
+    audio.pause();
+    if (lastSeg >= 0) segEls[lastSeg].classList.remove('on');
+    lastSeg = -1;
+    $('playhead').style.left = '0%';
+    $('play').textContent = 'Play with sound';
+    setMouth('smile');
+    $('status').textContent = 'Idle, blinking';
+  }
+  audio.addEventListener('ended', () => {
+    if ($('loop').checked) { setMouth('X'); setTimeout(() => { if (raf) { audio.currentTime = 0; audio.play(); } }, 600); }
+    else stop();
+  });
+  $('teethOn').addEventListener('change', () => { if (raf) applyTeeth(); });
+  $('slow').addEventListener('change', () => { audio.playbackRate = $('slow').checked ? 0.5 : 1; });
+  $('play').addEventListener('click', async () => {
+    if (raf) return stop();
+    shapeBtns.forEach(x => x.setAttribute('aria-pressed', 'false'));
+    applyTeeth();
+    audio.currentTime = 0;
+    audio.playbackRate = $('slow').checked ? 0.5 : 1;
+    if ('preservesPitch' in audio) audio.preservesPitch = true;
+    try { await audio.play(); } catch (e) { $('status').textContent = 'Audio could not start. Tap Play again.'; return; }
+    $('play').textContent = 'Stop';
+    $('status').textContent = 'Speaking';
+    raf = requestAnimationFrame(frame);
+  });
+
+  // Theme switch
+  const themeBtns = document.querySelectorAll('[data-theme-opt]');
+  function setTheme(t) {
+    if (t === 'auto') delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = t;
+    themeBtns.forEach(b => b.setAttribute('aria-pressed', b.dataset.themeOpt === t));
+    try { localStorage.setItem('rig-theme', t); } catch (e) {}
+  }
+  themeBtns.forEach(b => b.addEventListener('click', () => setTheme(b.dataset.themeOpt)));
+  setTheme(document.documentElement.dataset.theme || 'auto');
+
+  setEye('open');
+  scheduleBlink();
+})();
+</script>
