@@ -1,0 +1,230 @@
+{
+ "title": "Account setup: child's name",
+ "metadata": {
+  "soundFile": "/Users/manaf.alnakib/Library/CloudStorage/Dropbox/Projects/Business/Metstack/Coding/Neelo | Character Rig/dialogue/voice_line_1/voice_line_1.wav",
+  "duration": 4.98
+ },
+ "mouthCues": [
+  {
+   "start": 0.0,
+   "end": 0.06,
+   "value": "X"
+  },
+  {
+   "start": 0.06,
+   "end": 0.22,
+   "value": "D"
+  },
+  {
+   "start": 0.22,
+   "end": 0.29,
+   "value": "C"
+  },
+  {
+   "start": 0.29,
+   "end": 0.44,
+   "value": "C"
+  },
+  {
+   "start": 0.44,
+   "end": 0.5,
+   "value": "A"
+  },
+  {
+   "start": 0.5,
+   "end": 0.55,
+   "value": "B"
+  },
+  {
+   "start": 0.55,
+   "end": 0.62,
+   "value": "E"
+  },
+  {
+   "start": 0.62,
+   "end": 0.69,
+   "value": "F"
+  },
+  {
+   "start": 0.69,
+   "end": 0.75,
+   "value": "G"
+  },
+  {
+   "start": 0.75,
+   "end": 0.92,
+   "value": "D"
+  },
+  {
+   "start": 0.92,
+   "end": 1.09,
+   "value": "X"
+  },
+  {
+   "start": 1.09,
+   "end": 1.12,
+   "value": "H"
+  },
+  {
+   "start": 1.12,
+   "end": 1.19,
+   "value": "C"
+  },
+  {
+   "start": 1.19,
+   "end": 1.28,
+   "value": "B"
+  },
+  {
+   "start": 1.28,
+   "end": 1.36,
+   "value": "C"
+  },
+  {
+   "start": 1.36,
+   "end": 1.41,
+   "value": "B"
+  },
+  {
+   "start": 1.41,
+   "end": 1.48,
+   "value": "E"
+  },
+  {
+   "start": 1.48,
+   "end": 1.66,
+   "value": "B"
+  },
+  {
+   "start": 1.66,
+   "end": 1.7,
+   "value": "H"
+  },
+  {
+   "start": 1.7,
+   "end": 1.84,
+   "value": "E"
+  },
+  {
+   "start": 1.84,
+   "end": 1.89,
+   "value": "F"
+  },
+  {
+   "start": 1.89,
+   "end": 1.99,
+   "value": "C"
+  },
+  {
+   "start": 1.99,
+   "end": 2.07,
+   "value": "B"
+  },
+  {
+   "start": 2.07,
+   "end": 2.17,
+   "value": "E"
+  },
+  {
+   "start": 2.17,
+   "end": 2.35,
+   "value": "B"
+  },
+  {
+   "start": 2.35,
+   "end": 2.56,
+   "value": "C"
+  },
+  {
+   "start": 2.56,
+   "end": 2.63,
+   "value": "A"
+  },
+  {
+   "start": 2.63,
+   "end": 2.91,
+   "value": "X"
+  },
+  {
+   "start": 2.91,
+   "end": 2.97,
+   "value": "G"
+  },
+  {
+   "start": 2.97,
+   "end": 3.15,
+   "value": "E"
+  },
+  {
+   "start": 3.15,
+   "end": 3.42,
+   "value": "B"
+  },
+  {
+   "start": 3.42,
+   "end": 3.55,
+   "value": "X"
+  },
+  {
+   "start": 3.55,
+   "end": 3.6,
+   "value": "F"
+  },
+  {
+   "start": 3.6,
+   "end": 3.68,
+   "value": "C"
+  },
+  {
+   "start": 3.68,
+   "end": 3.75,
+   "value": "B"
+  },
+  {
+   "start": 3.75,
+   "end": 3.84,
+   "value": "F"
+  },
+  {
+   "start": 3.84,
+   "end": 3.92,
+   "value": "B"
+  },
+  {
+   "start": 3.92,
+   "end": 4.11,
+   "value": "C"
+  },
+  {
+   "start": 4.11,
+   "end": 4.16,
+   "value": "H"
+  },
+  {
+   "start": 4.16,
+   "end": 4.27,
+   "value": "B"
+  },
+  {
+   "start": 4.27,
+   "end": 4.48,
+   "value": "C"
+  },
+  {
+   "start": 4.48,
+   "end": 4.53,
+   "value": "B"
+  },
+  {
+   "start": 4.53,
+   "end": 4.68,
+   "value": "A"
+  },
+  {
+   "start": 4.68,
+   "end": 4.98,
+   "value": "X"
+  }
+ ],
+ "markers": []
+}

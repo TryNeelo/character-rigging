@@ -24,4 +24,5 @@ flutter:
     - assets/
     - assets/parts/
     - assets/lines/onboarding_nova_dialogue1/
+    - assets/lines/voice_line_1/
     # END GENERATED ASSETS
