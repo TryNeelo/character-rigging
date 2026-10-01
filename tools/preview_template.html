@@ -540,12 +540,16 @@ button { font: inherit; cursor: pointer; }
     return b;
   });
   $('lineCount').textContent = LINES.length;
-  function togglePanel(open) {
+  function togglePanel(open, returnFocus = true) {
     $('linesPanel').classList.toggle('open', open);
     $('linesBtn').setAttribute('aria-expanded', open);
     if (open) (lineBtns.find(b => b.dataset.id === line.id) || lineBtns[0]).focus();
-    else $('linesBtn').focus();
+    else if (returnFocus) $('linesBtn').focus();
   }
+  // A click anywhere outside the panel (and its button) closes it
+  document.addEventListener('pointerdown', e => {
+    if ($('linesPanel').classList.contains('open') && !$('linesPanel').contains(e.target) && !$('linesBtn').contains(e.target)) togglePanel(false, false);
+  });
   $('linesBtn').addEventListener('click', () => togglePanel(!$('linesPanel').classList.contains('open')));
   $('linesClose').addEventListener('click', () => togglePanel(false));
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('linesPanel').classList.contains('open')) togglePanel(false); });
