@@ -102,7 +102,7 @@ button { font: inherit; cursor: pointer; }
 .section-head h2 { margin: 0; }
 .btn.small { padding: 6px 14px; font-size: 13px; }
 .words { font-style: italic; color: var(--fg) !important; }
-/* Lines panel: slides in from the right so lines can be switched while watching Nova */
+/* Audio files panel: slides in from the right so lines can be switched while watching Nova */
 .lines-panel { position: fixed; top: 0; right: 0; bottom: 0; width: min(360px, 100vw); background: var(--surface); border-left: 1px solid var(--line); box-shadow: -12px 0 32px rgba(0, 0, 0, .18); z-index: 20; display: flex; flex-direction: column; transform: translateX(100%); visibility: hidden; transition: transform .2s ease, visibility .2s; }
 .lines-panel.open { transform: none; visibility: visible; }
 .panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px; border-bottom: 1px solid var(--line); }
@@ -167,7 +167,7 @@ button { font: inherit; cursor: pointer; }
       <section>
         <div class="section-head">
           <h2 id="lineTitle"></h2>
-          <button class="btn ghost small" id="linesBtn" aria-expanded="false" aria-controls="linesPanel">Lines (<span id="lineCount"></span>)</button>
+          <button class="btn ghost small" id="linesBtn" aria-expanded="false" aria-controls="linesPanel">Audio files (<span id="lineCount"></span>)</button>
         </div>
         <p class="words" id="lineWords" hidden></p>
         <p><span id="lineInfo"></span> Each block below is one shape, sized by how long it's held. Half speed slows the audio too, so you can check each change. Markers below the timeline are app events (red) and things Nova does, like looking toward the screen's right (teal).</p>
@@ -223,8 +223,8 @@ button { font: inherit; cursor: pointer; }
   </div>
 </div>
 
-<aside class="lines-panel" id="linesPanel" aria-label="Dialogue lines">
-  <div class="panel-head"><h2>Lines</h2><button class="btn ghost small" id="linesClose">Close</button></div>
+<aside class="lines-panel" id="linesPanel" aria-label="Audio files">
+  <div class="panel-head"><h2>Audio files</h2><button class="btn ghost small" id="linesClose">Close</button></div>
   <div class="lines-list" id="linesList"></div>
 </aside>
 
@@ -513,7 +513,7 @@ button { font: inherit; cursor: pointer; }
     return el;
   }
 
-  // Lines panel: pick a line to load it onto Nova
+  // Audio files panel: pick a line to load it onto Nova
   function loadLine(id) {
     stop();
     line = LINES.find(l => l.id === id) || LINES[0];

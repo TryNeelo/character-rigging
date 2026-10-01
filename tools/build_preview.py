@@ -6,7 +6,7 @@ Reads  art/Nova-rigged.svg and, for each folder in dialogue/: its .mp3, cues.jso
 Writes preview/index.html  (art, audio and timing all embedded; opens in any browser)
        preview/<line>.html (a short page that opens index.html on that line, so older links keep working)
 
-A line's title in the Lines panel is "title" in its cues.json, or its folder name.
+A line's title in the Audio files panel is "title" in its cues.json, or its folder name.
 """
 import base64, glob, json, os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
