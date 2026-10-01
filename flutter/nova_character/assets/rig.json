@@ -11,16 +11,37 @@
   "head": [
    278.7,
    392.0
-  ],
-  "armLeft": [
-   194.4,
-   432.8
-  ],
-  "armRight": [
-   359.7,
-   433.5
   ]
  },
+ "outfits": {
+  "hoodie": {
+   "label": "Hoodie",
+   "pivots": {
+    "armLeft": [
+     194.4,
+     432.8
+    ],
+    "armRight": [
+     359.7,
+     433.5
+    ]
+   }
+  },
+  "aviator": {
+   "label": "Aviator",
+   "pivots": {
+    "armLeft": [
+     194.2,
+     432.9
+    ],
+    "armRight": [
+     357.4,
+     434.4
+    ]
+   }
+  }
+ },
+ "defaultOutfit": "hoodie",
  "eyes": {
   "centers": [
    [

@@ -1,8 +1,9 @@
-"""Build art/Nova-rigged.svg from art/Nova-outfit_1.svg.
+"""Build art/Nova-rigged.svg and art/parts/ from the outfit exports.
 
-Groups the flat Figma export into movable parts, adds the original hat and the
-face rig (eyelids and mouth shapes) from art/Character.svg, and gives each sleeve
-a round cap so the arm can rotate without its flat top showing.
+Nova's head and face are shared; each outfit (see OUTFITS) brings its own legs,
+arms, body and hat from its flat Figma export. Adds the face rig (eyelids and mouth
+shapes) and the original cap from art/Character.svg, and gives each sleeve a round
+cap so the arm can rotate without its flat top showing.
 
 Element indexes refer to the flat Figma exports, so re-check them if either
 source file is re-exported.
@@ -48,11 +49,12 @@ def sleeve_cap(sleeve, dot):
     t = (dot[0] - mx) * ax + (dot[1] - my) * ay
     return round(mx + t * ax, 1), round(my + t * ay, 1), round(half, 1)
 
-def arm(side, fur, sleeve, dot):
+def arm(fur, sleeve, extras, dot):
+    """An arm's shapes plus its round sleeve cap, and the shoulder pivot (the cap's centre)."""
     cx, cy, r = sleeve_cap(sleeve, dot)
     fill = re.search(r'fill="([^"]*)"', sleeve).group(1)
-    return (f'<g id="arm-{side}" class="part" data-pivot="{cx} {cy}">{fur}{sleeve}'
-            f'<circle class="sleeve-cap" cx="{cx}" cy="{cy}" r="{r}" fill="{fill}"/></g>')
+    return (fur + sleeve + f'<circle class="sleeve-cap" cx="{cx}" cy="{cy}" r="{r}" fill="{fill}"/>'
+            + ''.join(extras)), (cx, cy)
 
 # ---- face rig, in the original coordinates (copied from the first rig) ----
 CLIPS = []
@@ -102,14 +104,54 @@ shapes = [
 mouth = f'<g id="mouth" transform="{OFF}">' + ''.join(m(k, b, vis=(k == 'smile')) for k, b in shapes) + '</g>'
 eyelids = (f'<g id="eyelids" transform="{OFF}">' + lid(178.875, 437.312, 24.654, '#983820', 'left')
            + lid(270.259, 437.312, 24.654, '#84270F', 'right') + '</g>')
-hat = f'<g id="hat" class="part" transform="{OFF}">' + ''.join(old[54:59]) + '</g>'
+# ---- Outfits. Each lists, by position in its flat export (0-based), the shapes that
+# make its legs, arms (fur, sleeve, then shapes drawn over the sleeve) and body, plus
+# its hat. The head comes from outfit 1's file and is the same in every outfit.
+R = lambda a, b: list(range(a, b))
+OUTFITS = {
+    'hoodie': dict(label='Hoodie', file='Nova-outfit_1.svg', count=64, legs=R(1, 13),
+                   arm_left=(13, 14, []), arm_right=(15, 16, []), body=[17] + R(18, 42), hat='cap'),
+    'aviator': dict(label='Aviator', file='Nova-outfit_2.svg', count=97, legs=R(0, 16),
+                    arm_left=(16, 17, R(18, 21)), arm_right=(21, 22, R(23, 26)),
+                    body=R(26, 33) + R(35, 59), hat=R(80, 97)),
+}
+DEFAULT_OUTFIT = 'hoodie'
+CAP = f'<g transform="{OFF}">' + ''.join(old[54:59]) + '</g>'  # the original cap, in its own coordinates
+OUTFIT_DEFS = ''   # gradients etc. that outfit shapes refer to
+for name, o in OUTFITS.items():
+    osrc = open(os.path.join(ROOT, 'art', o['file'])).read()
+    oels = re.findall(SHAPE, osrc)
+    assert len(oels) == o['count'], (name, len(oels))
+    odots = sorted((float(m[0]), float(m[1])) for m in
+                   re.findall(r'<circle cx="([\d.]+)" cy="([\d.]+)" r="4" fill="#F006D8"/>', osrc))
+    pick = lambda ids: ''.join(oels[i] for i in ids)
+    o['legs_svg'] = pick(o['legs'])
+    o['body_svg'] = pick(o['body'])
+    o['hat_svg'] = CAP if o['hat'] == 'cap' else pick(o['hat'])
+    for side, dot in (('left', odots[0]), ('right', odots[1])):
+        fur, sleeve, extras = o[f'arm_{side}']
+        o[f'arm_{side}_svg'], o[f'pivot_{side}'] = arm(oels[fur], oels[sleeve], [oels[i] for i in extras], dot)
+    for g in re.findall(r'<linearGradient.*?</linearGradient>|<radialGradient.*?</radialGradient>', osrc, re.S):
+        OUTFIT_DEFS += g
+        o['defs'] = o.get('defs', '') + g
+
+def per_outfit(key, pivot=None):
+    """One group per outfit; only the default outfit is shown."""
+    out = ''
+    for name, o in OUTFITS.items():
+        attrs = f' data-pivot="{o[pivot][0]} {o[pivot][1]}"' if pivot else ''
+        hide = '' if name == DEFAULT_OUTFIT else ' style="display:none"'
+        out += f'<g class="outfit" data-outfit="{name}" data-label="{o["label"]}"{attrs}{hide}>{o[key]}</g>'
+    return out
+hat = '<g id="hat">' + per_outfit('hat_svg') + '</g>'
 
 # ---- parts, back to front. Index = position in the flat export (0-based). ----
 J = lambda a, b: ''.join(els[a:b])
-legs = '<g id="legs">' + J(1, 13) + '</g>'                      # legs and shoes
-arms = arm('left', els[13], els[14], dots[0]) + arm('right', els[15], els[16], dots[1])
-pants = '<g id="pants">' + els[17] + '</g>'
-torso = '<g id="torso">' + J(18, 42) + '</g>'                   # hood, neck, shirt, jacket
+legs = '<g id="legs">' + per_outfit('legs_svg') + '</g>'                    # legs and shoes
+d = OUTFITS[DEFAULT_OUTFIT]
+arms = ''.join(f'<g id="arm-{side}" class="part" data-pivot="{d["pivot_" + side][0]} {d["pivot_" + side][1]}">'
+               + per_outfit(f'arm_{side}_svg', f'pivot_{side}') + '</g>' for side in ('left', 'right'))
+body = '<g id="body">' + per_outfit('body_svg') + '</g>'                    # shorts, neck, shirt, jacket
 head = (f'<g id="head" class="part" data-pivot="{HEAD_PIVOT[0]} {HEAD_PIVOT[1]}">'
         + els[0] + els[42]                                      # ear roots, behind the head
         + els[43] + els[44]                                     # head fur
@@ -140,12 +182,12 @@ clips = ('<clipPath id="clip-eyes">' + ''.join(f'<ellipse cx="{x}" cy="{y}" rx="
          '<clipPath id="clip-eye-right"><ellipse cx="270.259" cy="437.312" rx="25.4" ry="25.4"/></clipPath>' + ''.join(CLIPS))
 
 svg = (f'<svg id="nova" width="556" height="837" viewBox="0 0 556 837" fill="none" xmlns="http://www.w3.org/2000/svg">\n'
-       f'<defs>{OUTLINE}{clips}</defs>\n'
+       f'<defs>{OUTLINE}{clips}{OUTFIT_DEFS}</defs>\n'
        '<g id="character" filter="url(#outline)">\n'
-       f'{legs}\n<g id="upper">\n{arms}\n{pants}\n{torso}\n{head}\n</g>\n'
+       f'{legs}\n<g id="upper">\n{arms}\n{body}\n{head}\n</g>\n'
        '</g>\n</svg>\n')
 open(OUT, 'w').write(svg)
-print('wrote', OUT, len(svg), 'bytes; arm pivots', [sleeve_cap(els[14], dots[0]), sleeve_cap(els[16], dots[1])])
+print('wrote', OUT, len(svg), 'bytes; arm pivots', {n: (o['pivot_left'], o['pivot_right']) for n, o in OUTFITS.items()})
 
 # ---- Separate part files for the app (art/parts/). Every part is drawn on the full
 # 556 x 837 canvas, so the app stacks them in this order and moves them by their pivots.
@@ -157,8 +199,6 @@ def part(name, body, defs=''):
     open(os.path.join(PARTS_DIR, name + '.svg'), 'w').write(
         f'<svg width="556" height="837" viewBox="0 0 556 837" fill="none" xmlns="http://www.w3.org/2000/svg">'
         + (f'<defs>{defs}</defs>' if defs else '') + body + '</svg>\n')
-def strip_wrapper(g):  # drop the outer <g ...> of an arm so its transform is applied by the app
-    return g[g.index('>') + 1:-len('</g>')]
 eye_clips = ('<clipPath id="clip-eye-left"><ellipse cx="178.875" cy="437.312" rx="25.4" ry="25.4"/></clipPath>'
              '<clipPath id="clip-eye-right"><ellipse cx="270.259" cy="437.312" rx="25.4" ry="25.4"/></clipPath>')
 def lids(state):
@@ -172,10 +212,9 @@ def lids(state):
         else:
             out += f'<g clip-path="url(#clip-eye-{side})">' + closed_g.replace(' style="display:none"', '') + '</g>'
     return f'<g transform="{OFF}">{out}</g>'
-part('legs', J(1, 13))
-part('arm_left', strip_wrapper(arms[:arms.index('</g>') + 4]))
-part('arm_right', strip_wrapper(arms[arms.index('</g>') + 4:]))
-part('body', els[17] + J(18, 42))
+for name, o in OUTFITS.items():
+    for k in ('legs', 'arm_left', 'arm_right', 'body', 'hat'):
+        part(f'{k}_{name}', o[f'{k}_svg'], o.get('defs', '') if k == 'hat' else '')
 part('head_back', els[0] + els[42] + els[43] + els[44] + J(45, 49))
 part('pupil_left', els[49])
 part('pupil_right', els[50])
@@ -185,5 +224,5 @@ part('head_front', J(51, 55) + els[55] + els[56] + els[57])
 for k, b in shapes:
     used = ''.join(c for c in CLIPS if f'url(#{c.split(chr(34))[1]})' in b)
     part(f'mouth_{k}', f'<g transform="{OFF}">{b}</g>', used)
-part('head_top', els[60] + els[61] + f'<g transform="{OFF}">' + ''.join(old[54:59]) + '</g>')
+part('nose', els[60] + els[61])
 print('wrote', len([f for f in os.listdir(PARTS_DIR) if f.endswith('.svg')]), 'part files to', PARTS_DIR)

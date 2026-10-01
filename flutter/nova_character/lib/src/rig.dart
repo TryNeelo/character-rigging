@@ -21,6 +21,13 @@ class NovaFramingSpec {
       width: (j['width'] as num).toDouble());
 }
 
+/// An outfit: its name and the shoulder pivots its sleeves give.
+class NovaOutfitSpec {
+  const NovaOutfitSpec({required this.label, required this.armLeftPivot, required this.armRightPivot});
+  final String label;
+  final Offset armLeftPivot, armRightPivot;
+}
+
 /// Nova's rig: canvas, pivots and motion settings, loaded from assets/rig.json.
 /// Generated from the character repo by tools/build_flutter.py.
 class NovaRig {
@@ -29,8 +36,14 @@ class NovaRig {
         height = _num(_j['canvas']['height']),
         anchorX = _num(_j['anchor']['x']),
         headPivot = _offset(_j['pivots']['head']),
-        armLeftPivot = _offset(_j['pivots']['armLeft']),
-        armRightPivot = _offset(_j['pivots']['armRight']),
+        defaultOutfit = _j['defaultOutfit'] as String,
+        outfits = {
+          for (final e in (_j['outfits'] as Map<String, dynamic>).entries)
+            e.key: NovaOutfitSpec(
+                label: e.value['label'] as String,
+                armLeftPivot: _offset(e.value['pivots']['armLeft']),
+                armRightPivot: _offset(e.value['pivots']['armRight']))
+        },
         eyeCenters = [for (final c in _j['eyes']['centers'] as List) _offset(c)],
         eyeRadius = _num(_j['eyes']['radius']),
         pupilRest = [for (final v in _j['eyes']['pupilRest'] as List) _num(v)],
@@ -44,7 +57,11 @@ class NovaRig {
 
   final Map<String, dynamic> _j;
   final double width, height, anchorX, eyeRadius;
-  final Offset headPivot, armLeftPivot, armRightPivot;
+  final Offset headPivot;
+
+  /// Outfits by id (for example "hoodie", "aviator"). Each has its own legs, arms, body and hat.
+  final Map<String, NovaOutfitSpec> outfits;
+  final String defaultOutfit;
   final List<Offset> eyeCenters;
 
   /// How far each pupil (left, right) sits from its eye's centre at rest, in canvas units.

@@ -21,11 +21,21 @@ rigged = open(os.path.join(ROOT, 'art', 'Nova-rigged.svg')).read()
 def pivot(id_):
     return [float(v) for v in re.search(rf'<g id="{id_}"[^>]*data-pivot="([^"]+)"', rigged).group(1).split()]
 eyes = re.search(r'<clipPath id="clip-eyes">(.*?)</clipPath>', rigged).group(1)
+legs_line = re.search(r'<g id="legs">.*', rigged).group(0)  # one group per outfit
 settings = json.load(open(os.path.join(ROOT, 'tools', 'rig_settings.json')))
 rig = {
     'canvas': {'width': 556, 'height': 837},
     'anchor': {'x': 278, 'y': 837},
-    'pivots': {'head': pivot('head'), 'armLeft': pivot('arm-left'), 'armRight': pivot('arm-right')},
+    'pivots': {'head': pivot('head')},
+    # Parts that change with the outfit: legs_<id>, arm_left_<id>, arm_right_<id>, body_<id>, hat_<id>
+    'outfits': {
+        o: {'label': label,
+            'pivots': {side: [float(v) for v in re.search(
+                rf'<g id="arm-{css}".*?data-outfit="{o}"[^>]*data-pivot="([^"]+)"', rigged, re.S).group(1).split()]
+                for side, css in (('armLeft', 'left'), ('armRight', 'right'))}}
+        for o, label in re.findall(r'<g class="outfit" data-outfit="([^"]+)" data-label="([^"]+)"', legs_line)
+    },
+    'defaultOutfit': re.search(r'<g id="legs"><g class="outfit" data-outfit="([^"]+)"', rigged).group(1),
     'eyes': {'centers': [[float(x), float(y)] for x, y in re.findall(r'cx="([\d.]+)" cy="([\d.]+)"', eyes)],
              'radius': 24.654,
              'pupilRest': [float(v) for v in re.findall(r'id="pupil-(?:left|right)" data-rest="([-\d.]+)"', rigged)]},

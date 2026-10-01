@@ -37,6 +37,7 @@ NovaCharacter(
   framing: NovaFraming.waistUp,   // full, kneesUp, waistUp, closeUp
   align: NovaAlign.right,         // where he stands if the space is wide
   outline: true,                  // white sticker outline and soft shadow
+  outfit: 'aviator',              // 'hoodie' (default) or 'aviator'
 )
 
 // React to what he says.
@@ -72,6 +73,7 @@ Dispose the controller with your screen (`nova.dispose()`).
 | `outline` | `true` | White outline and shadow, generated around any pose. |
 | `idle` | `true` | Breathing, slight sway, small nod while talking. Kept subtle. |
 | `blink` | `true` | Random blinks every 2.5 to 5.5 s. |
+| `outfit` | `'hoodie'` | Which outfit Nova wears: `'hoodie'` or `'aviator'`. Change it any time; his face, lip-sync and motion carry over. |
 
 If the widget's height is unbounded, it sizes itself to the framing's proportions.
 

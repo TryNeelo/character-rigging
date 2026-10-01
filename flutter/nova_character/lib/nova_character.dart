@@ -3,7 +3,7 @@
 /// ```dart
 /// final nova = NovaController();
 ///
-/// NovaCharacter(controller: nova, framing: NovaFraming.waistUp, align: NovaAlign.right);
+/// NovaCharacter(controller: nova, framing: NovaFraming.waistUp, align: NovaAlign.right, outfit: 'aviator');
 ///
 /// nova.events.listen((e) => print(e.name));
 /// await nova.play('onboarding_nova_dialogue1');

@@ -35,6 +35,7 @@ class NovaCharacter extends StatefulWidget {
     this.outline = true,
     this.idle = true,
     this.blink = true,
+    this.outfit,
   });
 
   final NovaController controller;
@@ -49,6 +50,10 @@ class NovaCharacter extends StatefulWidget {
 
   /// Random blinks every few seconds.
   final bool blink;
+
+  /// Outfit id, such as "hoodie" or "aviator". Null uses the default outfit.
+  /// Unknown ids fall back to the default.
+  final String? outfit;
 
   @override
   State<NovaCharacter> createState() => _NovaCharacterState();
@@ -212,6 +217,8 @@ class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProvider
     final swing = idle * math.sin(_t * 2 * math.pi / breathSec + 0.6) * rig.idle('armSwingDegrees');
     final upperY = idle * -rig.idle('breathPx') * (1 + breath);
     final shape = _shape;
+    final outfitId = rig.outfits.containsKey(widget.outfit) ? widget.outfit! : rig.defaultOutfit;
+    final outfit = rig.outfits[outfitId]!;
 
     final head = Transform(
       transform: Matrix4.translationValues(rig.look('headPx') * _look * s, -rig.idle('talkNodPx') * _nod * s, 0)
@@ -234,7 +241,8 @@ class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProvider
         shown(_eye == _Eye.closed, part('lids_closed')),
         part('head_front'),
         for (final m in _mouths) shown(m == shape, part('mouth_$m')),
-        part('head_top'),
+        part('nose'),
+        part('hat_$outfitId'),
       ]),
     );
 
@@ -242,14 +250,14 @@ class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProvider
       width: w,
       height: h,
       child: Stack(children: [
-        part('legs'),
+        part('legs_$outfitId'),
         Transform.translate(
           offset: Offset(0, upperY * s),
           child: Stack(children: [
             // Positive raises lift each arm outward, away from the body
-            Transform(transform: rotateAbout(rig.armLeftPivot, _raiseLeft + swing), child: part('arm_left')),
-            Transform(transform: rotateAbout(rig.armRightPivot, -_raiseRight - swing), child: part('arm_right')),
-            part('body'),
+            Transform(transform: rotateAbout(outfit.armLeftPivot, _raiseLeft + swing), child: part('arm_left_$outfitId')),
+            Transform(transform: rotateAbout(outfit.armRightPivot, -_raiseRight - swing), child: part('arm_right_$outfitId')),
+            part('body_$outfitId'),
             head,
           ]),
         ),
