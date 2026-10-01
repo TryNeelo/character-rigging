@@ -64,6 +64,8 @@ button { font: inherit; cursor: pointer; }
 .seg-ctl { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; }
 .seg-ctl button { border: 0; background: transparent; color: var(--muted); border-radius: 999px; padding: 5px 12px; font-size: 13px; font-weight: 700; }
 .seg-ctl button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.seg-ctl button:disabled { opacity: .4; cursor: not-allowed; }
+.hint { font-size: 12.5px; color: var(--muted); }
 .theme { flex: none; }
 .btn:focus-visible, .shape:focus-visible, .seg-ctl button:focus-visible, .toggle input:focus-visible + span, input[type=range]:focus-visible { outline: 3px solid var(--rust); outline-offset: 2px; }
 .toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; user-select: none; }
@@ -172,7 +174,8 @@ button { font: inherit; cursor: pointer; }
           <div class="field"><span>Framing</span>
             <div class="seg-ctl" role="group" aria-label="Framing" id="framingCtl"></div></div>
           <div class="field"><span>Position</span>
-            <div class="seg-ctl" role="group" aria-label="Position" id="alignCtl"></div></div>
+            <div class="seg-ctl" role="group" aria-label="Position" id="alignCtl"></div>
+            <span class="hint" id="alignHint" hidden>Nova already fills this frame's width, so there's no room to move him. Try Square or Landscape.</span></div>
           <div class="row"><label class="toggle"><input type="checkbox" id="outlineOn" checked><span>White outline</span></label></div>
         </div>
       </section>
@@ -246,7 +249,7 @@ button { font: inherit; cursor: pointer; }
   // Cues from Rhubarb Lip Sync: {start, end, value}
   const cues = [{"start": 0.0, "end": 0.04, "value": "X"}, {"start": 0.04, "end": 0.14, "value": "F"}, {"start": 0.14, "end": 0.3, "value": "C"}, {"start": 0.3, "end": 0.35, "value": "B"}, {"start": 0.35, "end": 0.38, "value": "C"}, {"start": 0.38, "end": 0.45, "value": "A"}, {"start": 0.45, "end": 0.5, "value": "B"}, {"start": 0.5, "end": 0.56, "value": "F"}, {"start": 0.56, "end": 0.74, "value": "B"}, {"start": 0.74, "end": 0.79, "value": "H"}, {"start": 0.79, "end": 0.92, "value": "E"}, {"start": 0.92, "end": 1.09, "value": "F"}, {"start": 1.09, "end": 1.33, "value": "X"}, {"start": 1.33, "end": 1.41, "value": "C"}, {"start": 1.41, "end": 1.46, "value": "B"}, {"start": 1.46, "end": 1.54, "value": "A"}, {"start": 1.54, "end": 1.59, "value": "B"}, {"start": 1.59, "end": 1.7, "value": "E"}, {"start": 1.7, "end": 1.75, "value": "F"}, {"start": 1.75, "end": 1.81, "value": "G"}, {"start": 1.81, "end": 2.0, "value": "C"}, {"start": 2.0, "end": 2.28, "value": "X"}, {"start": 2.28, "end": 2.32, "value": "H"}, {"start": 2.32, "end": 2.38, "value": "C"}, {"start": 2.38, "end": 2.5, "value": "B"}, {"start": 2.5, "end": 2.6, "value": "C"}, {"start": 2.6, "end": 2.66, "value": "B"}, {"start": 2.66, "end": 2.75, "value": "C"}, {"start": 2.75, "end": 2.88, "value": "B"}, {"start": 2.88, "end": 3.02, "value": "E"}, {"start": 3.02, "end": 3.3, "value": "B"}, {"start": 3.3, "end": 3.44, "value": "D"}, {"start": 3.44, "end": 3.51, "value": "B"}, {"start": 3.51, "end": 3.63, "value": "C"}, {"start": 3.63, "end": 3.7, "value": "B"}, {"start": 3.7, "end": 3.76, "value": "X"}];
   // Shared with the Flutter component: tools/rig_settings.json
-  const S = {"framing": {"full": {"label": "Full body", "top": 20, "bottom": 855, "width": 480}, "knees": {"label": "Knees up", "top": 20, "bottom": 730, "width": 460}, "waist": {"label": "Waist up", "top": 20, "bottom": 600, "width": 440}, "close": {"label": "Close-up", "top": 30, "bottom": 440, "width": 380}}, "idle": {"breathSeconds": 4.2, "breathPx": 0.8, "swaySeconds": 7.3, "swayDegrees": 0.8, "armSwingDegrees": 1.2, "talkNodPx": 1.4, "talkNodDegrees": 0.8, "talkNodSmoothing": 0.18}, "look": {"pupilReach": 11, "headDegrees": 2.5, "headPx": 2, "smoothing": 0.12}, "gesture": {"smoothing": 0.1}, "blink": {"halfMs": 40, "closedMs": 80, "halfAgainMs": 50, "minGapMs": 2500, "maxGapMs": 5500, "doubleChance": 0.15, "doubleGapMs": 140}, "mouthOpenness": {"X": 0, "A": 0, "B": 0.3, "C": 0.7, "D": 1, "E": 0.6, "F": 0.4, "G": 0.3, "H": 0.6, "smile": 0.2}, "outline": {"widthPx": 8, "blur": 5, "shadowBlur": 8, "shadowOpacity": 0.25}};
+  const S = {"framing": {"full": {"label": "Full body", "top": 20, "bottom": 855, "width": 370}, "knees": {"label": "Knees up", "top": 20, "bottom": 730, "width": 370}, "waist": {"label": "Waist up", "top": 20, "bottom": 600, "width": 370}, "close": {"label": "Close-up", "top": 30, "bottom": 440, "width": 345}}, "idle": {"breathSeconds": 4.2, "breathPx": 0.8, "swaySeconds": 7.3, "swayDegrees": 0.8, "armSwingDegrees": 1.2, "talkNodPx": 1.4, "talkNodDegrees": 0.8, "talkNodSmoothing": 0.18}, "look": {"pupilReach": 11, "headDegrees": 2.5, "headPx": 2, "smoothing": 0.12}, "gesture": {"smoothing": 0.1}, "blink": {"halfMs": 40, "closedMs": 80, "halfAgainMs": 50, "minGapMs": 2500, "maxGapMs": 5500, "doubleChance": 0.15, "doubleGapMs": 140}, "mouthOpenness": {"X": 0, "A": 0, "B": 0.3, "C": 0.7, "D": 1, "E": 0.6, "F": 0.4, "G": 0.3, "H": 0.6, "smile": 0.2}, "outline": {"widthPx": 8, "blur": 5, "shadowBlur": 8, "shadowOpacity": 0.25}};
   // Markers: {time, type: "event", name} fires an app event; {time, end, type: "look", direction} turns Nova's gaze;
   // {time, end, type: "arm", side, degrees} raises an arm (side = the screen side it's on) and lowers it at end.
   const markers = [{"time": 0.56, "type": "event", "name": "show_logo", "note": "Sample: on \"Neelo\""}, {"time": 2.28, "end": 3.7, "type": "look", "direction": "right", "note": "Sample: looks toward screen right through \"Let's get this journey started\""}, {"time": 2.28, "end": 3.7, "type": "arm", "side": "right", "degrees": 32, "note": "Sample: raises the arm on the screen's right while looking over"}, {"time": 2.88, "type": "event", "name": "show_path", "note": "Sample: on \"journey\""}];
@@ -274,6 +277,10 @@ button { font: inherit; cursor: pointer; }
     if (scene.align === 'right') vx = Math.max(vx, ANCHOR_X + f.width / 2 - vw);
     svg.setAttribute('viewBox', `${vx.toFixed(1)} ${(f.bottom - vh).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`);
     $('frame').style.setProperty('--ar', fw / fh);
+    // Position only matters when the frame is wider than the framing needs
+    const noRoom = vw - f.width < 20;
+    $('alignCtl').querySelectorAll('button').forEach(b => { b.disabled = noRoom; });
+    $('alignHint').hidden = !noRoom;
     $('frameSize').textContent = `${fw} × ${fh}`;
   }
   function segControl(el, options, key) {

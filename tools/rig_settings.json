@@ -1,9 +1,9 @@
 {
   "framing": {
-    "full":  { "label": "Full body", "top": 20, "bottom": 855, "width": 480 },
-    "knees": { "label": "Knees up",  "top": 20, "bottom": 730, "width": 460 },
-    "waist": { "label": "Waist up",  "top": 20, "bottom": 600, "width": 440 },
-    "close": { "label": "Close-up",  "top": 30, "bottom": 440, "width": 380 }
+    "full":  { "label": "Full body", "top": 20, "bottom": 855, "width": 370 },
+    "knees": { "label": "Knees up",  "top": 20, "bottom": 730, "width": 370 },
+    "waist": { "label": "Waist up",  "top": 20, "bottom": 600, "width": 370 },
+    "close": { "label": "Close-up",  "top": 30, "bottom": 440, "width": 345 }
   },
   "idle": {
     "breathSeconds": 4.2,
