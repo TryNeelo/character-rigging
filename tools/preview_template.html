@@ -79,6 +79,12 @@ button { font: inherit; cursor: pointer; }
 .seg.x { background: repeating-linear-gradient(135deg, transparent 0 5px, var(--chip) 5px 7px); }
 .seg.on { background: var(--accent); color: var(--accent-ink); }
 .playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--rust); left: 0; pointer-events: none; }
+.marks { position: relative; height: 24px; margin-top: 4px; }
+.mark { position: absolute; top: 0; font-family: var(--font-mono); font-size: 11px; font-weight: 700; white-space: nowrap; color: var(--rust); border-left: 2px solid var(--rust); padding-left: 4px; line-height: 20px; }
+.mark.look { color: var(--accent); border: 0; background: var(--chip); border-radius: 4px; padding: 0 4px; overflow: hidden; text-overflow: ellipsis; }
+.mark.fired { background: var(--rust); color: #fff; border-radius: 4px; }
+.toast { position: absolute; left: 50%; top: 12px; translate: -50% 0; background: var(--rust); color: #fff; font-family: var(--font-mono); font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; transition: opacity .3s; }
+.toast[hidden] { display: block; opacity: 0; }
 .scale { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11px; color: var(--muted); padding: 4px 2px 0; font-variant-numeric: tabular-nums; }
 
 .shapes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
@@ -116,7 +122,7 @@ button { font: inherit; cursor: pointer; }
 
   <div class="grid">
     <div class="stage">
-      <div class="frame" id="frame"><span class="size" id="frameSize"></span>%%SVG%%</div>
+      <div class="frame" id="frame"><span class="size" id="frameSize"></span><div class="toast" id="toast" hidden></div>%%SVG%%</div>
       <div class="readout"><span>Mouth now: <span class="now" id="now">smile</span></span><span id="status">Idle, blinking</span></div>
     </div>
 
@@ -137,9 +143,9 @@ button { font: inherit; cursor: pointer; }
 
       <section>
         <h2>Onboarding dialogue 1</h2>
-        <p>%%NCUES%% mouth cues over %%DUR%% seconds. Each block below is one shape, sized by how long it's held. Half speed slows the audio too, so you can check each change.</p>
+        <p>%%NCUES%% mouth cues over %%DUR%% seconds. Each block below is one shape, sized by how long it's held. Half speed slows the audio too, so you can check each change. Markers below the timeline are app events (red) and things Nova does, like looking toward the screen's right (teal).</p>
         <audio id="audio" preload="auto" src="%%AUDIO%%"></audio>
-        <div class="strip-wrap"><div class="strip" id="strip"><div class="playhead" id="playhead"></div></div><div class="scale" id="scale"></div></div>
+        <div class="strip-wrap"><div class="strip" id="strip"><div class="playhead" id="playhead"></div></div><div class="scale" id="scale"></div><div class="marks" id="marks"></div></div>
         <div class="row" style="margin-top:12px">
           <button class="btn" id="play">Play with sound</button>
           <label class="toggle"><input type="checkbox" id="slow"><span>Half speed</span></label>
@@ -152,6 +158,7 @@ button { font: inherit; cursor: pointer; }
         <p>Arms stay behind the outfit and rotate at the shoulder; the head turns at the base of the neck. Idle adds slow breathing and a slight sway, plus a small nod while he talks.</p>
         <div class="fields">
           <label class="slider"><span>Head tilt</span><input type="range" id="poseHead" min="-10" max="10" step="0.5" value="0"><output for="poseHead" id="poseHeadOut">0°</output></label>
+          <label class="slider"><span>Eyes look</span><input type="range" id="poseLook" min="-1" max="1" step="0.1" value="0"><output for="poseLook" id="poseLookOut">0</output></label>
           <label class="slider"><span>Left arm</span><input type="range" id="poseArmL" min="-12" max="180" step="1" value="0"><output for="poseArmL" id="poseArmLOut">0°</output></label>
           <label class="slider"><span>Right arm</span><input type="range" id="poseArmR" min="-12" max="180" step="1" value="0"><output for="poseArmR" id="poseArmROut">0°</output></label>
           <div class="row">
@@ -202,6 +209,10 @@ button { font: inherit; cursor: pointer; }
   ];
   // Cues from Rhubarb Lip Sync: {start, end, value}
   const cues = %%CUES%%;
+  // Shared with the Flutter component: tools/rig_settings.json
+  const S = %%SETTINGS%%;
+  // Markers: {time, type: "event", name} fires an app event; {time, end, type: "look", direction} turns Nova's gaze.
+  const markers = %%MARKERS%%;
   const DURATION = cues[cues.length - 1].end;
 
   const $ = id => document.getElementById(id);
@@ -212,12 +223,7 @@ button { font: inherit; cursor: pointer; }
   // Framing presets are ranges in character units (artboard 556 x 837, feet at y 837, centre x 278).
   const ANCHOR_X = 278;
   const FRAMES = { phone: ['Phone', 390, 844], square: ['Square', 600, 600], wide: ['Landscape', 960, 540], avatar: ['Avatar', 160, 160] };
-  const FRAMING = {
-    full:  ['Full body', { top: 20, bottom: 855, width: 480 }],
-    knees: ['Knees up',  { top: 20, bottom: 730, width: 460 }],
-    waist: ['Waist up',  { top: 20, bottom: 600, width: 440 }],
-    close: ['Close-up',  { top: 30, bottom: 440, width: 380 }]
-  };
+  const FRAMING = Object.fromEntries(Object.entries(S.framing).map(([k, f]) => [k, [f.label, f]]));
   const ALIGN = { left: 'Left', center: 'Center', right: 'Right' };
   const scene = { frame: 'phone', framing: 'full', align: 'center' };
 
@@ -266,30 +272,36 @@ button { font: inherit; cursor: pointer; }
   svg.appendChild(dots);
   $('pivotsOn').addEventListener('change', e => dots.setAttribute('display', e.target.checked ? 'inline' : 'none'));
 
-  const pose = { head: 0, armL: 0, armR: 0 };
+  const pose = { head: 0, look: 0, armL: 0, armR: 0 };
+  const pupils = $('pupils');
+  // Looking: -1 is the screen's left, 1 the screen's right. Pupils slide, the head turns slightly.
+  const LOOK = S.look;
+  let look = 0, lookTarget = 0;
   // Slider ids are prefixed so they never collide with part ids in the SVG (#head)
-  const SLIDERS = { head: 'poseHead', armL: 'poseArmL', armR: 'poseArmR' };
+  const SLIDERS = { head: 'poseHead', look: 'poseLook', armL: 'poseArmL', armR: 'poseArmR' };
   Object.entries(SLIDERS).forEach(([k, id]) => {
     const input = $(id), out = $(id + 'Out');
-    input.addEventListener('input', () => { pose[k] = +input.value; out.textContent = `${input.value}°`; });
+    input.addEventListener('input', () => { pose[k] = +input.value; out.textContent = k === 'look' ? input.value : `${input.value}°`; });
   });
   $('resetPose').addEventListener('click', () => {
-    Object.entries(SLIDERS).forEach(([k, id]) => { pose[k] = 0; $(id).value = 0; $(id + 'Out').textContent = '0°'; });
+    Object.entries(SLIDERS).forEach(([k, id]) => { pose[k] = 0; $(id).value = 0; $(id + 'Out').textContent = k === 'look' ? '0' : '0°'; });
   });
 
   // How open each mouth shape is, for the small nod while talking
-  const OPEN = { X: 0, A: 0, B: 0.3, C: 0.7, D: 1, E: 0.6, F: 0.4, G: 0.3, H: 0.6, smile: 0.2 };
+  const OPEN = S.mouthOpenness, I = S.idle;
   let nod = 0;
   function animate(now) {
     const t = now / 1000;
     const idle = $('idleOn').checked;
-    const breath = idle ? Math.sin(t * 2 * Math.PI / 4.2) : 0;          // one breath every 4.2 s
-    const sway = idle ? Math.sin(t * 2 * Math.PI / 7.3) * 0.8 : 0;      // ±0.8° head sway
-    const swing = idle ? Math.sin(t * 2 * Math.PI / 4.2 + 0.6) * 1.2 : 0; // arms follow the breath
-    nod += (((raf && idle) ? OPEN[current] : 0) - nod) * 0.18;
-    upper.setAttribute('transform', `translate(0 ${(-0.8 - 0.8 * breath).toFixed(2)})`);
+    const breath = idle ? Math.sin(t * 2 * Math.PI / I.breathSeconds) : 0;
+    const sway = idle ? Math.sin(t * 2 * Math.PI / I.swaySeconds) * I.swayDegrees : 0;
+    const swing = idle ? Math.sin(t * 2 * Math.PI / I.breathSeconds + 0.6) * I.armSwingDegrees : 0; // arms follow the breath
+    nod += (((raf && idle) ? OPEN[current] : 0) - nod) * I.talkNodSmoothing;
+    look += (Math.max(-1, Math.min(1, lookTarget + pose.look)) - look) * LOOK.smoothing;
+    pupils.setAttribute('transform', `translate(${(LOOK.pupilPx * look).toFixed(2)} 0)`);
+    upper.setAttribute('transform', `translate(0 ${(-I.breathPx * (1 + breath)).toFixed(2)})`);
     dots.setAttribute('transform', upper.getAttribute('transform'));
-    head.setAttribute('transform', `translate(0 ${(-1.4 * nod).toFixed(2)}) rotate(${(pose.head + sway - 0.8 * nod).toFixed(2)} ${HP[0]} ${HP[1]})`);
+    head.setAttribute('transform', `translate(${(LOOK.headPx * look).toFixed(2)} ${(-I.talkNodPx * nod).toFixed(2)}) rotate(${(pose.head + sway - I.talkNodDegrees * nod + LOOK.headDegrees * look).toFixed(2)} ${HP[0]} ${HP[1]})`);
     armL.setAttribute('transform', `rotate(${(pose.armL + swing).toFixed(2)} ${LP[0]} ${LP[1]})`);
     armR.setAttribute('transform', `rotate(${(-pose.armR - swing).toFixed(2)} ${RP[0]} ${RP[1]})`);
     requestAnimationFrame(animate);
@@ -323,9 +335,9 @@ button { font: inherit; cursor: pointer; }
   async function blink() {
     if (held || blinking) return;
     blinking = true;
-    setEye('half'); await wait(40);
-    setEye('closed'); await wait(80);
-    setEye('half'); await wait(50);
+    setEye('half'); await wait(S.blink.halfMs);
+    setEye('closed'); await wait(S.blink.closedMs);
+    setEye('half'); await wait(S.blink.halfAgainMs);
     if (!held) setEye('open');
     blinking = false;
   }
@@ -334,9 +346,9 @@ button { font: inherit; cursor: pointer; }
     if (!$('blinkOn').checked) return;
     blinkTimer = setTimeout(async () => {
       await blink();
-      if (Math.random() < 0.15) { await wait(140); await blink(); }
+      if (Math.random() < S.blink.doubleChance) { await wait(S.blink.doubleGapMs); await blink(); }
       scheduleBlink();
-    }, 2500 + Math.random() * 3000);
+    }, S.blink.minGapMs + Math.random() * (S.blink.maxGapMs - S.blink.minGapMs));
   }
   $('blinkOn').addEventListener('change', scheduleBlink);
   $('blinkNow').addEventListener('click', blink);
@@ -377,9 +389,31 @@ button { font: inherit; cursor: pointer; }
   });
   for (let k = 0; k <= Math.floor(DURATION); k++) { const t = document.createElement('span'); t.textContent = k + 's'; $('scale').appendChild(t); }
   $('scale').lastChild.textContent = DURATION.toFixed(1) + 's';
-  let raf = null, lastSeg = -1;
+  const markEls = markers.map(mk => {
+    const el = document.createElement('div');
+    el.className = 'mark' + (mk.type === 'look' ? ' look' : '');
+    el.style.left = `${mk.time / DURATION * 100}%`;
+    if (mk.type === 'look') { el.style.width = `${(mk.end - mk.time) / DURATION * 100}%`; el.textContent = `look ${mk.direction}`; }
+    else el.textContent = mk.name;
+    el.title = mk.note || '';
+    $('marks').appendChild(el);
+    return el;
+  });
+  let toastTimer = null;
+  function fireEvent(mk, el) {
+    $('toast').textContent = `Event: ${mk.name}`;
+    $('toast').hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { $('toast').hidden = true; }, 1200);
+    el.classList.add('fired');
+  }
+  let raf = null, lastSeg = -1, lastT = -1;
   function frame() {
     const t = audio.currentTime;
+    markers.forEach((mk, i) => { if (mk.type === 'event' && lastT < mk.time && t >= mk.time) fireEvent(mk, markEls[i]); });
+    lastT = t;
+    const lk = markers.find(mk => mk.type === 'look' && t >= mk.time && t < mk.end);
+    lookTarget = lk ? (lk.direction === 'right' ? 1 : -1) : 0;
     const idx = cues.findIndex(c => t >= c.start && t < c.end);
     if (idx !== lastSeg) {
       if (lastSeg >= 0) segEls[lastSeg].classList.remove('on');
@@ -396,17 +430,20 @@ button { font: inherit; cursor: pointer; }
     if (lastSeg >= 0) segEls[lastSeg].classList.remove('on');
     lastSeg = -1;
     $('playhead').style.left = '0%';
+    lookTarget = 0; lastT = -1;
+    markEls.forEach(el => el.classList.remove('fired'));
     $('play').textContent = 'Play with sound';
     setMouth('smile');
     $('status').textContent = 'Idle, blinking';
   }
   audio.addEventListener('ended', () => {
-    if ($('loop').checked) { setMouth('X'); setTimeout(() => { if (raf) { audio.currentTime = 0; audio.play(); } }, 600); }
+    if ($('loop').checked) { setMouth('X'); setTimeout(() => { if (raf) { lastT = -1; markEls.forEach(el => el.classList.remove('fired')); audio.currentTime = 0; audio.play(); } }, 600); }
     else stop();
   });
   $('slow').addEventListener('change', () => { audio.playbackRate = $('slow').checked ? 0.5 : 1; });
   $('play').addEventListener('click', async () => {
     if (raf) return stop();
+    lastT = -1; markEls.forEach(el => el.classList.remove('fired'));
     shapeBtns.forEach(x => x.setAttribute('aria-pressed', 'false'));
     audio.currentTime = 0;
     audio.playbackRate = $('slow').checked ? 0.5 : 1;

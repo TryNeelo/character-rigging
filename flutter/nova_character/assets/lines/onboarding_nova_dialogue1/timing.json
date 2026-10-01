@@ -1,0 +1,208 @@
+{
+ "id": "onboarding_nova_dialogue1",
+ "audio": "audio.mp3",
+ "duration": 3.76,
+ "cues": [
+  {
+   "start": 0.0,
+   "end": 0.04,
+   "shape": "X"
+  },
+  {
+   "start": 0.04,
+   "end": 0.14,
+   "shape": "F"
+  },
+  {
+   "start": 0.14,
+   "end": 0.3,
+   "shape": "C"
+  },
+  {
+   "start": 0.3,
+   "end": 0.35,
+   "shape": "B"
+  },
+  {
+   "start": 0.35,
+   "end": 0.38,
+   "shape": "C"
+  },
+  {
+   "start": 0.38,
+   "end": 0.45,
+   "shape": "A"
+  },
+  {
+   "start": 0.45,
+   "end": 0.5,
+   "shape": "B"
+  },
+  {
+   "start": 0.5,
+   "end": 0.56,
+   "shape": "F"
+  },
+  {
+   "start": 0.56,
+   "end": 0.74,
+   "shape": "B"
+  },
+  {
+   "start": 0.74,
+   "end": 0.79,
+   "shape": "H"
+  },
+  {
+   "start": 0.79,
+   "end": 0.92,
+   "shape": "E"
+  },
+  {
+   "start": 0.92,
+   "end": 1.09,
+   "shape": "F"
+  },
+  {
+   "start": 1.09,
+   "end": 1.33,
+   "shape": "X"
+  },
+  {
+   "start": 1.33,
+   "end": 1.41,
+   "shape": "C"
+  },
+  {
+   "start": 1.41,
+   "end": 1.46,
+   "shape": "B"
+  },
+  {
+   "start": 1.46,
+   "end": 1.54,
+   "shape": "A"
+  },
+  {
+   "start": 1.54,
+   "end": 1.59,
+   "shape": "B"
+  },
+  {
+   "start": 1.59,
+   "end": 1.7,
+   "shape": "E"
+  },
+  {
+   "start": 1.7,
+   "end": 1.75,
+   "shape": "F"
+  },
+  {
+   "start": 1.75,
+   "end": 1.81,
+   "shape": "G"
+  },
+  {
+   "start": 1.81,
+   "end": 2.0,
+   "shape": "C"
+  },
+  {
+   "start": 2.0,
+   "end": 2.28,
+   "shape": "X"
+  },
+  {
+   "start": 2.28,
+   "end": 2.32,
+   "shape": "H"
+  },
+  {
+   "start": 2.32,
+   "end": 2.38,
+   "shape": "C"
+  },
+  {
+   "start": 2.38,
+   "end": 2.5,
+   "shape": "B"
+  },
+  {
+   "start": 2.5,
+   "end": 2.6,
+   "shape": "C"
+  },
+  {
+   "start": 2.6,
+   "end": 2.66,
+   "shape": "B"
+  },
+  {
+   "start": 2.66,
+   "end": 2.75,
+   "shape": "C"
+  },
+  {
+   "start": 2.75,
+   "end": 2.88,
+   "shape": "B"
+  },
+  {
+   "start": 2.88,
+   "end": 3.02,
+   "shape": "E"
+  },
+  {
+   "start": 3.02,
+   "end": 3.3,
+   "shape": "B"
+  },
+  {
+   "start": 3.3,
+   "end": 3.44,
+   "shape": "D"
+  },
+  {
+   "start": 3.44,
+   "end": 3.51,
+   "shape": "B"
+  },
+  {
+   "start": 3.51,
+   "end": 3.63,
+   "shape": "C"
+  },
+  {
+   "start": 3.63,
+   "end": 3.7,
+   "shape": "B"
+  },
+  {
+   "start": 3.7,
+   "end": 3.76,
+   "shape": "X"
+  }
+ ],
+ "markers": [
+  {
+   "time": 0.56,
+   "type": "event",
+   "name": "show_logo",
+   "note": "Sample: on \"Neelo\""
+  },
+  {
+   "time": 2.28,
+   "end": 3.7,
+   "type": "look",
+   "direction": "right",
+   "note": "Sample: looks toward screen right through \"Let's get this journey started\""
+  },
+  {
+   "time": 2.88,
+   "type": "event",
+   "name": "show_path",
+   "note": "Sample: on \"journey\""
+  }
+ ]
+}

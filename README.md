@@ -10,19 +10,25 @@ art/
   Nova-rigged.svg               Current rig, built from Nova-outfit_1.svg: grouped parts, hat, eyelids and mouth shapes.
   Character.svg                 First flat Figma export (waist up, with hat). Never edited. Source of the hat and smile.
   Character-rigged.svg          First rig, kept for the prototyping project. Built by an earlier build_rig.py (see git history).
+  parts/                        Each part on its own full canvas, for the Flutter component. Built by build_rig.py.
   mouth-shapes-reference.png    Sheet of all mouth shapes, in order X A B C D E F G H, smile.
 dialogue/
   <line_name>/
     <line_name>.mp3             Voice audio for the line.
-    cues.json                   Approved mouth timing (what the app and previews use).
+    cues.json                   Approved mouth timing and markers (what the app and previews use).
     cues-rhubarb-raw.json       Untouched output from the lip-sync tool, kept for reference.
     script.txt                  Exact words spoken (add when available).
 preview/
   <line_name>.html              Self-contained player for one line. Open in any browser.
+flutter/nova_character/         Nova as a ready-made Flutter widget, with a demo app. Its assets/ folder is generated.
+dist/                           Zips for the developers (not in git). Built by make_handoff.py.
 tools/
   build_rig.py                  Rebuilds art/Nova-rigged.svg from art/Nova-outfit_1.svg and art/Character.svg.
   build_preview.py              Builds preview/<line_name>.html for one line.
   preview_template.html         Page template the preview builder fills in.
+  rig_settings.json             Framing, idle, look, blink and outline numbers, shared by the preview and the Flutter widget.
+  build_flutter.py              Packages parts, settings and lines into flutter/nova_character/assets/.
+  make_handoff.py               Runs every build step and writes dist/nova_character-<version>.zip.
 ```
 
 ## How the rig works
@@ -76,6 +82,8 @@ Timing is 40 ms half, 80 ms closed, 50 ms half. Blinks happen at random every 2.
 
 **Scenes.** The preview places Nova in a frame by setting the SVG's `viewBox`. Framing presets are vertical ranges in artboard units (full body, knees up, waist up, close-up); the crop is aligned to the bottom of the frame, and Nova can stand left, centre or right.
 
+**Markers.** `cues.json` can carry a `markers` list next to the mouth cues. `{"time", "type": "event", "name"}` sends an event to the app at that moment, for example to highlight the shops. `{"time", "end", "type": "look", "direction": "left" | "right"}` turns Nova's eyes and head toward that side of the screen; the pupils slide up to 8 px, the head turns 2.5°. The preview shows markers under the timeline and pops up each event as it fires.
+
 **Not rigged yet.** Legs, elbows, separate paws, ears, gaze (`pupils`) and brow expressions.
 
 ## Adding a new dialogue line
@@ -90,9 +98,15 @@ Timing is 40 ms half, 80 ms closed, 50 ms half. Blinks happen at random every 2.
 
 Giving Rhubarb the script text (step 3) usually improves accuracy a lot. The first line was timed from audio alone because no script was available.
 
+## Handing Nova to the developers
+
+The developers get Nova as a Flutter package (`flutter/nova_character/`): a widget they place on a screen, a controller that plays lines, and a stream of events. Art, audio and timing are bundled inside, so there is nothing to assemble. Its README is the developer guide, and `example/` is a demo screen.
+
+To send a new version: bump `version` in `flutter/nova_character/pubspec.yaml`, run `python3 tools/make_handoff.py`, and send `dist/nova_character-<version>.zip`.
+
 ## Line log
 
-**onboarding_nova_dialogue1** (3.8 s, 36 cues). Words (from an automatic transcript, to confirm): "Welcome to Neelo. I'm Nova. Let's get this journey started." Timed by Rhubarb from audio only, then hand-fixed against the audio (energy, frication and vowel formants per 10 ms). Shapes lead the sound by about 30 ms, as Rhubarb does. Hand fixes: (1) "welcome": short B and C for "kuh" before A for M (0.30 to 0.45 s). (2) "to Neelo": B for T, F for OO, then B for N and EE, H for L, E closing to F for O (0.45 to 1.09 s). (3) Both pauses are true silence and now rest on X instead of holding B (1.09 to 1.33 s and 2.00 to 2.28 s). (4) "Nova": B for N, and G for V moved about 50 ms earlier (1.54 to 2.00 s). (5) "Let's": C opens on the E before B for TS (2.28 to 2.50 s). The earlier split of a long B over "get this" into B, C, B, C, B is kept. (6) "started": B for T, C for the "-te-" vowel, B for D, then X (3.44 to 3.76 s).
+**onboarding_nova_dialogue1** (3.8 s, 36 cues). Words (from an automatic transcript, to confirm): "Welcome to Neelo. I'm Nova. Let's get this journey started." Timed by Rhubarb from audio only, then hand-fixed against the audio (energy, frication and vowel formants per 10 ms). Shapes lead the sound by about 30 ms, as Rhubarb does. Sample markers for the developer handoff: event `show_logo` on "Neelo" (0.56 s), look right through "Let's get this journey started" (2.28 to 3.70 s), event `show_path` on "journey" (2.88 s). Hand fixes: (1) "welcome": short B and C for "kuh" before A for M (0.30 to 0.45 s). (2) "to Neelo": B for T, F for OO, then B for N and EE, H for L, E closing to F for O (0.45 to 1.09 s). (3) Both pauses are true silence and now rest on X instead of holding B (1.09 to 1.33 s and 2.00 to 2.28 s). (4) "Nova": B for N, and G for V moved about 50 ms earlier (1.54 to 2.00 s). (5) "Let's": C opens on the E before B for TS (2.28 to 2.50 s). The earlier split of a long B over "get this" into B, C, B, C, B is kept. (6) "started": B for T, C for the "-te-" vowel, B for D, then X (3.44 to 3.76 s).
 
 ## Decisions so far
 

@@ -111,7 +111,7 @@ head = (f'<g id="head" class="part" data-pivot="{HEAD_PIVOT[0]} {HEAD_PIVOT[1]}"
         + els[0] + els[42]                                      # ear roots, behind the head
         + els[43] + els[44]                                     # head fur
         + J(45, 49)                                             # eye patches, eye whites
-        + '<g id="pupils">' + els[49] + els[50] + '</g>'
+        + '<g clip-path="url(#clip-eyes)"><g id="pupils">' + els[49] + els[50] + '</g></g>'  # pupils stay inside the eyes when they move
         + eyelids
         + J(51, 55)                                             # ears
         + '<g id="brows">' + els[55] + els[56] + '</g>'
@@ -129,7 +129,9 @@ OUTLINE = '''<filter id="outline" x="-0.15" y="-0.1" width="1.3" height="1.2" co
 <feColorMatrix in="sb" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0" result="shadow"/>
 <feMerge><feMergeNode in="shadow"/><feMergeNode in="edge"/><feMergeNode in="SourceGraphic"/></feMerge>
 </filter>'''
-clips = ('<clipPath id="clip-eye-left"><ellipse cx="178.875" cy="437.312" rx="25.4" ry="25.4"/></clipPath>'
+EYE_WHITES = [(232.875, 269.183), (324.259, 269.183)]  # new-art coordinates, radius 24.654
+clips = ('<clipPath id="clip-eyes">' + ''.join(f'<ellipse cx="{x}" cy="{y}" rx="24.654" ry="24.6125"/>' for x, y in EYE_WHITES) + '</clipPath>'
+         '<clipPath id="clip-eye-left"><ellipse cx="178.875" cy="437.312" rx="25.4" ry="25.4"/></clipPath>'
          '<clipPath id="clip-eye-right"><ellipse cx="270.259" cy="437.312" rx="25.4" ry="25.4"/></clipPath>' + ''.join(CLIPS))
 
 svg = (f'<svg id="nova" width="556" height="837" viewBox="0 0 556 837" fill="none" xmlns="http://www.w3.org/2000/svg">\n'
@@ -139,3 +141,43 @@ svg = (f'<svg id="nova" width="556" height="837" viewBox="0 0 556 837" fill="non
        '</g>\n</svg>\n')
 open(OUT, 'w').write(svg)
 print('wrote', OUT, len(svg), 'bytes; arm pivots', [sleeve_cap(els[14], dots[0]), sleeve_cap(els[16], dots[1])])
+
+# ---- Separate part files for the app (art/parts/). Every part is drawn on the full
+# 556 x 837 canvas, so the app stacks them in this order and moves them by their pivots.
+PARTS_DIR = os.path.join(ROOT, 'art', 'parts')
+os.makedirs(PARTS_DIR, exist_ok=True)
+for f in os.listdir(PARTS_DIR):
+    if f.endswith('.svg'): os.remove(os.path.join(PARTS_DIR, f))
+def part(name, body, defs=''):
+    open(os.path.join(PARTS_DIR, name + '.svg'), 'w').write(
+        f'<svg width="556" height="837" viewBox="0 0 556 837" fill="none" xmlns="http://www.w3.org/2000/svg">'
+        + (f'<defs>{defs}</defs>' if defs else '') + body + '</svg>\n')
+def strip_wrapper(g):  # drop the outer <g ...> of an arm so its transform is applied by the app
+    return g[g.index('>') + 1:-len('</g>')]
+eye_clips = ('<clipPath id="clip-eye-left"><ellipse cx="178.875" cy="437.312" rx="25.4" ry="25.4"/></clipPath>'
+             '<clipPath id="clip-eye-right"><ellipse cx="270.259" cy="437.312" rx="25.4" ry="25.4"/></clipPath>')
+def lids(state):
+    out = ''
+    for side, (cx, fur) in {'left': (178.875, '#983820'), 'right': (270.259, '#84270F')}.items():
+        g = lid(cx, 437.312, 24.654, fur, side)
+        lid_g = re.search(r'<g id="eye-%s-lid".*?</g>' % side, g, re.S).group(0)
+        closed_g = re.search(r'<g id="eye-%s-closed".*?</g>' % side, g, re.S).group(0)
+        if state == 'half':
+            out += f'<g clip-path="url(#clip-eye-{side})">' + lid_g.replace(f'translate(0 -{2*24.654+2:.1f})', 'translate(0 -15)') + '</g>'
+        else:
+            out += f'<g clip-path="url(#clip-eye-{side})">' + closed_g.replace(' style="display:none"', '') + '</g>'
+    return f'<g transform="{OFF}">{out}</g>'
+part('legs', J(1, 13))
+part('arm_left', strip_wrapper(arms[:arms.index('</g>') + 4]))
+part('arm_right', strip_wrapper(arms[arms.index('</g>') + 4:]))
+part('body', els[17] + J(18, 42))
+part('head_back', els[0] + els[42] + els[43] + els[44] + J(45, 49))
+part('pupils', els[49] + els[50])
+part('lids_half', lids('half'), eye_clips)
+part('lids_closed', lids('closed'), eye_clips)
+part('head_front', J(51, 55) + els[55] + els[56] + els[57])
+for k, b in shapes:
+    used = ''.join(c for c in CLIPS if f'url(#{c.split(chr(34))[1]})' in b)
+    part(f'mouth_{k}', f'<g transform="{OFF}">{b}</g>', used)
+part('head_top', els[60] + els[61] + f'<g transform="{OFF}">' + ''.join(old[54:59]) + '</g>')
+print('wrote', len([f for f in os.listdir(PARTS_DIR) if f.endswith('.svg')]), 'part files to', PARTS_DIR)

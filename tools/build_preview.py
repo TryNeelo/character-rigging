@@ -11,13 +11,16 @@ d = os.path.join(ROOT, 'dialogue', line)
 mp3 = os.path.join(d, line + '.mp3')
 if not os.path.exists(mp3):
     mp3 = sorted(glob.glob(os.path.join(d, '*.mp3')))[0]
-cues = json.load(open(os.path.join(d, 'cues.json')))['mouthCues']
+timing = json.load(open(os.path.join(d, 'cues.json')))
+cues, markers = timing['mouthCues'], timing.get('markers', [])
 svg = open(os.path.join(ROOT, 'art', 'Nova-rigged.svg')).read().replace(
     '<svg id="nova" ', '<svg id="nova" role="img" aria-label="Nova, a bear in a teal hoodie and cap" ', 1)
 audio = 'data:audio/mpeg;base64,' + base64.b64encode(open(mp3, 'rb').read()).decode()
 page = open(os.path.join(ROOT, 'tools', 'preview_template.html')).read()
 page = (page.replace('%%SVG%%', svg)
             .replace('%%CUES%%', json.dumps([{k: c[k] for k in ('start', 'end', 'value')} for c in cues]))
+            .replace('%%MARKERS%%', json.dumps(markers))
+            .replace('%%SETTINGS%%', json.dumps(json.load(open(os.path.join(ROOT, 'tools', 'rig_settings.json')))))
             .replace('%%AUDIO%%', audio)
             .replace('%%NCUES%%', str(len(cues)))
             .replace('%%DUR%%', f"{cues[-1]['end']:.1f}"))

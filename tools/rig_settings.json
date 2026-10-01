@@ -1,0 +1,35 @@
+{
+  "framing": {
+    "full":  { "label": "Full body", "top": 20, "bottom": 855, "width": 480 },
+    "knees": { "label": "Knees up",  "top": 20, "bottom": 730, "width": 460 },
+    "waist": { "label": "Waist up",  "top": 20, "bottom": 600, "width": 440 },
+    "close": { "label": "Close-up",  "top": 30, "bottom": 440, "width": 380 }
+  },
+  "idle": {
+    "breathSeconds": 4.2,
+    "breathPx": 0.8,
+    "swaySeconds": 7.3,
+    "swayDegrees": 0.8,
+    "armSwingDegrees": 1.2,
+    "talkNodPx": 1.4,
+    "talkNodDegrees": 0.8,
+    "talkNodSmoothing": 0.18
+  },
+  "look": {
+    "pupilPx": 8,
+    "headDegrees": 2.5,
+    "headPx": 2,
+    "smoothing": 0.12
+  },
+  "blink": {
+    "halfMs": 40,
+    "closedMs": 80,
+    "halfAgainMs": 50,
+    "minGapMs": 2500,
+    "maxGapMs": 5500,
+    "doubleChance": 0.15,
+    "doubleGapMs": 140
+  },
+  "mouthOpenness": { "X": 0, "A": 0, "B": 0.3, "C": 0.7, "D": 1, "E": 0.6, "F": 0.4, "G": 0.3, "H": 0.6, "smile": 0.2 },
+  "outline": { "widthPx": 8, "blur": 5, "shadowBlur": 8, "shadowOpacity": 0.25 }
+}

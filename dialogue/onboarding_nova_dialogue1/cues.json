@@ -184,5 +184,26 @@
    "end": 3.76,
    "value": "X"
   }
+ ],
+ "markers": [
+  {
+   "time": 0.56,
+   "type": "event",
+   "name": "show_logo",
+   "note": "Sample: on \"Neelo\""
+  },
+  {
+   "time": 2.28,
+   "end": 3.7,
+   "type": "look",
+   "direction": "right",
+   "note": "Sample: looks toward screen right through \"Let's get this journey started\""
+  },
+  {
+   "time": 2.88,
+   "type": "event",
+   "name": "show_path",
+   "note": "Sample: on \"journey\""
+  }
  ]
 }
