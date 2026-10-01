@@ -55,6 +55,7 @@ class NovaRig {
   double idle(String key) => _num(_j['idle'][key]);
   double look(String key) => _num(_j['look'][key]);
   double blink(String key) => _num(_j['blink'][key]);
+  double gesture(String key) => _num(_j['gesture'][key]);
   double outline(String key) => _num(_j['outline'][key]);
 
   static Future<NovaRig>? _loading;

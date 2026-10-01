@@ -83,13 +83,15 @@ The timing file holds the mouth shapes and the markers:
 ```json
 "markers": [
   { "time": 0.56, "type": "event", "name": "show_logo" },
-  { "time": 2.28, "end": 3.70, "type": "look", "direction": "right" }
+  { "time": 2.28, "end": 3.70, "type": "look", "direction": "right" },
+  { "time": 2.28, "end": 3.70, "type": "arm", "side": "right", "degrees": 32 }
 ]
 ```
 
 - `event` markers become `NovaEvent`s in your app. The names are agreed per scene.
 - `look` markers turn Nova's eyes and head toward the screen's left or right between
-  `time` and `end`. You don't need to do anything with these; the widget handles them.
+  `time` and `end`. `arm` markers raise the arm on that side of the screen, then lower it
+  at `end`. You don't need to do anything with these; the widget handles them.
 
 The audio is the clock, so slow devices and speed changes stay in sync.
 

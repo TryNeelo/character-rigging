@@ -13,22 +13,27 @@ class NovaCue {
 }
 
 /// A moment in a line. Either an app event (`type: "event"`, with a [name]) or something
-/// Nova does (`type: "look"`, from [time] to [end], toward [direction] "left" or "right"
-/// of the screen).
+/// Nova does from [time] to [end]: `type: "look"` toward [direction] "left" or "right" of
+/// the screen, or `type: "arm"` raising the arm on the screen's [side] by [degrees].
 class NovaMarker {
-  const NovaMarker({required this.time, required this.type, this.end, this.name, this.direction});
+  const NovaMarker(
+      {required this.time, required this.type, this.end, this.name, this.direction, this.side, this.degrees});
   final double time;
   final double? end;
   final String type;
   final String? name;
   final String? direction;
+  final String? side;
+  final double? degrees;
 
   factory NovaMarker.fromJson(Map<String, dynamic> j) => NovaMarker(
       time: (j['time'] as num).toDouble(),
       end: (j['end'] as num?)?.toDouble(),
       type: j['type'] as String,
       name: j['name'] as String?,
-      direction: j['direction'] as String?);
+      direction: j['direction'] as String?,
+      side: j['side'] as String?,
+      degrees: (j['degrees'] as num?)?.toDouble());
 }
 
 /// A dialogue line (or a whole scene): its audio, mouth timing and markers.
@@ -61,6 +66,18 @@ class NovaLine {
       if (t >= c.start && t < c.end) return c.shape;
     }
     return null;
+  }
+
+  /// How far each arm is raised at [t] seconds, in degrees: (left, right) by screen side.
+  (double, double) armsAt(double t) {
+    var left = 0.0, right = 0.0;
+    for (final m in markers) {
+      if (m.type == 'arm' && t >= m.time && t < (m.end ?? m.time)) {
+        if (m.side == 'left') left = m.degrees ?? 0;
+        if (m.side == 'right') right = m.degrees ?? 0;
+      }
+    }
+    return (left, right);
   }
 
   /// Look direction at [t] seconds: -1 screen left, 1 screen right, 0 straight ahead.

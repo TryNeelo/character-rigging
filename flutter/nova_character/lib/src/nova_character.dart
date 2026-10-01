@@ -59,7 +59,7 @@ enum _Eye { open, half, closed }
 class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProviderStateMixin {
   NovaRig? _rig;
   late final Ticker _ticker;
-  double _t = 0, _nod = 0, _look = 0;
+  double _t = 0, _nod = 0, _look = 0, _raiseLeft = 0, _raiseRight = 0;
   _Eye _eye = _Eye.open;
   Timer? _blinkTimer;
   final _random = math.Random();
@@ -98,11 +98,14 @@ class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProvider
     final c = widget.controller;
     final lineLook = c.line?.lookAt(c.time) ?? 0;
     final lookTarget = lineLook != 0 ? lineLook : c.look.value;
+    final (armLeft, armRight) = c.line?.armsAt(c.time) ?? (0.0, 0.0);
     final open = (c.isSpeaking && widget.idle) ? (rig.mouthOpenness[_shape] ?? 0) : 0.0;
     setState(() {
       _t = elapsed.inMicroseconds / 1e6;
       _nod += (open - _nod) * rig.idle('talkNodSmoothing');
       _look += (lookTarget - _look) * rig.look('smoothing');
+      _raiseLeft += (armLeft - _raiseLeft) * rig.gesture('smoothing');
+      _raiseRight += (armRight - _raiseRight) * rig.gesture('smoothing');
     });
   }
 
@@ -243,8 +246,9 @@ class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProvider
         Transform.translate(
           offset: Offset(0, upperY * s),
           child: Stack(children: [
-            Transform(transform: rotateAbout(rig.armLeftPivot, swing), child: part('arm_left')),
-            Transform(transform: rotateAbout(rig.armRightPivot, -swing), child: part('arm_right')),
+            // Positive raises lift each arm outward, away from the body
+            Transform(transform: rotateAbout(rig.armLeftPivot, _raiseLeft + swing), child: part('arm_left')),
+            Transform(transform: rotateAbout(rig.armRightPivot, -_raiseRight - swing), child: part('arm_right')),
             part('body'),
             head,
           ]),

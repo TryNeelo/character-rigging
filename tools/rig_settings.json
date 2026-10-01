@@ -21,6 +21,9 @@
     "headPx": 2,
     "smoothing": 0.12
   },
+  "gesture": {
+    "smoothing": 0.1
+  },
   "blink": {
     "halfMs": 40,
     "closedMs": 80,

@@ -200,6 +200,14 @@
    "note": "Sample: looks toward screen right through \"Let's get this journey started\""
   },
   {
+   "time": 2.28,
+   "end": 3.7,
+   "type": "arm",
+   "side": "right",
+   "degrees": 32,
+   "note": "Sample: raises the arm on the screen's right while looking over"
+  },
+  {
    "time": 2.88,
    "type": "event",
    "name": "show_path",
