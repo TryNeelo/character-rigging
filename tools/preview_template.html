@@ -98,6 +98,23 @@ button { font: inherit; cursor: pointer; }
 .shape[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); }
 .shape.live { background: var(--chip); }
 
+.section-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+.section-head h2 { margin: 0; }
+.btn.small { padding: 6px 14px; font-size: 13px; }
+.words { font-style: italic; color: var(--fg) !important; }
+/* Lines panel: slides in from the right so lines can be switched while watching Nova */
+.lines-panel { position: fixed; top: 0; right: 0; bottom: 0; width: min(360px, 100vw); background: var(--surface); border-left: 1px solid var(--line); box-shadow: -12px 0 32px rgba(0, 0, 0, .18); z-index: 20; display: flex; flex-direction: column; transform: translateX(100%); visibility: hidden; transition: transform .2s ease, visibility .2s; }
+.lines-panel.open { transform: none; visibility: visible; }
+.panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px; border-bottom: 1px solid var(--line); }
+.panel-head h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; margin: 0; }
+.lines-list { overflow-y: auto; padding: 10px; display: grid; gap: 6px; align-content: start; }
+.line-item { text-align: left; background: transparent; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; color: var(--fg); display: grid; gap: 2px; }
+.line-item[aria-current="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); background: var(--chip); }
+.line-item .t { font-weight: 700; font-size: 14px; }
+.line-item .m { font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.line-item .w { font-size: 12.5px; color: var(--muted); }
+.line-item:focus-visible, .panel-head button:focus-visible { outline: 3px solid var(--rust); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .lines-panel { transition: none; } }
 .notes { font-size: 13.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; display: grid; gap: 6px; }
 .notes p { margin: 0; max-width: 65ch; }
 </style>
@@ -148,9 +165,13 @@ button { font: inherit; cursor: pointer; }
       </section>
 
       <section>
-        <h2>Onboarding dialogue 1</h2>
-        <p>%%NCUES%% mouth cues over %%DUR%% seconds. Each block below is one shape, sized by how long it's held. Half speed slows the audio too, so you can check each change. Markers below the timeline are app events (red) and things Nova does, like looking toward the screen's right (teal).</p>
-        <audio id="audio" preload="auto" src="%%AUDIO%%"></audio>
+        <div class="section-head">
+          <h2 id="lineTitle"></h2>
+          <button class="btn ghost small" id="linesBtn" aria-expanded="false" aria-controls="linesPanel">Lines (<span id="lineCount"></span>)</button>
+        </div>
+        <p class="words" id="lineWords" hidden></p>
+        <p><span id="lineInfo"></span> Each block below is one shape, sized by how long it's held. Half speed slows the audio too, so you can check each change. Markers below the timeline are app events (red) and things Nova does, like looking toward the screen's right (teal).</p>
+        <audio id="audio" preload="auto"></audio>
         <div class="strip-wrap"><div class="strip" id="strip"><div class="playhead" id="playhead"></div></div><div class="scale" id="scale"></div><div class="marks" id="marks"></div></div>
         <div class="row" style="margin-top:12px">
           <button class="btn" id="play">Play with sound</button>
@@ -202,6 +223,11 @@ button { font: inherit; cursor: pointer; }
   </div>
 </div>
 
+<aside class="lines-panel" id="linesPanel" aria-label="Dialogue lines">
+  <div class="panel-head"><h2>Lines</h2><button class="btn ghost small" id="linesClose">Close</button></div>
+  <div class="lines-list" id="linesList"></div>
+</aside>
+
 <script>
 (() => {
   const SHAPES = [
@@ -216,17 +242,17 @@ button { font: inherit; cursor: pointer; }
     ['G','Bite','F, V'],
     ['H','Tongue up','L']
   ];
-  // Cues from Rhubarb Lip Sync: {start, end, value}
-  const cues = %%CUES%%;
+  // Every dialogue line: {id, title, words, audio, cues, markers, emphasis}. One is loaded at a time.
+  // Cues come from Rhubarb Lip Sync: {start, end, value}.
+  const LINES = %%LINES%%;
+  let line = LINES.find(l => `#${l.id}` === location.hash) || LINES[0];
+  let cues = line.cues, markers = line.markers, emphasis = line.emphasis, DURATION = cues[cues.length - 1].end;
   // Shared with the Flutter component: tools/rig_settings.json
   const S = %%SETTINGS%%;
   // Markers: {time, type: "event", name} fires an app event; {time, end, type: "look", direction} turns Nova's gaze;
   // {time, end, type: "arm", side, degrees} raises an arm (side = the screen side it's on) and lowers it at end;
   // {time, end, type: "expression", name} sets the brows (happy, surprised, concerned).
   // Emphasis: stressed moments found in the audio (tools/build_emphasis.py); the brows lift briefly on each.
-  const emphasis = %%EMPHASIS%%;
-  const markers = %%MARKERS%%;
-  const DURATION = cues[cues.length - 1].end;
 
   const $ = id => document.getElementById(id);
   const svg = $('nova');
@@ -452,18 +478,27 @@ button { font: inherit; cursor: pointer; }
 
   // Dialogue playback, clocked by the audio element
   const audio = $('audio');
-  const segEls = cues.map(c => {
-    const s = document.createElement('div');
-    s.className = 'seg' + (c.value === 'X' ? ' x' : '');
-    s.style.flex = `${c.end - c.start} 0 0`;
-    if ((c.end - c.start) >= 0.09) s.textContent = c.value;
-    s.title = `${c.value}  ${c.start.toFixed(2)}–${c.end.toFixed(2)}s`;
-    $('strip').insertBefore(s, $('playhead'));
-    return s;
-  });
-  for (let k = 0; k <= Math.floor(DURATION); k++) { const t = document.createElement('span'); t.textContent = k + 's'; $('scale').appendChild(t); }
-  $('scale').lastChild.textContent = DURATION.toFixed(1) + 's';
-  const markEls = markers.map(mk => {
+  let segEls = [], markEls = [];
+  function buildTimeline() {
+    segEls.forEach(el => el.remove());
+    $('scale').replaceChildren();
+    $('marks').replaceChildren();
+    segEls = cues.map(c => {
+      const s = document.createElement('div');
+      s.className = 'seg' + (c.value === 'X' ? ' x' : '');
+      s.style.flex = `${c.end - c.start} 0 0`;
+      if ((c.end - c.start) >= 0.09) s.textContent = c.value;
+      s.title = `${c.value}  ${c.start.toFixed(2)}–${c.end.toFixed(2)}s`;
+      $('strip').insertBefore(s, $('playhead'));
+      return s;
+    });
+    // Ticks every second, or every 5 s for long scenes
+    const step = DURATION > 20 ? 5 : 1;
+    for (let k = 0; k <= Math.floor(DURATION); k += step) { const t = document.createElement('span'); t.textContent = k + 's'; $('scale').appendChild(t); }
+    $('scale').lastChild.textContent = DURATION.toFixed(1) + 's';
+    markEls = markers.map(markEl);
+  }
+  function markEl(mk) {
     const el = document.createElement('div');
     el.className = 'mark' + (mk.type !== 'event' ? ` ${mk.type}` : '');
     el.style.left = `${mk.time / DURATION * 100}%`;
@@ -476,7 +511,44 @@ button { font: inherit; cursor: pointer; }
     el.title = mk.note || '';
     $('marks').appendChild(el);
     return el;
+  }
+
+  // Lines panel: pick a line to load it onto Nova
+  function loadLine(id) {
+    stop();
+    line = LINES.find(l => l.id === id) || LINES[0];
+    ({ cues, markers, emphasis } = line);
+    DURATION = cues[cues.length - 1].end;
+    audio.src = line.audio;
+    $('lineTitle').textContent = line.title;
+    $('lineWords').textContent = line.words ? `“${line.words}”` : '';
+    $('lineWords').hidden = !line.words;
+    $('lineInfo').textContent = `${cues.length} mouth cues over ${DURATION.toFixed(1)} seconds.`;
+    buildTimeline();
+    lineBtns.forEach(b => b.setAttribute('aria-current', b.dataset.id === line.id));
+    try { history.replaceState(null, '', `#${line.id}`); } catch (e) {}
+  }
+  const lineBtns = LINES.map(l => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'line-item'; b.dataset.id = l.id;
+    b.innerHTML = `<span class="t"></span><span class="m"></span>${l.words ? '<span class="w"></span>' : ''}`;
+    b.querySelector('.t').textContent = l.title;
+    b.querySelector('.m').textContent = `${l.cues[l.cues.length - 1].end.toFixed(1)} s · ${l.markers.length} markers`;
+    if (l.words) b.querySelector('.w').textContent = l.words;
+    b.addEventListener('click', () => loadLine(l.id));
+    $('linesList').appendChild(b);
+    return b;
   });
+  $('lineCount').textContent = LINES.length;
+  function togglePanel(open) {
+    $('linesPanel').classList.toggle('open', open);
+    $('linesBtn').setAttribute('aria-expanded', open);
+    if (open) (lineBtns.find(b => b.dataset.id === line.id) || lineBtns[0]).focus();
+    else $('linesBtn').focus();
+  }
+  $('linesBtn').addEventListener('click', () => togglePanel(!$('linesPanel').classList.contains('open')));
+  $('linesClose').addEventListener('click', () => togglePanel(false));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('linesPanel').classList.contains('open')) togglePanel(false); });
   let toastTimer = null;
   function fireEvent(mk, el) {
     $('toast').textContent = `Event: ${mk.name}`;
@@ -547,6 +619,7 @@ button { font: inherit; cursor: pointer; }
   themeBtns.forEach(b => b.addEventListener('click', () => setTheme(b.dataset.themeOpt)));
   setTheme(document.documentElement.dataset.theme || 'auto');
 
+  loadLine(line.id);
   layout();
   setEye('open');
   scheduleBlink();

@@ -19,14 +19,17 @@ dialogue/
     <line_name>.mp3             Voice audio for the line.
     cues.json                   Approved mouth timing and markers (what the app and previews use).
     cues-rhubarb-raw.json       Untouched output from the lip-sync tool, kept for reference.
-    script.txt                  Exact words spoken (add when available).
+    script.txt                  Exact words spoken (add when available). Shown in the preview.
+    emphasis.json               Stressed moments in the audio, from build_emphasis.py.
 preview/
-  <line_name>.html              Self-contained player for one line. Open in any browser.
+  index.html                    The rig preview with every line, switched from its Lines panel. Open in any browser.
+  <line_name>.html              Short link that opens index.html on that line.
 flutter/nova_character/         Nova as a ready-made Flutter widget, with a demo app. Its assets/ folder is generated.
 dist/                           Zips for the developers (not in git). Built by make_handoff.py.
 tools/
   build_rig.py                  Rebuilds art/Nova-rigged.svg from art/Nova-outfit_1.svg and art/Character.svg.
-  build_preview.py              Builds preview/<line_name>.html for one line.
+  build_preview.py              Builds preview/index.html with every line in dialogue/.
+  build_emphasis.py             Finds each line's stressed moments for the brow lifts and head nods.
   preview_template.html         Page template the preview builder fills in.
   rig_settings.json             Framing, idle, look, blink and outline numbers, shared by the preview and the Flutter widget.
   build_flutter.py              Packages parts, settings and lines into flutter/nova_character/assets/.
@@ -97,8 +100,9 @@ Timing is 40 ms half, 80 ms closed, 50 ms half. Blinks happen at random every 2.
 3. Run Rhubarb Lip Sync (free, from github.com/DanielSWolf/rhubarb-lip-sync/releases; use the macOS build on a Mac):
    `rhubarb -f json --extendedShapes GHX --dialogFile script.txt -o cues-rhubarb-raw.json <line_name>.wav`
 4. Copy `cues-rhubarb-raw.json` to `cues.json`.
-5. Build the preview: `python3 tools/build_preview.py <line_name>` and open `preview/<line_name>.html`.
-6. Review at half speed. Fix any mouth holds that look wrong by editing `cues.json` (each cue is `{"start", "end", "value"}` in seconds), then rebuild the preview.
+5. Find the stressed words: `python3 tools/build_emphasis.py <line_name>`. Optionally add `"title"` to `cues.json` for the name shown in the Lines panel.
+6. Build the preview: `python3 tools/build_preview.py` and open `preview/index.html`. The new line is in the Lines panel.
+7. Review at half speed. Fix any mouth holds that look wrong by editing `cues.json` (each cue is `{"start", "end", "value"}` in seconds), then rebuild the preview.
 
 Giving Rhubarb the script text (step 3) usually improves accuracy a lot. The first line was timed from audio alone because no script was available.
 

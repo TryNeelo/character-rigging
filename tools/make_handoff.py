@@ -1,6 +1,6 @@
 """Rebuild everything and zip the Flutter component for the developers.
 
-Runs build_rig.py, build_preview.py (every line) and build_flutter.py, then writes
+Runs build_rig.py, build_emphasis.py, build_preview.py and build_flutter.py, then writes
 dist/nova_character-<version>.zip with the package and its demo app (no build output).
 
 Usage: python3 tools/make_handoff.py
@@ -10,8 +10,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 run = lambda *a: subprocess.run([sys.executable, *a], cwd=ROOT, check=True)
 run('tools/build_rig.py')
 run('tools/build_emphasis.py')
-for d in sorted(glob.glob(os.path.join(ROOT, 'dialogue', '*', 'cues.json'))):
-    run('tools/build_preview.py', os.path.basename(os.path.dirname(d)))
+run('tools/build_preview.py')
 run('tools/build_flutter.py')
 
 PKG = os.path.join(ROOT, 'flutter', 'nova_character')
