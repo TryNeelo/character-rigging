@@ -65,7 +65,6 @@ button { font: inherit; cursor: pointer; }
 .seg-ctl button { border: 0; background: transparent; color: var(--muted); border-radius: 999px; padding: 5px 12px; font-size: 13px; font-weight: 700; }
 .seg-ctl button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
 .seg-ctl button:disabled { opacity: .4; cursor: not-allowed; }
-.hint { font-size: 12.5px; color: var(--muted); }
 .theme { flex: none; }
 .btn:focus-visible, .shape:focus-visible, .seg-ctl button:focus-visible, .toggle input:focus-visible + span, input[type=range]:focus-visible { outline: 3px solid var(--rust); outline-offset: 2px; }
 .toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; user-select: none; }
@@ -146,7 +145,6 @@ button { font: inherit; cursor: pointer; }
     <div class="panel">
       <section>
         <h2>Scene</h2>
-        <p>Nova is drawn once, full body, and each scene decides the frame, the crop and where he stands. Crops are cut at the bottom of the frame.</p>
         <div class="fields">
           <div class="field"><span>Outfit</span>
             <div class="seg-ctl" role="group" aria-label="Outfit" id="outfitCtl"></div></div>
@@ -155,8 +153,7 @@ button { font: inherit; cursor: pointer; }
           <div class="field"><span>Framing</span>
             <div class="seg-ctl" role="group" aria-label="Framing" id="framingCtl"></div></div>
           <div class="field"><span>Position</span>
-            <div class="seg-ctl" role="group" aria-label="Position" id="alignCtl"></div>
-            <span class="hint" id="alignHint" hidden>Nova already fills this frame's width, so there's no room to move him. Try Square or Landscape.</span></div>
+            <div class="seg-ctl" role="group" aria-label="Position" id="alignCtl"></div></div>
           <div class="row"><label class="toggle"><input type="checkbox" id="outlineOn" checked><span>White outline</span></label></div>
         </div>
       </section>
@@ -282,7 +279,6 @@ button { font: inherit; cursor: pointer; }
     // Position only matters when the frame is wider than the framing needs
     const noRoom = vw - f.width < 20;
     $('alignCtl').querySelectorAll('button').forEach(b => { b.disabled = noRoom; });
-    $('alignHint').hidden = !noRoom;
     $('frameSize').textContent = `${fw} × ${fh}`;
   }
   function segControl(el, options, key) {
