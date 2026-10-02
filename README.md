@@ -100,7 +100,7 @@ Timing is 40 ms half, 80 ms closed, 50 ms half. Blinks happen at random every 2.
 3. Run Rhubarb Lip Sync (free, from github.com/DanielSWolf/rhubarb-lip-sync/releases; use the macOS build on a Mac):
    `rhubarb -f json --extendedShapes GHX --dialogFile script.txt -o cues-rhubarb-raw.json <line_name>.wav`
 4. Copy `cues-rhubarb-raw.json` to `cues.json`.
-5. Find the stressed words: `python3 tools/build_emphasis.py <line_name>`.
+5. Find the stressed words: `python3 tools/build_emphasis.py <line_name>`, and add a `"title"` to `cues.json`: the line's name in the Audio files panel.
 6. Build the preview: `python3 tools/build_preview.py` and open `preview/index.html`. The new line is in the Audio files panel.
 7. Review at half speed. Fix any mouth holds that look wrong by editing `cues.json` (each cue is `{"start", "end", "value"}` in seconds), then rebuild the preview.
 

@@ -6,7 +6,8 @@ Reads  art/Nova-rigged.svg and, for each folder in dialogue/: its .mp3, cues.jso
 Writes preview/index.html  (art, audio and timing all embedded; opens in any browser)
        preview/<line>.html (a short page that opens index.html on that line, so older links keep working)
 
-Each line is listed in the Audio files panel by its audio file's name, length and number of markers.
+Each line is listed in the Audio files panel by its name ("title" in cues.json, or the folder
+name), length and number of markers.
 """
 import base64, glob, json, os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,7 +23,7 @@ def load(line):
                                   else open(os.path.join(d, name)).read().strip()) if os.path.exists(os.path.join(d, name)) else default
     return {
         'id': line,
-        'title': os.path.basename(mp3),
+        'title': timing.get('title') or line.replace('_', ' ').capitalize(),
         'words': ' '.join(read('script.txt', '').split()),
         'audio': 'data:audio/mpeg;base64,' + base64.b64encode(open(mp3, 'rb').read()).decode(),
         'cues': [{k: c[k] for k in ('start', 'end', 'value')} for c in timing['mouthCues']],
