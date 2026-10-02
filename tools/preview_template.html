@@ -169,7 +169,6 @@ button { font: inherit; cursor: pointer; }
           <button class="btn ghost small" id="linesBtn" aria-expanded="false" aria-controls="linesPanel">Audio files (<span id="lineCount"></span>)</button>
         </div>
         <p class="words" id="lineWords" hidden></p>
-        <p><span id="lineInfo"></span> Each block below is one shape, sized by how long it's held. Half speed slows the audio too, so you can check each change. Markers below the timeline are app events (red) and things Nova does, like looking toward the screen's right (teal).</p>
         <audio id="audio" preload="auto"></audio>
         <div class="strip-wrap"><div class="strip" id="strip"><div class="playhead" id="playhead"></div></div><div class="scale" id="scale"></div><div class="marks" id="marks"></div></div>
         <div class="row" style="margin-top:12px">
@@ -522,7 +521,6 @@ button { font: inherit; cursor: pointer; }
     $('lineTitle').textContent = line.title;
     $('lineWords').textContent = line.words ? `“${line.words}”` : '';
     $('lineWords').hidden = !line.words;
-    $('lineInfo').textContent = `${cues.length} mouth cues over ${DURATION.toFixed(1)} seconds.`;
     buildTimeline();
     lineBtns.forEach(b => b.setAttribute('aria-current', b.dataset.id === line.id));
     try { history.replaceState(null, '', `#${line.id}`); } catch (e) {}
