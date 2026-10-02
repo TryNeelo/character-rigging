@@ -112,7 +112,6 @@ button { font: inherit; cursor: pointer; }
 .line-item[aria-current="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); background: var(--chip); }
 .line-item .t { font-weight: 700; font-size: 14px; }
 .line-item .m { font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
-.line-item .w { font-size: 12.5px; color: var(--muted); }
 .line-item:focus-visible, .panel-head button:focus-visible { outline: 3px solid var(--rust); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { .lines-panel { transition: none; } }
 .notes { font-size: 13.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; display: grid; gap: 6px; }
@@ -531,10 +530,9 @@ button { font: inherit; cursor: pointer; }
   const lineBtns = LINES.map(l => {
     const b = document.createElement('button');
     b.type = 'button'; b.className = 'line-item'; b.dataset.id = l.id;
-    b.innerHTML = `<span class="t"></span><span class="m"></span>${l.words ? '<span class="w"></span>' : ''}`;
+    b.innerHTML = '<span class="t"></span><span class="m"></span>';
     b.querySelector('.t').textContent = l.title;
     b.querySelector('.m').textContent = `${l.cues[l.cues.length - 1].end.toFixed(1)} s · ${l.markers.length} markers`;
-    if (l.words) b.querySelector('.w').textContent = l.words;
     b.addEventListener('click', () => loadLine(l.id));
     $('linesList').appendChild(b);
     return b;
