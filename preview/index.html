@@ -216,8 +216,6 @@ button { font: inherit; cursor: pointer; }
           <label class="slider"><span>Head tilt</span><input type="range" id="poseHead" min="-10" max="10" step="0.5" value="0"><output for="poseHead" id="poseHeadOut">0°</output></label>
           <label class="slider"><span>Left arm</span><input type="range" id="poseArmL" min="-12" max="180" step="1" value="0"><output for="poseArmL" id="poseArmLOut">0°</output></label>
           <label class="slider"><span>Right arm</span><input type="range" id="poseArmR" min="-12" max="180" step="1" value="0"><output for="poseArmR" id="poseArmROut">0°</output></label>
-          <div class="field"><span>Look</span>
-            <div class="look-pad" role="group" aria-label="Look direction" id="lookPad"></div></div>
           <div class="field"><span>Brows</span>
             <div class="seg-ctl" role="group" aria-label="Brow expression" id="browCtl"></div></div>
           <div class="row">
@@ -238,6 +236,8 @@ button { font: inherit; cursor: pointer; }
           <button class="btn ghost" id="blinkNow">Blink now</button>
           <button class="btn ghost" id="holdClosed" aria-pressed="false">Hold closed</button>
         </div>
+        <div class="field" style="margin-top:18px"><span>Look</span>
+          <div class="look-pad" role="group" aria-label="Look direction" id="lookPad"></div></div>
       </section>
 
       <section>
