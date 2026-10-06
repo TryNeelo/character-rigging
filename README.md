@@ -126,7 +126,7 @@ A line's `script.txt` is plain text:
 - **One caption per line**, broken wherever the caption should change. A script written as one paragraph is split by sentence.
 - **Exact words** as spoken, with punctuation.
 - **[Bracketed cues]** right before the word where something should happen, even mid-line: `There's lots to explore. [Highlight the shops] See those shops?` The cue is removed from the caption and becomes an event at that word. It must match an event in `dialogue/events.json` (its name, or one of its `cues`), or `build_captions.py` stops.
-- Captions longer than `captions.maxChars` in `tools/rig_settings.json` (42 for now, until the developers confirm the subtitle bubble's width) are split at a sentence end, then a comma, then a space, and flagged to check.
+- Captions longer than `captions.maxChars` in `tools/rig_settings.json` (55, the length of "Each world is packed with stories and games to explore.", set by Manaf) are split at a sentence end, then a comma, then a space, and flagged to check.
 
 ## Line log
 
