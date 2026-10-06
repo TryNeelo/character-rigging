@@ -40,7 +40,7 @@ NovaCharacter(
   outfit: 'aviator',              // 'hoodie' (default), 'aviator' or 'construction'
 )
 
-// React to what he says.
+// React to what he says. EVENTS.md lists every event and what it should do.
 nova.events.listen((event) {
   switch (event.name) {
     case 'show_logo': showLogo();
@@ -92,7 +92,8 @@ The timing file holds the mouth shapes and the markers:
 ]
 ```
 
-- `event` markers become `NovaEvent`s in your app. The names are agreed per scene.
+- `event` markers become `NovaEvent`s in your app. **`EVENTS.md`** lists every event name,
+  which line sends it and when, and what the app should do on screen.
 - `look` markers turn Nova's eyes and head toward one of eight directions on screen between
   `time` and `end`: `left`, `right`, `up`, `down`, `up-left`, `up-right`, `down-left`,
   `down-right`. `arm` markers raise the arm on that side of the screen, then lower it

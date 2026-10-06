@@ -541,7 +541,7 @@ button { font: inherit; cursor: pointer; }
         : mk.type === 'arm' ? `${mk.side} arm ${mk.degrees}°` : `${mk.name} brows`;
     }
     else el.textContent = mk.name;
-    el.title = mk.note || '';
+    el.title = mk.type === 'event' ? `${mk.name}: ${mk.does || 'not in the event list'}` : (mk.note || '');
     $('marks').appendChild(el);
     return el;
   }

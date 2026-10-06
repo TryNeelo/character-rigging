@@ -1,0 +1,15 @@
+{
+  "_about": "Every app event Nova can send. Each event in a line's markers must be listed here. 'does' is what the app should do on screen. tools/build_events.py builds the developers' reference sheet (EVENTS.md) from this list and the lines that use each event.",
+  "line_end": { "does": "Sent automatically when a line finishes. Use it to move to the next step.", "builtIn": true },
+  "show_logo": { "does": "Sample only: show the Neelo logo. Replaced when the real FTUX audio arrives.", "sample": true },
+  "show_path": { "does": "Sample only: show the path forward. Replaced when the real FTUX audio arrives.", "sample": true },
+  "highlight_shops": { "does": "Highlight the shops on the home map (\"See those shops?\")." },
+  "highlight_coins": { "does": "Highlight the coin counter (\"As you earn coins...\")." },
+  "highlight_home": { "does": "Highlight the home on the map with the arrow (\"let's head inside your home\"). It stays until the child taps the home." },
+  "highlight_sticker_book": { "does": "Highlight the sticker book in the room." },
+  "highlight_closet": { "does": "Highlight the closet with the arrow. It stays until the child taps the closet." },
+  "highlight_back_arrow": { "does": "Highlight the back arrow (\"Tap the back arrow, and let's go!\"). It stays until the child taps it." },
+  "highlight_next_world_arrow": { "does": "Highlight the arrow that rotates to the next world (\"Tap the arrow to keep traveling through worlds\")." },
+  "highlight_enter": { "does": "Highlight the Enter button on the world selection screen." },
+  "nova_exit": { "does": "Nova leaves the screen; the scene stays for the child to explore and choose." }
+}

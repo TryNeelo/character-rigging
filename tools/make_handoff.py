@@ -1,6 +1,6 @@
 """Rebuild everything and zip the Flutter component for the developers.
 
-Runs build_rig.py, build_emphasis.py, build_preview.py and build_flutter.py, then writes
+Runs build_rig.py, build_emphasis.py, build_events.py, build_preview.py and build_flutter.py, then writes
 dist/nova_character-<version>.zip with the package and its demo app (no build output).
 
 Usage: python3 tools/make_handoff.py
@@ -10,6 +10,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 run = lambda *a: subprocess.run([sys.executable, *a], cwd=ROOT, check=True)
 run('tools/build_rig.py')
 run('tools/build_emphasis.py')
+run('tools/build_events.py')        # stops here if a line uses an event that isn't in dialogue/events.json
 run('tools/build_preview.py')
 run('tools/build_flutter.py')
 

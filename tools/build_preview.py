@@ -27,10 +27,13 @@ def load(line):
         'words': ' '.join(read('script.txt', '').split()),
         'audio': 'data:audio/mpeg;base64,' + base64.b64encode(open(mp3, 'rb').read()).decode(),
         'cues': [{k: c[k] for k in ('start', 'end', 'value')} for c in timing['mouthCues']],
-        'markers': timing.get('markers', []),
+        # Event markers carry what the app should do (from dialogue/events.json), shown on hover
+        'markers': [dict(m, does=EVENTS.get(m.get('name'), {}).get('does', '')) if m['type'] == 'event' else m
+                    for m in timing.get('markers', [])],
         'emphasis': read('emphasis.json', []),
     }
 
+EVENTS = {k: v for k, v in json.load(open(os.path.join(ROOT, 'dialogue', 'events.json'))).items() if not k.startswith('_')}
 lines = [load(os.path.basename(os.path.dirname(p))) for p in sorted(glob.glob(os.path.join(ROOT, 'dialogue', '*', 'cues.json')))]
 svg = open(os.path.join(ROOT, 'art', 'Nova-rigged.svg')).read().replace(
     '<svg id="nova" ', '<svg id="nova" role="img" aria-label="Nova, a bear, in his chosen outfit" ', 1)
