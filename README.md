@@ -22,6 +22,7 @@ dialogue/
     cues-rhubarb-raw.json       Untouched output from the lip-sync tool, kept for reference.
     script.txt                  Exact words spoken (add when available). Shown in the preview.
     emphasis.json               Stressed moments in the audio, from build_emphasis.py.
+    captions.json               Each sentence of script.txt with its start and end time, from build_captions.py. The app shows these as subtitles.
 preview/
   index.html                    The rig preview with every line, switched from its Audio files panel. Open in any browser.
   <line_name>.html              Short link that opens index.html on that line.
@@ -31,6 +32,7 @@ tools/
   build_rig.py                  Rebuilds art/Nova-rigged.svg from art/Nova-outfit_1.svg and art/Character.svg.
   build_preview.py              Builds preview/index.html with every line in dialogue/.
   build_emphasis.py             Finds each line's stressed moments for the brow lifts and head nods.
+  build_captions.py             Times each sentence of a line's script for captions (needs faster-whisper; see the file).
   build_events.py               Checks every event in the lines against dialogue/events.json and writes the developers' EVENTS.md.
   preview_template.html         Page template the preview builder fills in.
   rig_settings.json             Framing, idle, look, blink and outline numbers, shared by the preview and the Flutter widget.

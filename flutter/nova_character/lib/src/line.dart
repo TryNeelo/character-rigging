@@ -38,9 +38,20 @@ class NovaMarker {
       degrees: (j['degrees'] as num?)?.toDouble());
 }
 
+/// One sentence of a line, to show as a subtitle from [start] to [end] seconds.
+/// The app draws the subtitle in its own style.
+class NovaCaption {
+  const NovaCaption(this.start, this.end, this.text);
+  final double start, end;
+  final String text;
+
+  @override
+  String toString() => 'NovaCaption("$text", $start–$end s)';
+}
+
 /// A dialogue line (or a whole scene): its audio, mouth timing and markers.
 class NovaLine {
-  NovaLine._(this.id, this.audio, this.duration, this.cues, this.markers, this.emphasis);
+  NovaLine._(this.id, this.audio, this.duration, this.cues, this.markers, this.emphasis, this.captions);
   final String id, audio;
   final double duration;
   final List<NovaCue> cues;
@@ -49,6 +60,9 @@ class NovaLine {
   /// Stressed moments found in the audio, as (time in seconds, strength 0 to 1).
   /// Nova's brows lift briefly on each.
   final List<(double, double)> emphasis;
+
+  /// The line's words, one entry per sentence, timed to the audio.
+  final List<NovaCaption> captions;
 
   /// Asset key of this line's audio file.
   String get audioAsset => novaAsset('lines/$id/$audio');
@@ -67,7 +81,19 @@ class NovaLine {
         [
           for (final e in (j['emphasis'] as List?) ?? [])
             ((e['time'] as num).toDouble(), (e['strength'] as num).toDouble())
+        ],
+        [
+          for (final c in (j['captions'] as List?) ?? [])
+            NovaCaption((c['start'] as num).toDouble(), (c['end'] as num).toDouble(), c['text'] as String)
         ]);
+  }
+
+  /// The caption to show at [t] seconds, or null between sentences.
+  NovaCaption? captionAt(double t) {
+    for (final c in captions) {
+      if (t >= c.start && t < c.end) return c;
+    }
+    return null;
   }
 
   /// Mouth shape at [t] seconds, or null outside the line.

@@ -35,10 +35,26 @@ class _NovaDemoState extends State<NovaDemo> {
 
   @override
   Widget build(BuildContext context) {
+    // The app draws subtitles in its own style; Nova only says which sentence is current
+    final subtitle = ValueListenableBuilder<NovaCaption?>(
+      valueListenable: nova.caption,
+      builder: (context, caption, _) => AnimatedOpacity(
+        opacity: caption == null ? 0 : 1,
+        duration: const Duration(milliseconds: 150),
+        child: Container(
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
+          child: Text(caption?.text ?? '', textAlign: TextAlign.center, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+        ),
+      ),
+    );
     final scene = Container(
       decoration: BoxDecoration(color: const Color(0xFFC3DEDB), borderRadius: BorderRadius.circular(16)),
       clipBehavior: Clip.antiAlias,
-      child: NovaCharacter(controller: nova, framing: framing, align: align, outline: outline, outfit: outfit, idle: movement),
+      child: Stack(children: [Positioned.fill(child: NovaCharacter(controller: nova, framing: framing, align: align, outline: outline, outfit: outfit, idle: movement)),
+        Positioned(left: 0, right: 0, bottom: 0, child: Center(child: subtitle)),
+      ]),
     );
     final controls = ListView(padding: const EdgeInsets.all(16), children: [
       Text('Nova demo', style: Theme.of(context).textTheme.headlineSmall),

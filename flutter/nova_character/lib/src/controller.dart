@@ -62,6 +62,12 @@ class NovaController extends ChangeNotifier {
   double _lastTime = -1;
   NovaLook _look = NovaLook.ahead;
   String? _expression;
+  final ValueNotifier<NovaCaption?> _caption = ValueNotifier(null);
+
+  /// The sentence Nova is saying right now, or null between sentences and when he's
+  /// quiet. Listen to it (for example with a ValueListenableBuilder) to show subtitles
+  /// in the app's own style.
+  ValueListenable<NovaCaption?> get caption => _caption;
 
   /// Events from the playing line's markers, as they happen.
   Stream<NovaEvent> get events => _events.stream;
@@ -108,6 +114,7 @@ class NovaController extends ChangeNotifier {
     _ticker = null;
     if (_line == null) return;
     _line = null;
+    _caption.value = null;
     await _player.stop();
     notifyListeners();
   }
@@ -119,6 +126,7 @@ class NovaController extends ChangeNotifier {
     final line = _line;
     if (line == null) return;
     final t = time;
+    _caption.value = line.captionAt(t);
     for (final m in line.markers) {
       if (m.type == 'event' && m.name != null && _lastTime < m.time && t >= m.time) {
         _events.add(NovaEvent(m.name!, line.id, m.time));
@@ -133,6 +141,7 @@ class NovaController extends ChangeNotifier {
     _ticker?.cancel();
     _ticker = null;
     _line = null;
+    _caption.value = null;
     _events.add(NovaEvent(NovaEvent.lineEnd, line.id, line.duration));
     notifyListeners();
   }
@@ -142,6 +151,7 @@ class NovaController extends ChangeNotifier {
     _ticker?.cancel();
     _player.dispose();
     _events.close();
+    _caption.dispose();
     super.dispose();
   }
 }

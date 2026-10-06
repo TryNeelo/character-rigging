@@ -31,6 +31,7 @@ def load(line):
         'markers': [dict(m, does=EVENTS.get(m.get('name'), {}).get('does', '')) if m['type'] == 'event' else m
                     for m in timing.get('markers', [])],
         'emphasis': read('emphasis.json', []),
+        'captions': read('captions.json', []),
     }
 
 EVENTS = {k: v for k, v in json.load(open(os.path.join(ROOT, 'dialogue', 'events.json'))).items() if not k.startswith('_')}

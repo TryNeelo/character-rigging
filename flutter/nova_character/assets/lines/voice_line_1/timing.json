@@ -254,5 +254,22 @@
    "time": 4.37,
    "strength": 0.67
   }
+ ],
+ "captions": [
+  {
+   "start": 0.0,
+   "end": 1.04,
+   "text": "Hi, I'm Nova!"
+  },
+  {
+   "start": 1.04,
+   "end": 3.0,
+   "text": "Let's get your Neelo account set up."
+  },
+  {
+   "start": 3.0,
+   "end": 4.94,
+   "text": "First, what's your child's name?"
+  }
  ]
 }

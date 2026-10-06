@@ -11,5 +11,5 @@
 library;
 
 export 'src/controller.dart' show NovaController, NovaEvent, NovaLook;
-export 'src/line.dart' show NovaLine, NovaCue, NovaMarker;
+export 'src/line.dart' show NovaLine, NovaCue, NovaMarker, NovaCaption;
 export 'src/nova_character.dart' show NovaCharacter, NovaFraming, NovaAlign;

@@ -47,6 +47,9 @@ header p { margin: 6px 0 0; color: var(--muted); max-width: 62ch; }
 .frame { aspect-ratio: var(--ar, 0.46); width: min(100%, calc(64vh * var(--ar, 0.46))); background: var(--scene); border-radius: 12px; overflow: hidden; position: relative; }
 .frame svg { width: 100%; height: 100%; display: block; }
 .frame .size { position: absolute; right: 8px; top: 6px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.caption { justify-self: stretch; min-height: 2.6em; display: grid; place-items: center; text-align: center; font-weight: 700; font-size: 15px; color: var(--fg); background: var(--surface); border-radius: 12px; padding: 8px 14px; }
+.caption:empty { visibility: hidden; }
+.caption[hidden] { display: none; }
 .readout { justify-self: stretch; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
 .readout .now { font-family: var(--font-mono); font-weight: 700; color: var(--fg); background: var(--surface); border-radius: 8px; padding: 2px 10px; font-variant-numeric: tabular-nums; }
 
@@ -144,6 +147,7 @@ button { font: inherit; cursor: pointer; }
   <div class="grid">
     <div class="stage">
       <div class="frame" id="frame"><span class="size" id="frameSize"></span><div class="toast" id="toast" hidden></div>%%SVG%%</div>
+      <div class="caption" id="caption" aria-live="polite"></div>
       <div class="readout"><span>Mouth now: <span class="now" id="now">smile</span></span><span id="status">Idle, blinking</span></div>
     </div>
 
@@ -159,7 +163,8 @@ button { font: inherit; cursor: pointer; }
             <div class="seg-ctl" role="group" aria-label="Framing" id="framingCtl"></div></div>
           <div class="field"><span>Position</span>
             <div class="seg-ctl" role="group" aria-label="Position" id="alignCtl"></div></div>
-          <div class="row"><label class="toggle"><input type="checkbox" id="outlineOn" checked><span>White outline</span></label></div>
+          <div class="row"><label class="toggle"><input type="checkbox" id="outlineOn" checked><span>White outline</span></label>
+            <label class="toggle"><input type="checkbox" id="captionsOn" checked><span>Captions (the app draws its own subtitle)</span></label></div>
         </div>
       </section>
 
@@ -242,7 +247,7 @@ button { font: inherit; cursor: pointer; }
   // Cues come from Rhubarb Lip Sync: {start, end, value}.
   const LINES = %%LINES%%;
   let line = LINES.find(l => `#${l.id}` === location.hash) || LINES[0];
-  let cues = line.cues, markers = line.markers, emphasis = line.emphasis, DURATION = cues[cues.length - 1].end;
+  let cues = line.cues, markers = line.markers, emphasis = line.emphasis, captions = line.captions, DURATION = cues[cues.length - 1].end;
   // Shared with the Flutter component: tools/rig_settings.json
   const S = %%SETTINGS%%;
   // Markers: {time, type: "event", name} fires an app event; {time, end, type: "look", direction} turns Nova's gaze
@@ -305,6 +310,7 @@ button { font: inherit; cursor: pointer; }
   let dots = null;
   const character = $('character');
   // The outline is drawn into the art as a white layer behind Nova; the toggle shows or hides it
+  $('captionsOn').addEventListener('change', e => { $('caption').hidden = !e.target.checked; });
   $('outlineOn').addEventListener('change', e => { $('outline').style.display = e.target.checked ? '' : 'none'; });
 
   // ---- Pose and idle ----
@@ -550,7 +556,7 @@ button { font: inherit; cursor: pointer; }
   function loadLine(id) {
     stop();
     line = LINES.find(l => l.id === id) || LINES[0];
-    ({ cues, markers, emphasis } = line);
+    ({ cues, markers, emphasis, captions } = line);
     DURATION = cues[cues.length - 1].end;
     audio.src = line.audio;
     $('lineTitle').textContent = line.title;
@@ -604,6 +610,9 @@ button { font: inherit; cursor: pointer; }
     const ex = markers.find(mk => mk.type === 'expression' && t >= mk.time && t < mk.end);
     lineExpression = ex ? ex.name : null;
     markers.forEach(mk => { if (mk.type === 'arm' && t >= mk.time && t < mk.end) raiseTarget[mk.side] = mk.degrees; });
+    // Caption: the sentence being spoken, as the app would show it
+    const cap = captions.find(c => t >= c.start && t < c.end);
+    $('caption').textContent = cap ? cap.text : '';
     const idx = cues.findIndex(c => t >= c.start && t < c.end);
     if (idx !== lastSeg) {
       if (lastSeg >= 0) segEls[lastSeg].classList.remove('on');
@@ -624,6 +633,7 @@ button { font: inherit; cursor: pointer; }
     markEls.forEach(el => el.classList.remove('fired'));
     $('play').textContent = 'Play with sound';
     pendingMouth = null;
+    $('caption').textContent = '';
     setMouth('smile');
     $('status').textContent = 'Idle, blinking';
   }

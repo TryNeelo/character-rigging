@@ -63,6 +63,7 @@ Dispose the controller with your screen (`nova.dispose()`).
 | `events` | Stream of `NovaEvent(name, lineId, time)` from the line's markers. `line_end` arrives when a line finishes. |
 | `isSpeaking`, `line`, `time` | Current state. |
 | `look` | Where Nova looks when no line is directing him: `NovaLook.ahead`, `left`, `right`, `up`, `down`, `upLeft`, `upRight`, `downLeft`, `downRight`. |
+| `caption` | The sentence Nova is saying now (`NovaCaption`: `text`, `start`, `end`), or null. Listen to it to show subtitles in the app's own style. |
 | `expression` | Brows to hold (`'happy'`, `'surprised'`, `'concerned'`), or null to follow the line. |
 
 ## The widget
@@ -101,6 +102,10 @@ The timing file holds the mouth shapes and the markers:
   don't need to do anything with these; the widget handles them.
 - His brows also lift briefly on the stressed words of each line (the `emphasis` list,
   found from the audio when the line is packaged).
+
+- `captions` holds the line's words, one entry per sentence with its start and end time.
+  You don't read these yourself: `NovaController.caption` tells you which sentence to show
+  as Nova speaks, and goes back to null between sentences and when he's quiet.
 
 The audio is the clock, so slow devices and speed changes stay in sync.
 
