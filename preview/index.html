@@ -218,6 +218,7 @@ button { font: inherit; cursor: pointer; }
           <div class="row">
             <label class="toggle"><input type="checkbox" id="idleOn" checked><span>Idle motion</span></label>
             <label class="toggle"><input type="checkbox" id="browLiftsOn" checked><span>Brow lifts on stressed words</span></label>
+            <label class="toggle"><input type="checkbox" id="appRateOn" checked><span>App frame rate (15 fps idle, 30 talking)</span></label>
             <label class="toggle"><input type="checkbox" id="pivotsOn"><span>Show pivots</span></label>
             <button class="btn ghost" id="resetPose">Reset pose</button>
           </div>
@@ -401,17 +402,29 @@ button { font: inherit; cursor: pointer; }
   });
 
   const I = S.idle;
+  // Draw at the app's frame rates (30 fps talking, 15 fps idle) so the preview looks like the app.
+  // Unticked, it draws on every screen refresh for comparison.
+  let lastDraw = -1, pendingMouth = null;
   function animate(now) {
+    requestAnimationFrame(animate);
+    const appRate = $('appRateOn').checked;
+    const fps = raf ? S.frameRate.talking : S.frameRate.idle;
+    if (appRate && lastDraw >= 0 && now - lastDraw < 1000 / fps - 4) return;
+    const dt = lastDraw < 0 ? 1 / 60 : Math.min((now - lastDraw) / 1000, 0.25);
+    lastDraw = now;
+    if (pendingMouth) { setMouth(pendingMouth); pendingMouth = null; }
+    // Smoothing amounts are tuned per 60 fps frame; scale them to the real frame time
+    const ease = k => 1 - Math.pow(1 - k, dt * 60);
     const t = now / 1000;
     const idle = $('idleOn').checked;
     const breath = idle ? Math.sin(t * 2 * Math.PI / I.breathSeconds) : 0;
     const sway = idle ? Math.sin(t * 2 * Math.PI / I.swaySeconds) * I.swayDegrees : 0;
     const swing = idle ? Math.sin(t * 2 * Math.PI / I.breathSeconds + 0.6) * I.armSwingDegrees : 0; // arms follow the breath
-    look += (Math.max(-1, Math.min(1, lookTarget + pose.look)) - look) * LOOK.smoothing;
-    for (const side of ['left', 'right']) raise[side] += (raiseTarget[side] - raise[side]) * S.gesture.smoothing;
+    look += (Math.max(-1, Math.min(1, lookTarget + pose.look)) - look) * ease(LOOK.smoothing);
+    for (const side of ['left', 'right']) raise[side] += (raiseTarget[side] - raise[side]) * ease(S.gesture.smoothing);
     const expr = B.expressions[testExpression || lineExpression] || { liftPx: 0, tiltDegrees: 0 };
-    brow.lift += (expr.liftPx - brow.lift) * B.smoothing;
-    brow.tilt += (expr.tiltDegrees - brow.tilt) * B.smoothing;
+    brow.lift += (expr.liftPx - brow.lift) * ease(B.smoothing);
+    brow.tilt += (expr.tiltDegrees - brow.tilt) * ease(B.smoothing);
     const lift = brow.lift + ((raf && idle && $('browLiftsOn').checked) ? autoLift(audio.currentTime) * B.autoLiftPx : 0);
     // Positive tilt raises the inner ends: the screen-left brow turns anticlockwise, the right one clockwise
     browEls.forEach(b => b.el.setAttribute('transform',
@@ -425,7 +438,6 @@ button { font: inherit; cursor: pointer; }
     armR.setAttribute('transform', `rotate(${(-pose.armR - raise.right - swing).toFixed(2)} ${RP[0]} ${RP[1]})`);
     // The outline layer follows the same moves
     for (const [ol, el] of [['upper-ol', upper], ['arm-left-ol', armL], ['arm-right-ol', armR], ['head-ol', head]]) $(ol).setAttribute('transform', el.getAttribute('transform'));
-    requestAnimationFrame(animate);
   }
 
   // ---- Mouth ----
@@ -594,7 +606,7 @@ button { font: inherit; cursor: pointer; }
     const idx = cues.findIndex(c => t >= c.start && t < c.end);
     if (idx !== lastSeg) {
       if (lastSeg >= 0) segEls[lastSeg].classList.remove('on');
-      if (idx >= 0) { segEls[idx].classList.add('on'); setMouth(cues[idx].value); }
+      if (idx >= 0) { segEls[idx].classList.add('on'); if ($('appRateOn').checked) pendingMouth = cues[idx].value; else setMouth(cues[idx].value); }
       lastSeg = idx;
     }
     $('playhead').style.left = `${Math.min(t / DURATION, 1) * 100}%`;
@@ -610,6 +622,7 @@ button { font: inherit; cursor: pointer; }
     lookTarget = 0; lastT = -1; raiseTarget = { left: 0, right: 0 }; lineExpression = null;
     markEls.forEach(el => el.classList.remove('fired'));
     $('play').textContent = 'Play with sound';
+    pendingMouth = null;
     setMouth('smile');
     $('status').textContent = 'Idle, blinking';
   }
