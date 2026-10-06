@@ -13,9 +13,8 @@ PKG = os.path.join(ROOT, 'flutter', 'nova_character')
 ASSETS = os.path.join(PKG, 'assets')
 
 shutil.rmtree(ASSETS, ignore_errors=True)
-os.makedirs(os.path.join(ASSETS, 'parts'))
-for f in glob.glob(os.path.join(ROOT, 'art', 'parts', '*.svg')):
-    shutil.copy(f, os.path.join(ASSETS, 'parts'))
+os.makedirs(ASSETS)
+shutil.copytree(os.path.join(ROOT, 'art', 'parts'), os.path.join(ASSETS, 'parts'))   # base/ and outfits/<outfit>/
 
 rigged = open(os.path.join(ROOT, 'art', 'Nova-rigged.svg')).read()
 def pivot(id_):
@@ -30,7 +29,7 @@ rig = {
     # Parts that change with the outfit: legs_<id>, arm_left_<id>, arm_right_<id>, body_<id>, hat_<id>
     'outfits': {
         o: {'label': label,
-            'hatBack': os.path.exists(os.path.join(ROOT, 'art', 'parts', f'hat_back_{o}.svg')),
+            'hatBack': os.path.exists(os.path.join(ROOT, 'art', 'parts', 'outfits', o, 'hat_back.svg')),
             'pivots': {side: [float(v) for v in re.search(
                 rf'<g id="arm-{css}".*?data-outfit="{o}"[^>]*data-pivot="([^"]+)"', rigged, re.S).group(1).split()]
                 for side, css in (('armLeft', 'left'), ('armRight', 'right'))}}
@@ -65,8 +64,11 @@ for d in sorted(glob.glob(os.path.join(ROOT, 'dialogue', '*', 'cues.json'))):
     lines.append(line)
 
 pub = os.path.join(PKG, 'pubspec.yaml')
-block = '    - assets/\n    - assets/parts/\n' + ''.join(f'    - assets/lines/{l}/\n' for l in lines)
+# Flutter needs every asset folder listed: base parts, one folder per outfit, one per line
+outfit_dirs = sorted(os.listdir(os.path.join(ASSETS, 'parts', 'outfits')))
+block = ('    - assets/\n    - assets/parts/base/\n' + ''.join(f'    - assets/parts/outfits/{o}/\n' for o in outfit_dirs)
+         + ''.join(f'    - assets/lines/{l}/\n' for l in lines))
 s = open(pub).read()
 s = re.sub(r'(    # BEGIN GENERATED ASSETS\n).*?(    # END GENERATED ASSETS)', lambda m: m.group(1) + block + m.group(2), s, flags=re.S)
 open(pub, 'w').write(s)
-print('packaged', len(os.listdir(os.path.join(ASSETS, 'parts'))), 'parts and lines', lines)
+print('packaged', len(os.listdir(os.path.join(ASSETS, 'parts', 'base'))), 'base parts, outfits', outfit_dirs, 'and lines', lines)

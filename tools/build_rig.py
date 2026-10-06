@@ -10,7 +10,7 @@ source file is re-exported.
 
 Usage: python3 tools/build_rig.py
 """
-import json, math, os, re
+import json, math, os, re, shutil
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, 'art', 'Nova-outfit_1.svg')
 OLD = os.path.join(ROOT, 'art', 'Character.svg')
@@ -222,12 +222,15 @@ print('wrote', OUT, len(svg), 'bytes; arm pivots', {n: (o['pivot_left'], o['pivo
 
 # ---- Separate part files for the app (art/parts/). Every part is drawn on the full
 # 556 x 837 canvas, so the app stacks them in this order and moves them by their pivots.
+#   base/              the same in every outfit: head, eyes, brows, mouths, nose
+#   outfits/<outfit>/  that outfit's legs, arms, body and hat (and their white outlines)
+# A new outfit only adds a folder; base/ never changes.
 PARTS_DIR = os.path.join(ROOT, 'art', 'parts')
-os.makedirs(PARTS_DIR, exist_ok=True)
-for f in os.listdir(PARTS_DIR):
-    if f.endswith('.svg'): os.remove(os.path.join(PARTS_DIR, f))
+shutil.rmtree(PARTS_DIR, ignore_errors=True)
 def part(name, body, defs=''):
-    open(os.path.join(PARTS_DIR, name + '.svg'), 'w').write(
+    path = os.path.join(PARTS_DIR, name + '.svg')
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    open(path, 'w').write(
         f'<svg width="556" height="837" viewBox="0 0 556 837" fill="none" xmlns="http://www.w3.org/2000/svg">'
         + (f'<defs>{defs}</defs>' if defs else '') + body + '</svg>\n')
 eye_clips = ('<clipPath id="clip-eye-left"><ellipse cx="178.875" cy="437.312" rx="25.4" ry="25.4"/></clipPath>'
@@ -246,20 +249,20 @@ def lids(state):
 for name, o in OUTFITS.items():
     for k in ('legs', 'arm_left', 'arm_right', 'body', 'hat', 'hat_back'):
         if o[f'{k}_svg']:
-            part(f'{k}_{name}', o[f'{k}_svg'], o.get('defs', '') if k.startswith('hat') else '')
-            part(f'{k}_{name}_outline', o[f'{k}_ol_svg'])
-part('head_outline', HEAD_OL)
-part('head_back', els[0] + els[42] + els[43] + els[44] + J(45, 49))
-part('pupil_left', els[49])
-part('pupil_right', els[50])
-part('lids_half', lids('half'), eye_clips)
-part('lids_closed', lids('closed'), eye_clips)
-part('ears', J(51, 55))
-part('brow_left', BROWS['left'])
-part('brow_right', BROWS['right'])
-part('muzzle', els[57])
+            part(f'outfits/{name}/{k}', o[f'{k}_svg'], o.get('defs', '') if k.startswith('hat') else '')
+            part(f'outfits/{name}/{k}_outline', o[f'{k}_ol_svg'])
+part('base/head_outline', HEAD_OL)
+part('base/head_back', els[0] + els[42] + els[43] + els[44] + J(45, 49))
+part('base/pupil_left', els[49])
+part('base/pupil_right', els[50])
+part('base/lids_half', lids('half'), eye_clips)
+part('base/lids_closed', lids('closed'), eye_clips)
+part('base/ears', J(51, 55))
+part('base/brow_left', BROWS['left'])
+part('base/brow_right', BROWS['right'])
+part('base/muzzle', els[57])
 for k, b in shapes:
     used = ''.join(c for c in CLIPS if f'url(#{c.split(chr(34))[1]})' in b)
-    part(f'mouth_{k}', f'<g transform="{OFF}">{b}</g>', used)
-part('nose', els[60] + els[61])
-print('wrote', len([f for f in os.listdir(PARTS_DIR) if f.endswith('.svg')]), 'part files to', PARTS_DIR)
+    part(f'base/mouth_{k}', f'<g transform="{OFF}">{b}</g>', used)
+part('base/nose', els[60] + els[61])
+print('wrote', sum(len(f) for _, _, f in os.walk(PARTS_DIR)), 'part files to', PARTS_DIR, '(base/ and outfits/)')

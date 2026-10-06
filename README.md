@@ -13,6 +13,8 @@ art/
   Character.svg                 First flat Figma export (waist up, with hat). Never edited. Source of the hat and smile.
   Character-rigged.svg          First rig, kept for the prototyping project. Built by an earlier build_rig.py (see git history).
   parts/                        Each part on its own full canvas, for the Flutter component. Built by build_rig.py.
+    base/                       The same in every outfit: head, eyes, brows, mouth shapes, nose.
+    outfits/<outfit>/           That outfit's legs, arms, body and hat, each with a white *_outline copy. A new outfit only adds a folder.
   mouth-shapes-reference.png    Sheet of all mouth shapes, in order X A B C D E F G H, smile.
 dialogue/
   events.json                   Every app event name and what the app should do. Lines may only use events listed here.

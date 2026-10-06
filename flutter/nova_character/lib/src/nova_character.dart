@@ -299,6 +299,8 @@ class _NovaCharacterState extends State<NovaCharacter> {
     Widget part(String name) => RepaintBoundary(
         child: SvgPicture.asset('assets/parts/$name.svg',
             package: novaPackage, width: w, height: h, fit: BoxFit.fill, allowDrawingOutsideViewBox: true));
+    // Parts that are the same in every outfit live in base/; the outfit's own in outfits/<id>/
+    Widget base(String name) => part('base/$name');
     Widget shown(bool visible, Widget child) =>
         Visibility(visible: visible, maintainState: true, maintainAnimation: true, maintainSize: true, child: child);
     Matrix4 rotateAbout(Offset p, double degrees) => Matrix4.translationValues(p.dx * s, p.dy * s, 0)
@@ -317,6 +319,7 @@ class _NovaCharacterState extends State<NovaCharacter> {
     final (dip, talkTilt) = _talkHead(rig);
     final outfitId = rig.outfits.containsKey(widget.outfit) ? widget.outfit! : rig.defaultOutfit;
     final outfit = rig.outfits[outfitId]!;
+    Widget wear(String name) => part('outfits/$outfitId/$name');
 
     final ol = outline ? '_outline' : '';
     final head = Transform(
@@ -324,13 +327,13 @@ class _NovaCharacterState extends State<NovaCharacter> {
         ..multiply(rotateAbout(rig.headPivot, sway + talkTilt + rig.look('headDegrees') * _lookX)),
       child: Stack(children: outline
           ? [
-              if (outfit.hatBack) part('hat_back_${outfitId}_outline'),
-              part('head_outline'),
-              part('hat_${outfitId}_outline'),
+              if (outfit.hatBack) wear('hat_back_outline'),
+              base('head_outline'),
+              wear('hat_outline'),
             ]
           : [
-        if (outfit.hatBack) part('hat_back_$outfitId'),
-        part('head_back'),
+        if (outfit.hatBack) wear('hat_back'),
+        base('head_back'),
         ClipPath(
           clipper: _EyesClipper(rig, s),
           child: Stack(children: [
@@ -339,23 +342,23 @@ class _NovaCharacterState extends State<NovaCharacter> {
               Transform.translate(
                 offset: Offset((rig.look('pupilReach') * _lookX - rig.pupilRest[i] * _lookX.abs()) * s,
                     (rig.look('pupilReachY') * _lookY - rig.pupilRestY * _lookY.abs()) * s),
-                child: part('pupil_$side'),
+                child: base('pupil_$side'),
               ),
           ]),
         ),
-        shown(_eye == _Eye.half, part('lids_half')),
-        shown(_eye == _Eye.closed, part('lids_closed')),
-        part('ears'),
+        shown(_eye == _Eye.half, base('lids_half')),
+        shown(_eye == _Eye.closed, base('lids_closed')),
+        base('ears'),
         // Positive tilt raises the inner ends: the screen-left brow turns anticlockwise, the right one clockwise
         for (final (side, pivot, sign) in [('left', rig.browLeftPivot, -1.0), ('right', rig.browRightPivot, 1.0)])
           Transform(
             transform: Matrix4.translationValues(0, -browLift * s, 0)..multiply(rotateAbout(pivot, sign * _browTilt)),
-            child: part('brow_$side'),
+            child: base('brow_$side'),
           ),
-        part('muzzle'),
-        for (final m in _mouths) shown(m == shape, part('mouth_$m')),
-        part('nose'),
-        part('hat_$outfitId'),
+        base('muzzle'),
+        for (final m in _mouths) shown(m == shape, base('mouth_$m')),
+        base('nose'),
+        wear('hat'),
       ]),
     );
 
@@ -363,14 +366,14 @@ class _NovaCharacterState extends State<NovaCharacter> {
       width: w,
       height: h,
       child: Stack(children: [
-        part('legs_$outfitId$ol'),
+        wear('legs$ol'),
         Transform.translate(
           offset: Offset(0, upperY * s),
           child: Stack(children: [
             // Positive raises lift each arm outward, away from the body
-            Transform(transform: rotateAbout(outfit.armLeftPivot, _raiseLeft + swing), child: part('arm_left_$outfitId$ol')),
-            Transform(transform: rotateAbout(outfit.armRightPivot, -_raiseRight - swing), child: part('arm_right_$outfitId$ol')),
-            part('body_$outfitId$ol'),
+            Transform(transform: rotateAbout(outfit.armLeftPivot, _raiseLeft + swing), child: wear('arm_left$ol')),
+            Transform(transform: rotateAbout(outfit.armRightPivot, -_raiseRight - swing), child: wear('arm_right$ol')),
+            wear('body$ol'),
             head,
           ]),
         ),

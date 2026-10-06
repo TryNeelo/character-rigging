@@ -22,7 +22,10 @@ flutter:
   assets:
     # BEGIN GENERATED ASSETS
     - assets/
-    - assets/parts/
+    - assets/parts/base/
+    - assets/parts/outfits/aviator/
+    - assets/parts/outfits/construction/
+    - assets/parts/outfits/hoodie/
     - assets/lines/onboarding_nova_dialogue1/
     - assets/lines/voice_line_1/
     # END GENERATED ASSETS
