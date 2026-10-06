@@ -188,17 +188,17 @@
  ],
  "markers": [
   {
-   "time": 0.56,
-   "type": "event",
-   "name": "show_logo",
-   "note": "Sample: on \"Neelo\""
-  },
-  {
    "time": 0.04,
    "end": 1.09,
    "type": "expression",
    "name": "happy",
    "note": "Sample: happy brows through \"Welcome to Neelo\""
+  },
+  {
+   "time": 0.56,
+   "type": "event",
+   "name": "show_logo",
+   "note": "Sample: on \"Neelo\""
   },
   {
    "time": 2.28,

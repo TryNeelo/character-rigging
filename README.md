@@ -20,7 +20,7 @@ dialogue/
     <line_name>.mp3             Voice audio for the line.
     cues.json                   Approved mouth timing and markers (what the app and previews use).
     cues-rhubarb-raw.json       Untouched output from the lip-sync tool, kept for reference.
-    script.txt                  Exact words spoken (add when available). Shown in the preview.
+    script.txt                  Exact words spoken, one caption per line, with optional [cues]. See "Script format" below.
     emphasis.json               Stressed moments in the audio, from build_emphasis.py.
     captions.json               Each sentence of script.txt with its start and end time, from build_captions.py. The app shows these as subtitles.
 preview/
@@ -106,7 +106,7 @@ Timing is 40 ms half, 80 ms closed, 50 ms half. Blinks happen at random every 2.
 3. Run Rhubarb Lip Sync (free, from github.com/DanielSWolf/rhubarb-lip-sync/releases; use the macOS build on a Mac):
    `rhubarb -f json --extendedShapes GHX --dialogFile script.txt -o cues-rhubarb-raw.json <line_name>.wav`
 4. Copy `cues-rhubarb-raw.json` to `cues.json`.
-5. If the line sends app events, add any new event names to `dialogue/events.json` with what the app should do.
+5. Write `script.txt` (see Script format). Add any new event names to `dialogue/events.json`, then time the captions and cues: `~/whisper-venv/bin/python tools/build_captions.py <line_name>`.
 6. Find the stressed words: `python3 tools/build_emphasis.py <line_name>`, and add a `"title"` to `cues.json`: the line's name in the Audio files panel.
 7. Build the preview: `python3 tools/build_preview.py` and open `preview/index.html`. The new line is in the Audio files panel.
 8. Review at half speed. Fix any mouth holds that look wrong by editing `cues.json` (each cue is `{"start", "end", "value"}` in seconds), then rebuild the preview.
@@ -118,6 +118,15 @@ Giving Rhubarb the script text (step 3) usually improves accuracy a lot. The fir
 The developers get Nova as a Flutter package (`flutter/nova_character/`): a widget they place on a screen, a controller that plays lines, and a stream of events. Art, audio and timing are bundled inside, so there is nothing to assemble. Its README is the developer guide, and `example/` is a demo screen.
 
 To send a new version: bump `version` in `flutter/nova_character/pubspec.yaml`, run `python3 tools/make_handoff.py`, and send `dist/nova_character-<version>.zip`.
+
+## Script format
+
+A line's `script.txt` is plain text:
+
+- **One caption per line**, broken wherever the caption should change. A script written as one paragraph is split by sentence.
+- **Exact words** as spoken, with punctuation.
+- **[Bracketed cues]** right before the word where something should happen, even mid-line: `There's lots to explore. [Highlight the shops] See those shops?` The cue is removed from the caption and becomes an event at that word. It must match an event in `dialogue/events.json` (its name, or one of its `cues`), or `build_captions.py` stops.
+- Captions longer than `captions.maxChars` in `tools/rig_settings.json` (42 for now, until the developers confirm the subtitle bubble's width) are split at a sentence end, then a comma, then a space, and flagged to check.
 
 ## Line log
 
