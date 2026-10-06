@@ -62,7 +62,7 @@ Dispose the controller with your screen (`nova.dispose()`).
 | `stop()`, `pause()`, `resume()` | Playback control. |
 | `events` | Stream of `NovaEvent(name, lineId, time)` from the line's markers. `line_end` arrives when a line finishes. |
 | `isSpeaking`, `line`, `time` | Current state. |
-| `look` | Where Nova looks when no line is directing him: `NovaLook.left`, `ahead`, `right`. |
+| `look` | Where Nova looks when no line is directing him: `NovaLook.ahead`, `left`, `right`, `up`, `down`, `upLeft`, `upRight`, `downLeft`, `downRight`. |
 | `expression` | Brows to hold (`'happy'`, `'surprised'`, `'concerned'`), or null to follow the line. |
 
 ## The widget
@@ -93,8 +93,9 @@ The timing file holds the mouth shapes and the markers:
 ```
 
 - `event` markers become `NovaEvent`s in your app. The names are agreed per scene.
-- `look` markers turn Nova's eyes and head toward the screen's left or right between
-  `time` and `end`. `arm` markers raise the arm on that side of the screen, then lower it
+- `look` markers turn Nova's eyes and head toward one of eight directions on screen between
+  `time` and `end`: `left`, `right`, `up`, `down`, `up-left`, `up-right`, `down-left`,
+  `down-right`. `arm` markers raise the arm on that side of the screen, then lower it
   at `end`. `expression` markers set his brows: `happy`, `surprised` or `concerned`. You
   don't need to do anything with these; the widget handles them.
 - His brows also lift briefly on the stressed words of each line (the `emphasis` list,

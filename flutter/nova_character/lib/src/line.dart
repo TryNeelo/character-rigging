@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
+import 'controller.dart';
 import 'rig.dart';
 
 /// One mouth shape held from [start] to [end] seconds. Shapes follow Rhubarb Lip Sync
@@ -13,8 +14,8 @@ class NovaCue {
 }
 
 /// A moment in a line. Either an app event (`type: "event"`, with a [name]) or something
-/// Nova does from [time] to [end]: `type: "look"` toward [direction] "left" or "right" of
-/// the screen, `type: "arm"` raising the arm on the screen's [side] by [degrees], or
+/// Nova does from [time] to [end]: `type: "look"` toward [direction] on screen ("left",
+/// "right", "up", "down", "up-left", "up-right", "down-left", "down-right"), `type: "arm"` raising the arm on the screen's [side] by [degrees], or
 /// `type: "expression"` setting his brows to [name] ("happy", "surprised", "concerned").
 class NovaMarker {
   const NovaMarker(
@@ -97,11 +98,11 @@ class NovaLine {
     return null;
   }
 
-  /// Look direction at [t] seconds: -1 screen left, 1 screen right, 0 straight ahead.
-  double lookAt(double t) {
+  /// Look direction at [t] seconds, or null when the line isn't directing his gaze.
+  NovaLook? lookAt(double t) {
     for (final m in markers) {
-      if (m.type == 'look' && t >= m.time && t < (m.end ?? m.time)) return m.direction == 'left' ? -1 : 1;
+      if (m.type == 'look' && t >= m.time && t < (m.end ?? m.time)) return NovaLook.byName(m.direction);
     }
-    return 0;
+    return null;
   }
 }

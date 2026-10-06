@@ -98,6 +98,10 @@ button { font: inherit; cursor: pointer; }
 .shape[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); }
 .shape.live { background: var(--chip); }
 
+.look-pad { display: grid; grid-template-columns: repeat(3, 40px); gap: 4px; }
+.look-pad button { height: 34px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); font-size: 16px; }
+.look-pad button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.look-pad button:focus-visible { outline: 3px solid var(--rust); outline-offset: 2px; }
 .section-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
 .section-head h2 { margin: 0; }
 .btn.small { padding: 6px 14px; font-size: 13px; }
@@ -179,9 +183,10 @@ button { font: inherit; cursor: pointer; }
         <p>Arms stay behind the outfit and rotate at the shoulder; the head turns at the base of the neck. Idle adds slow breathing and a slight sway, plus a small nod, a slight tilt and a brow lift on each stressed word while he talks.</p>
         <div class="fields">
           <label class="slider"><span>Head tilt</span><input type="range" id="poseHead" min="-10" max="10" step="0.5" value="0"><output for="poseHead" id="poseHeadOut">0°</output></label>
-          <label class="slider"><span>Eyes look</span><input type="range" id="poseLook" min="-1" max="1" step="0.1" value="0"><output for="poseLook" id="poseLookOut">0</output></label>
           <label class="slider"><span>Left arm</span><input type="range" id="poseArmL" min="-12" max="180" step="1" value="0"><output for="poseArmL" id="poseArmLOut">0°</output></label>
           <label class="slider"><span>Right arm</span><input type="range" id="poseArmR" min="-12" max="180" step="1" value="0"><output for="poseArmR" id="poseArmROut">0°</output></label>
+          <div class="field"><span>Look</span>
+            <div class="look-pad" role="group" aria-label="Look direction" id="lookPad"></div></div>
           <div class="field"><span>Brows</span>
             <div class="seg-ctl" role="group" aria-label="Brow expression" id="browCtl"></div></div>
           <div class="row">
@@ -240,7 +245,8 @@ button { font: inherit; cursor: pointer; }
   let cues = line.cues, markers = line.markers, emphasis = line.emphasis, DURATION = cues[cues.length - 1].end;
   // Shared with the Flutter component: tools/rig_settings.json
   const S = %%SETTINGS%%;
-  // Markers: {time, type: "event", name} fires an app event; {time, end, type: "look", direction} turns Nova's gaze;
+  // Markers: {time, type: "event", name} fires an app event; {time, end, type: "look", direction} turns Nova's gaze
+  // (left, right, up, down, up-left, up-right, down-left, down-right);
   // {time, end, type: "arm", side, degrees} raises an arm (side = the screen side it's on) and lowers it at end;
   // {time, end, type: "expression", name} sets the brows (happy, surprised, concerned).
   // Emphasis: stressed moments found in the audio (tools/build_emphasis.py); the brows lift briefly on each.
@@ -318,12 +324,14 @@ button { font: inherit; cursor: pointer; }
   svg.appendChild(dots);
   $('pivotsOn').addEventListener('change', e => dots.setAttribute('display', e.target.checked ? 'inline' : 'none'));
 
-  const pose = { head: 0, look: 0, armL: 0, armR: 0 };
+  const pose = { head: 0, look: [0, 0], armL: 0, armR: 0 };
   // Each pupil moves from where it rests in the art to the same spot in its eye
-  const pupils = [$('pupil-left'), $('pupil-right')].map(el => ({ el, rest: +el.dataset.rest }));
-  // Looking: -1 is the screen's left, 1 the screen's right. Pupils slide, the head turns slightly.
+  const pupils = [$('pupil-left'), $('pupil-right')].map(el => ({ el, rest: +el.dataset.rest, restY: +el.dataset.restY }));
+  // Looking: [x, y], x -1 screen left to 1 screen right, y -1 up to 1 down. Diagonals are scaled down a
+  // little so the pupils stay inside the eyes. Pupils slide, the head turns and tips slightly.
   const LOOK = S.look;
-  let look = 0, lookTarget = 0;
+  const lookVec = name => { const v = LOOK.directions[name] || [0, 0]; const k = v[0] && v[1] ? LOOK.diagonal : 1; return [v[0] * k, v[1] * k]; };
+  let look = [0, 0], lookTarget = [0, 0], lineLooking = false;
   let raise = { left: 0, right: 0 }, raiseTarget = { left: 0, right: 0 };
   // Arms ease in and out: each follows a midpoint that follows the target, so moves start softly
   let raiseMid = { left: 0, right: 0 };
@@ -354,10 +362,19 @@ button { font: inherit; cursor: pointer; }
     return { dip: dip * TK.nodPx, tilt: tilt * TK.tiltDegrees };
   }
   // Slider ids are prefixed so they never collide with part ids in the SVG (#head)
-  const SLIDERS = { head: 'poseHead', look: 'poseLook', armL: 'poseArmL', armR: 'poseArmR' };
+  const SLIDERS = { head: 'poseHead', armL: 'poseArmL', armR: 'poseArmR' };
+  // Look pad: eight directions around "ahead"
+  const PAD = [['up-left', '↖'], ['up', '↑'], ['up-right', '↗'], ['left', '←'], ['ahead', '•'], ['right', '→'], ['down-left', '↙'], ['down', '↓'], ['down-right', '↘']];
+  const padBtns = PAD.map(([name, arrow]) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = arrow; b.title = name; b.setAttribute('aria-label', `Look ${name}`);
+    b.setAttribute('aria-pressed', name === 'ahead');
+    b.addEventListener('click', () => { pose.look = lookVec(name); padBtns.forEach(x => x.setAttribute('aria-pressed', x === b)); });
+    $('lookPad').appendChild(b); return b;
+  });
   Object.entries(SLIDERS).forEach(([k, id]) => {
     const input = $(id), out = $(id + 'Out');
-    input.addEventListener('input', () => { pose[k] = +input.value; out.textContent = k === 'look' ? input.value : `${input.value}°`; });
+    input.addEventListener('input', () => { pose[k] = +input.value; out.textContent = `${input.value}°`; });
   });
   // Brow test control: Auto follows the line; the others hold an expression
   const browBtns = ['auto', ...Object.keys(B.expressions)].map(name => {
@@ -369,7 +386,8 @@ button { font: inherit; cursor: pointer; }
   });
   $('resetPose').addEventListener('click', () => {
     testExpression = null; browBtns.forEach((x, i) => x.setAttribute('aria-pressed', i === 0));
-    Object.entries(SLIDERS).forEach(([k, id]) => { pose[k] = 0; $(id).value = 0; $(id + 'Out').textContent = k === 'look' ? '0' : '0°'; });
+    Object.entries(SLIDERS).forEach(([k, id]) => { pose[k] = 0; $(id).value = 0; $(id + 'Out').textContent = '0°'; });
+    pose.look = [0, 0]; padBtns.forEach(x => x.setAttribute('aria-pressed', x.title === 'ahead'));
   });
 
   const I = S.idle;
@@ -381,7 +399,7 @@ button { font: inherit; cursor: pointer; }
     const appRate = $('appRateOn').checked;
     // Full frame rate while an arm or the head is on its way somewhere; the move only lasts a moment
     const moving = Math.abs(raiseTarget.left - raise.left) > 0.3 || Math.abs(raiseTarget.right - raise.right) > 0.3
-      || Math.abs(lookTarget + pose.look - look) > 0.01 || ['left', 'right'].some(k => Math.abs(pose['arm' + k[0].toUpperCase()] - drawnPose['arm' + k[0].toUpperCase()]) > 0.1);
+      || [0, 1].some(i => Math.abs((lineLooking ? lookTarget[i] : pose.look[i]) - look[i]) > 0.01) || ['left', 'right'].some(k => Math.abs(pose['arm' + k[0].toUpperCase()] - drawnPose['arm' + k[0].toUpperCase()]) > 0.1);
     const fps = moving ? S.frameRate.moving : raf ? S.frameRate.talking : S.frameRate.idle;
     if (appRate && lastDraw >= 0 && now - lastDraw < 1000 / fps - 4) return;
     const dt = lastDraw < 0 ? 1 / 60 : Math.min((now - lastDraw) / 1000, 0.25);
@@ -395,7 +413,9 @@ button { font: inherit; cursor: pointer; }
     const breath = idle ? Math.sin(t * 2 * Math.PI / I.breathSeconds) : 0;
     const sway = idle ? Math.sin(t * 2 * Math.PI / I.swaySeconds) * I.swayDegrees : 0;
     const swing = idle ? Math.sin(t * 2 * Math.PI / I.breathSeconds + 0.6) * I.armSwingDegrees : 0; // arms follow the breath
-    look += (Math.max(-1, Math.min(1, lookTarget + pose.look)) - look) * ease(LOOK.smoothing);
+    // A look from the line wins over the test pad
+    const want = lineLooking ? lookTarget : pose.look;
+    for (const i of [0, 1]) look[i] += (want[i] - look[i]) * ease(LOOK.smoothing);
     for (const side of ['left', 'right']) {
       raiseMid[side] += (raiseTarget[side] - raiseMid[side]) * ease(S.gesture.smoothing * 1.6);
       raise[side] += (raiseMid[side] - raise[side]) * ease(S.gesture.smoothing * 1.6);
@@ -403,15 +423,17 @@ button { font: inherit; cursor: pointer; }
     const expr = B.expressions[testExpression || lineExpression] || { liftPx: 0, tiltDegrees: 0 };
     brow.lift += (expr.liftPx - brow.lift) * ease(B.smoothing);
     brow.tilt += (expr.tiltDegrees - brow.tilt) * ease(B.smoothing);
-    const lift = brow.lift + ((raf && idle && $('browLiftsOn').checked) ? autoLift(audio.currentTime) * B.autoLiftPx : 0);
+    // Brows rise a little when he looks up
+    const lift = brow.lift + LOOK.browLiftUp * Math.max(0, -look[1])
+      + ((raf && idle && $('browLiftsOn').checked) ? autoLift(audio.currentTime) * B.autoLiftPx : 0);
     // Positive tilt raises the inner ends: the screen-left brow turns anticlockwise, the right one clockwise
     browEls.forEach(b => b.el.setAttribute('transform',
       `translate(0 ${(-lift).toFixed(2)}) rotate(${((b.side === 'left' ? -1 : 1) * brow.tilt).toFixed(2)} ${b.p[0]} ${b.p[1]})`));
-    pupils.forEach(p => p.el.setAttribute('transform', `translate(${(LOOK.pupilReach * look - p.rest * Math.abs(look)).toFixed(2)} 0)`));
+    pupils.forEach(p => p.el.setAttribute('transform', `translate(${(LOOK.pupilReach * look[0] - p.rest * Math.abs(look[0])).toFixed(2)} ${(LOOK.pupilReachY * look[1] - p.restY * Math.abs(look[1])).toFixed(2)})`));
     upper.setAttribute('transform', `translate(0 ${(-I.breathPx * (1 + breath)).toFixed(2)})`);
     dots.setAttribute('transform', upper.getAttribute('transform'));
     const talk = (raf && idle) ? talkHead(audio.currentTime) : { dip: 0, tilt: 0 };
-    head.setAttribute('transform', `translate(${(LOOK.headPx * look).toFixed(2)} ${talk.dip.toFixed(2)}) rotate(${(pose.head + sway + talk.tilt + LOOK.headDegrees * look).toFixed(2)} ${HP[0]} ${HP[1]})`);
+    head.setAttribute('transform', `translate(${(LOOK.headPx * look[0]).toFixed(2)} ${(talk.dip + LOOK.headPxY * look[1]).toFixed(2)}) rotate(${(pose.head + sway + talk.tilt + LOOK.headDegrees * look[0]).toFixed(2)} ${HP[0]} ${HP[1]})`);
     armL.setAttribute('transform', `rotate(${(pose.armL + raise.left + swing).toFixed(2)} ${LP[0]} ${LP[1]})`);
     armR.setAttribute('transform', `rotate(${(-pose.armR - raise.right - swing).toFixed(2)} ${RP[0]} ${RP[1]})`);
     // The outline layer follows the same moves
@@ -576,7 +598,8 @@ button { font: inherit; cursor: pointer; }
     markers.forEach((mk, i) => { if (mk.type === 'event' && lastT < mk.time && t >= mk.time) fireEvent(mk, markEls[i]); });
     lastT = t;
     const lk = markers.find(mk => mk.type === 'look' && t >= mk.time && t < mk.end);
-    lookTarget = lk ? (lk.direction === 'right' ? 1 : -1) : 0;
+    lookTarget = lk ? lookVec(lk.direction) : [0, 0];
+    lineLooking = !!lk;
     raiseTarget = { left: 0, right: 0 };
     const ex = markers.find(mk => mk.type === 'expression' && t >= mk.time && t < mk.end);
     lineExpression = ex ? ex.name : null;
@@ -597,7 +620,7 @@ button { font: inherit; cursor: pointer; }
     if (lastSeg >= 0) segEls[lastSeg].classList.remove('on');
     lastSeg = -1;
     $('playhead').style.left = '0%';
-    lookTarget = 0; lastT = -1; raiseTarget = { left: 0, right: 0 }; lineExpression = null;
+    lookTarget = [0, 0]; lineLooking = false; lastT = -1; raiseTarget = { left: 0, right: 0 }; lineExpression = null;
     markEls.forEach(el => el.classList.remove('fired'));
     $('play').textContent = 'Play with sound';
     pendingMouth = null;

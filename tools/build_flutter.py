@@ -39,7 +39,8 @@ rig = {
     'defaultOutfit': re.search(r'<g id="legs"><g class="outfit" data-outfit="([^"]+)"', rigged).group(1),
     'eyes': {'centers': [[float(x), float(y)] for x, y in re.findall(r'cx="([\d.]+)" cy="([\d.]+)"', eyes)],
              'radius': 24.654,
-             'pupilRest': [float(v) for v in re.findall(r'id="pupil-(?:left|right)" data-rest="([-\d.]+)"', rigged)]},
+             'pupilRest': [float(v) for v in re.findall(r'id="pupil-(?:left|right)" data-rest="([-\d.]+)"', rigged)],
+             'pupilRestY': float(re.search(r'data-rest-y="([-\d.]+)"', rigged).group(1))},
     **settings,
 }
 rig['brows']['pivots'] = {side: pivot(f'brow-{side}') for side in ('left', 'right')}

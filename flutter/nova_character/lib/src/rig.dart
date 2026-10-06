@@ -52,6 +52,7 @@ class NovaRig {
         eyeCenters = [for (final c in _j['eyes']['centers'] as List) _offset(c)],
         eyeRadius = _num(_j['eyes']['radius']),
         pupilRest = [for (final v in _j['eyes']['pupilRest'] as List) _num(v)],
+        pupilRestY = _num(_j['eyes']['pupilRestY']),
         framing = {
           for (final e in (_j['framing'] as Map<String, dynamic>).entries)
             e.key: NovaFramingSpec.fromJson(e.value as Map<String, dynamic>)
@@ -68,6 +69,9 @@ class NovaRig {
 
   /// How far each pupil (left, right) sits from its eye's centre at rest, in canvas units.
   final List<double> pupilRest;
+
+  /// How far both pupils sit below their eye's centre at rest.
+  final double pupilRestY;
   final Map<String, NovaFramingSpec> framing;
 
 

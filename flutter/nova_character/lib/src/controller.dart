@@ -20,14 +20,25 @@ class NovaEvent {
   String toString() => 'NovaEvent($name at ${time.toStringAsFixed(2)}s in $lineId)';
 }
 
-/// Where Nova looks when no line is telling him: -1 screen left, 0 ahead, 1 screen right.
+/// Where Nova looks when no line is telling him. Directions are on screen: [x] -1 left to
+/// 1 right, [y] -1 up to 1 down. [name] matches the "direction" of look markers.
 enum NovaLook {
-  left(-1),
-  ahead(0),
-  right(1);
+  ahead(0, 0, 'ahead'),
+  left(-1, 0, 'left'),
+  right(1, 0, 'right'),
+  up(0, -1, 'up'),
+  down(0, 1, 'down'),
+  upLeft(-1, -1, 'up-left'),
+  upRight(1, -1, 'up-right'),
+  downLeft(-1, 1, 'down-left'),
+  downRight(1, 1, 'down-right');
 
-  const NovaLook(this.value);
-  final double value;
+  const NovaLook(this.x, this.y, this.name);
+  final double x, y;
+  final String name;
+
+  /// The direction named in a look marker, or [ahead].
+  static NovaLook byName(String? name) => values.firstWhere((v) => v.name == name, orElse: () => ahead);
 }
 
 /// Plays Nova's lines and reports their events. Give it to a [NovaCharacter] widget.

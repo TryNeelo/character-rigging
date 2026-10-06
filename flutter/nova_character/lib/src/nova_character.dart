@@ -69,7 +69,7 @@ class _NovaCharacterState extends State<NovaCharacter> {
   final Stopwatch _clock = Stopwatch()..start();
   // Arms ease in and out: each follows a midpoint that follows the target, so moves start softly
   double _midLeft = 0, _midRight = 0;
-  double _t = 0, _lastFrame = -1, _look = 0, _raiseLeft = 0, _raiseRight = 0, _browLift = 0, _browTilt = 0;
+  double _t = 0, _lastFrame = -1, _lookX = 0, _lookY = 0, _raiseLeft = 0, _raiseRight = 0, _browLift = 0, _browTilt = 0;
   _Eye _eye = _Eye.open;
   Timer? _blinkTimer;
   final _random = math.Random();
@@ -139,15 +139,19 @@ class _NovaCharacterState extends State<NovaCharacter> {
     final fps = _moving ? rig.frameRate('moving') : c.isSpeaking ? rig.frameRate('talking') : rig.frameRate('idle');
     final dt = _lastFrame < 0 ? 1 / fps : math.min(now - _lastFrame, 0.25);
     _lastFrame = now;
-    final lineLook = c.line?.lookAt(c.time) ?? 0;
-    final lookTarget = lineLook != 0 ? lineLook : c.look.value;
+    // A look from the line wins over the controller's look. Diagonals are scaled down a little
+    // so the pupils stay inside the eyes.
+    final dir = c.line?.lookAt(c.time) ?? c.look;
+    final diag = dir.x != 0 && dir.y != 0 ? rig.look('diagonal') : 1.0;
+    final (lookX, lookY) = (dir.x * diag, dir.y * diag);
     final (armLeft, armRight) = c.line?.armsAt(c.time) ?? (0.0, 0.0);
     final (lift, tilt) = rig.browExpressions[c.expression ?? c.line?.expressionAt(c.time)] ?? (0.0, 0.0);
     // Smoothing amounts are tuned per 60 fps frame; scale them to the real frame time
     double ease(double perFrame) => 1 - math.pow(1 - perFrame, dt * 60).toDouble();
     setState(() {
       _t = now;
-      _look += (lookTarget - _look) * ease(rig.look('smoothing'));
+      _lookX += (lookX - _lookX) * ease(rig.look('smoothing'));
+      _lookY += (lookY - _lookY) * ease(rig.look('smoothing'));
       final arm = ease(rig.gesture('smoothing') * 1.6);
       _midLeft += (armLeft - _midLeft) * arm;
       _midRight += (armRight - _midRight) * arm;
@@ -158,8 +162,9 @@ class _NovaCharacterState extends State<NovaCharacter> {
     });
     // With movement off and nothing left to settle, stop redrawing until something changes.
     // Blinks redraw on their own.
-    _moving = (lookTarget - _look).abs() > 0.01 || (armLeft - _raiseLeft).abs() > 0.3 || (armRight - _raiseRight).abs() > 0.3;
-    final settled = (lookTarget - _look).abs() < 0.002 && (armLeft - _raiseLeft).abs() < 0.05 &&
+    final lookOff = math.max((lookX - _lookX).abs(), (lookY - _lookY).abs());
+    _moving = lookOff > 0.01 || (armLeft - _raiseLeft).abs() > 0.3 || (armRight - _raiseRight).abs() > 0.3;
+    final settled = lookOff < 0.002 && (armLeft - _raiseLeft).abs() < 0.05 &&
         (armRight - _raiseRight).abs() < 0.05 && (lift - _browLift).abs() < 0.02 && (tilt - _browTilt).abs() < 0.02;
     if (!widget.idle && !c.isSpeaking && settled) {
       _lastFrame = -1;
@@ -307,15 +312,16 @@ class _NovaCharacterState extends State<NovaCharacter> {
     final swing = idle * math.sin(_t * 2 * math.pi / breathSec + 0.6) * rig.idle('armSwingDegrees');
     final upperY = idle * -rig.idle('breathPx') * (1 + breath);
     final shape = _shape;
-    final browLift = _browLift + _autoBrowLift(rig);
+    // Brows rise a little when he looks up
+    final browLift = _browLift + _autoBrowLift(rig) + rig.look('browLiftUp') * math.max(0, -_lookY);
     final (dip, talkTilt) = _talkHead(rig);
     final outfitId = rig.outfits.containsKey(widget.outfit) ? widget.outfit! : rig.defaultOutfit;
     final outfit = rig.outfits[outfitId]!;
 
     final ol = outline ? '_outline' : '';
     final head = Transform(
-      transform: Matrix4.translationValues(rig.look('headPx') * _look * s, dip * s, 0)
-        ..multiply(rotateAbout(rig.headPivot, sway + talkTilt + rig.look('headDegrees') * _look)),
+      transform: Matrix4.translationValues(rig.look('headPx') * _lookX * s, (dip + rig.look('headPxY') * _lookY) * s, 0)
+        ..multiply(rotateAbout(rig.headPivot, sway + talkTilt + rig.look('headDegrees') * _lookX)),
       child: Stack(children: outline
           ? [
               if (outfit.hatBack) part('hat_back_${outfitId}_outline'),
@@ -331,7 +337,8 @@ class _NovaCharacterState extends State<NovaCharacter> {
             // Each pupil moves from its resting spot to the same spot in its own eye
             for (final (i, side) in [(0, 'left'), (1, 'right')])
               Transform.translate(
-                offset: Offset((rig.look('pupilReach') * _look - rig.pupilRest[i] * _look.abs()) * s, 0),
+                offset: Offset((rig.look('pupilReach') * _lookX - rig.pupilRest[i] * _lookX.abs()) * s,
+                    (rig.look('pupilReachY') * _lookY - rig.pupilRestY * _lookY.abs()) * s),
                 child: part('pupil_$side'),
               ),
           ]),

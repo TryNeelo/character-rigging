@@ -35,6 +35,7 @@ HEAD_PIVOT = (278.7, 392)  # base of the neck, where the chin meets the collar
 # How far each pupil sits from its eye's centre at rest (x). The art has them turned slightly
 # inward, so looking sideways moves each pupil a different amount to the same spot.
 PUPIL_REST = (8.2, -7.8)
+PUPIL_REST_Y = 5.9  # both pupils also sit a little below their eye's centre
 
 def centre(shape):
     """Centre of a path's bounding box, rounded: where a brow tilts from."""
@@ -187,8 +188,8 @@ head = (f'<g id="head" class="part" data-pivot="{HEAD_PIVOT[0]} {HEAD_PIVOT[1]}"
         + els[43] + els[44]                                     # head fur
         + J(45, 49)                                             # eye patches, eye whites
         + '<g id="pupils" clip-path="url(#clip-eyes)">'                 # pupils stay inside the eyes when they move
-        + f'<g id="pupil-left" data-rest="{PUPIL_REST[0]}">' + els[49] + '</g>'
-        + f'<g id="pupil-right" data-rest="{PUPIL_REST[1]}">' + els[50] + '</g></g>'
+        + f'<g id="pupil-left" data-rest="{PUPIL_REST[0]}" data-rest-y="{PUPIL_REST_Y}">' + els[49] + '</g>'
+        + f'<g id="pupil-right" data-rest="{PUPIL_REST[1]}" data-rest-y="{PUPIL_REST_Y}">' + els[50] + '</g></g>'
         + eyelids
         + J(51, 55)                                             # ears
         + '<g id="brows">' + ''.join(f'<g id="brow-{side}" data-pivot="{centre(b)[0]} {centre(b)[1]}">{b}</g>'
