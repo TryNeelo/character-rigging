@@ -16,7 +16,7 @@ class _NovaDemoState extends State<NovaDemo> {
   final log = <String>[];
   NovaFraming framing = NovaFraming.waistUp;
   NovaAlign align = NovaAlign.right;
-  bool outline = true, halfSpeed = false;
+  bool outline = true, halfSpeed = false, movement = true;
   String outfit = 'hoodie';
 
   @override
@@ -38,7 +38,7 @@ class _NovaDemoState extends State<NovaDemo> {
     final scene = Container(
       decoration: BoxDecoration(color: const Color(0xFFC3DEDB), borderRadius: BorderRadius.circular(16)),
       clipBehavior: Clip.antiAlias,
-      child: NovaCharacter(controller: nova, framing: framing, align: align, outline: outline, outfit: outfit),
+      child: NovaCharacter(controller: nova, framing: framing, align: align, outline: outline, outfit: outfit, idle: movement),
     );
     final controls = ListView(padding: const EdgeInsets.all(16), children: [
       Text('Nova demo', style: Theme.of(context).textTheme.headlineSmall),
@@ -83,6 +83,13 @@ class _NovaDemoState extends State<NovaDemo> {
         ],
         selected: {align},
         onSelectionChanged: (v) => setState(() => align = v.first),
+      ),
+      SwitchListTile(
+        contentPadding: EdgeInsets.zero,
+        title: const Text('Movement'),
+        subtitle: const Text('Off: Nova only blinks and talks, and stays still in between'),
+        value: movement,
+        onChanged: (v) => setState(() => movement = v),
       ),
       SwitchListTile(
         contentPadding: EdgeInsets.zero,

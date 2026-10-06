@@ -72,7 +72,7 @@ Dispose the controller with your screen (`nova.dispose()`).
 | `framing` | `full` | How much of Nova to show. The crop line sits at the bottom of the widget. |
 | `align` | `center` | Only matters when the widget is wider than the framing needs. |
 | `outline` | `true` | White sticker outline. It's drawn into the art (white copies of the outer parts), so it follows any pose and costs no blur. |
-| `idle` | `true` | Breathing, slight sway, small nod while talking. Kept subtle. |
+| `idle` | `true` | Movement switch. On: breathing and slight sway between lines, nods and brow lifts while talking. Off: he only blinks and lip-syncs, and doesn't redraw between blinks. |
 | `blink` | `true` | Random blinks every 2.5 to 5.5 s. |
 | `outfit` | `'hoodie'` | Which outfit Nova wears: `'hoodie'`, `'aviator'` or `'construction'`. Change it any time; his face, lip-sync and motion carry over. |
 

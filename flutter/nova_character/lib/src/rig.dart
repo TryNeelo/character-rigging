@@ -78,6 +78,7 @@ class NovaRig {
   double gesture(String key) => _num(_j['gesture'][key]);
   double outline(String key) => _num(_j['outline'][key]);
   double brows(String key) => _num(_j['brows'][key]);
+  double frameRate(String key) => _num(_j['frameRate'][key]);
 
   /// Brow expressions by name: (lift in canvas units, tilt in degrees; positive raises the inner ends).
   late final Map<String, (double, double)> browExpressions = {

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -44,7 +43,9 @@ class NovaCharacter extends StatefulWidget {
   /// White sticker outline and soft shadow around Nova.
   final bool outline;
 
-  /// Breathing, slight sway and a small nod while talking.
+  /// Movement switch: breathing and slight sway between lines, nods and brow lifts
+  /// while talking. When off, Nova only blinks and lip-syncs, and he doesn't redraw
+  /// at all between blinks.
   final bool idle;
 
   /// Random blinks every few seconds.
@@ -60,10 +61,13 @@ class NovaCharacter extends StatefulWidget {
 
 enum _Eye { open, half, closed }
 
-class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProviderStateMixin {
+class _NovaCharacterState extends State<NovaCharacter> {
   NovaRig? _rig;
-  late final Ticker _ticker;
-  double _t = 0, _look = 0, _raiseLeft = 0, _raiseRight = 0, _browLift = 0, _browTilt = 0;
+  // Nova's own frame clock: wakes only at his frame rate (not every screen refresh),
+  // and stops entirely when he's still.
+  Timer? _frameTimer;
+  final Stopwatch _clock = Stopwatch()..start();
+  double _t = 0, _lastFrame = -1, _look = 0, _raiseLeft = 0, _raiseRight = 0, _browLift = 0, _browTilt = 0;
   _Eye _eye = _Eye.open;
   Timer? _blinkTimer;
   final _random = math.Random();
@@ -73,11 +77,12 @@ class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProvider
   @override
   void initState() {
     super.initState();
-    _ticker = createTicker(_tick)..start();
+    widget.controller.addListener(_wake);
     NovaRig.load().then((rig) {
       if (!mounted) return;
       setState(() => _rig = rig);
       _scheduleBlink();
+      _wake();
     });
   }
 
@@ -85,33 +90,69 @@ class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProvider
   void didUpdateWidget(NovaCharacter old) {
     super.didUpdateWidget(old);
     if (old.blink != widget.blink) _scheduleBlink();
+    if (old.controller != widget.controller) {
+      old.controller.removeListener(_wake);
+      widget.controller.addListener(_wake);
+    }
+    _wake();
+  }
+
+  /// Starts redrawing again after Nova has been still (a line starts, a look is set...).
+  void _wake() {
+    if (_frameTimer == null && mounted) _nextFrame();
+  }
+
+  void _nextFrame() {
+    final rig = _rig;
+    if (rig == null) return;
+    final fps = widget.controller.isSpeaking ? rig.frameRate('talking') : rig.frameRate('idle');
+    _frameTimer = Timer(Duration(microseconds: (1e6 / fps).round()), _frame);
   }
 
   @override
   void dispose() {
-    _ticker.dispose();
+    widget.controller.removeListener(_wake);
+    _frameTimer?.cancel();
     _blinkTimer?.cancel();
     super.dispose();
   }
 
   String get _shape => widget.controller.line?.shapeAt(widget.controller.time) ?? 'smile';
 
-  void _tick(Duration elapsed) {
+  /// One frame of Nova: 30 fps while talking, 15 fps for slow idle motion, and none
+  /// at all once he's still with movement off.
+  void _frame() {
+    _frameTimer = null;
     final rig = _rig;
-    if (rig == null) return;
+    if (rig == null || !mounted) return;
     final c = widget.controller;
+    final now = _clock.elapsedMicroseconds / 1e6;
+    final fps = c.isSpeaking ? rig.frameRate('talking') : rig.frameRate('idle');
+    final dt = _lastFrame < 0 ? 1 / fps : math.min(now - _lastFrame, 0.25);
+    _lastFrame = now;
     final lineLook = c.line?.lookAt(c.time) ?? 0;
     final lookTarget = lineLook != 0 ? lineLook : c.look.value;
     final (armLeft, armRight) = c.line?.armsAt(c.time) ?? (0.0, 0.0);
+    final (lift, tilt) = rig.browExpressions[c.expression ?? c.line?.expressionAt(c.time)] ?? (0.0, 0.0);
+    // Smoothing amounts are tuned per 60 fps frame; scale them to the real frame time
+    double ease(double perFrame) => 1 - math.pow(1 - perFrame, dt * 60).toDouble();
     setState(() {
-      _t = elapsed.inMicroseconds / 1e6;
-      _look += (lookTarget - _look) * rig.look('smoothing');
-      _raiseLeft += (armLeft - _raiseLeft) * rig.gesture('smoothing');
-      _raiseRight += (armRight - _raiseRight) * rig.gesture('smoothing');
-      final (lift, tilt) = rig.browExpressions[c.expression ?? c.line?.expressionAt(c.time)] ?? (0.0, 0.0);
-      _browLift += (lift - _browLift) * rig.brows('smoothing');
-      _browTilt += (tilt - _browTilt) * rig.brows('smoothing');
+      _t = now;
+      _look += (lookTarget - _look) * ease(rig.look('smoothing'));
+      _raiseLeft += (armLeft - _raiseLeft) * ease(rig.gesture('smoothing'));
+      _raiseRight += (armRight - _raiseRight) * ease(rig.gesture('smoothing'));
+      _browLift += (lift - _browLift) * ease(rig.brows('smoothing'));
+      _browTilt += (tilt - _browTilt) * ease(rig.brows('smoothing'));
     });
+    // With movement off and nothing left to settle, stop redrawing until something changes.
+    // Blinks redraw on their own.
+    final settled = (lookTarget - _look).abs() < 0.002 && (armLeft - _raiseLeft).abs() < 0.05 &&
+        (armRight - _raiseRight).abs() < 0.05 && (lift - _browLift).abs() < 0.02 && (tilt - _browTilt).abs() < 0.02;
+    if (!widget.idle && !c.isSpeaking && settled) {
+      _lastFrame = -1;
+    } else {
+      _nextFrame();
+    }
   }
 
   /// A smooth bump around a stressed moment, [d] seconds after it: quick rise, short hold, slower fall.
@@ -235,8 +276,11 @@ class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProvider
   /// outline copies of the outer parts (legs, arms, body, head, hat).
   Widget _layers(NovaRig rig, double s, {bool outline = false}) {
     final w = rig.width * s, h = rig.height * s;
-    Widget part(String name) => SvgPicture.asset('assets/parts/$name.svg',
-        package: novaPackage, width: w, height: h, fit: BoxFit.fill, allowDrawingOutsideViewBox: true);
+    // Each part is drawn once and kept (RepaintBoundary); moving it only shifts the finished
+    // picture, so breathing and sway don't redraw the art.
+    Widget part(String name) => RepaintBoundary(
+        child: SvgPicture.asset('assets/parts/$name.svg',
+            package: novaPackage, width: w, height: h, fit: BoxFit.fill, allowDrawingOutsideViewBox: true));
     Widget shown(bool visible, Widget child) =>
         Visibility(visible: visible, maintainState: true, maintainAnimation: true, maintainSize: true, child: child);
     Matrix4 rotateAbout(Offset p, double degrees) => Matrix4.translationValues(p.dx * s, p.dy * s, 0)
