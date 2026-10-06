@@ -2,16 +2,100 @@
  {
   "start": 0.0,
   "end": 1.04,
-  "text": "Hi, I'm Nova!"
+  "text": "Hi, I'm Nova!",
+  "words": [
+   {
+    "w": "Hi,",
+    "s": 0.0,
+    "e": 0.3
+   },
+   {
+    "w": "I'm",
+    "s": 0.38,
+    "e": 0.6
+   },
+   {
+    "w": "Nova!",
+    "s": 0.6,
+    "e": 0.82
+   }
+  ],
+  "split": false
  },
  {
   "start": 1.04,
   "end": 3.0,
-  "text": "Let's get your Neelo account set up."
+  "text": "Let's get your Neelo account set up.",
+  "words": [
+   {
+    "w": "Let's",
+    "s": 1.14,
+    "e": 1.32
+   },
+   {
+    "w": "get",
+    "s": 1.32,
+    "e": 1.42
+   },
+   {
+    "w": "your",
+    "s": 1.42,
+    "e": 1.56
+   },
+   {
+    "w": "Neelo",
+    "s": 1.56,
+    "e": 1.92
+   },
+   {
+    "w": "account",
+    "s": 1.92,
+    "e": 2.2
+   },
+   {
+    "w": "set",
+    "s": 2.2,
+    "e": 2.48
+   },
+   {
+    "w": "up.",
+    "s": 2.48,
+    "e": 2.72
+   }
+  ],
+  "split": false
  },
  {
   "start": 3.0,
   "end": 4.94,
-  "text": "First, what's your child's name?"
+  "text": "First, what's your child's name?",
+  "words": [
+   {
+    "w": "First,",
+    "s": 3.1,
+    "e": 3.2
+   },
+   {
+    "w": "what's",
+    "s": 3.6,
+    "e": 3.82
+   },
+   {
+    "w": "your",
+    "s": 3.82,
+    "e": 3.9
+   },
+   {
+    "w": "child's",
+    "s": 3.9,
+    "e": 4.36
+   },
+   {
+    "w": "name?",
+    "s": 4.36,
+    "e": 4.54
+   }
+  ],
+  "split": false
  }
 ]

@@ -12,7 +12,8 @@ Script format (dialogue/<line>/script.txt), plain text:
 
 Whisper (faster-whisper) only supplies when each word is heard; the words always come from
 the script, so a misheard word (e.g. "Nilo" for "Neelo") still gets the right time.
-Writes dialogue/<line>/captions.json as [{"start", "end", "text"}] and puts the cue events
+Writes dialogue/<line>/captions.json as [{"start", "end", "text", "words", "split"}] (words: each
+word's time, for the preview's script view; split: true if the caption was split for length) and puts the cue events
 into cues.json markers (marked "source": "script", replaced on every run).
 
 Needs faster-whisper:  python3 -m venv ~/whisper-venv && ~/whisper-venv/bin/pip install faster-whisper
@@ -105,7 +106,9 @@ for line in sorted(lines):
         for piece in row_pieces:
             n = len(piece.split())
             ts = times[k:k + n]; k += n
-            captions.append({'start': round(max(0.0, ts[0][0] - LEAD), 2), 'end': round(ts[-1][1] + HOLD, 2), 'text': piece})
+            captions.append({'start': round(max(0.0, ts[0][0] - LEAD), 2), 'end': round(ts[-1][1] + HOLD, 2), 'text': piece,
+                             'words': [{'w': w, 's': round(s, 2), 'e': round(e, 2)} for w, (s, e) in zip(piece.split(), ts)],
+                             'split': len(row_pieces) > 1})
     for a, b in zip(captions, captions[1:]):
         a['end'] = min(a['end'], b['start'])
     captions[-1]['end'] = round(min(captions[-1]['end'], duration), 2)

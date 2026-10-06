@@ -2,16 +2,75 @@
  {
   "start": 0.0,
   "end": 1.24,
-  "text": "Welcome to Neelo."
+  "text": "Welcome to Neelo.",
+  "words": [
+   {
+    "w": "Welcome",
+    "s": 0.0,
+    "e": 0.42
+   },
+   {
+    "w": "to",
+    "s": 0.42,
+    "e": 0.64
+   },
+   {
+    "w": "Neelo.",
+    "s": 0.64,
+    "e": 0.98
+   }
+  ],
+  "split": false
  },
  {
   "start": 1.24,
   "end": 2.24,
-  "text": "I'm Nova."
+  "text": "I'm Nova.",
+  "words": [
+   {
+    "w": "I'm",
+    "s": 1.34,
+    "e": 1.6
+   },
+   {
+    "w": "Nova.",
+    "s": 1.6,
+    "e": 1.86
+   }
+  ],
+  "split": false
  },
  {
   "start": 2.24,
   "end": 3.76,
-  "text": "Let's get this journey started."
+  "text": "Let's get this journey started.",
+  "words": [
+   {
+    "w": "Let's",
+    "s": 2.34,
+    "e": 2.5
+   },
+   {
+    "w": "get",
+    "s": 2.5,
+    "e": 2.62
+   },
+   {
+    "w": "this",
+    "s": 2.62,
+    "e": 2.82
+   },
+   {
+    "w": "journey",
+    "s": 2.82,
+    "e": 3.06
+   },
+   {
+    "w": "started.",
+    "s": 3.06,
+    "e": 3.54
+   }
+  ],
+  "split": false
  }
 ]

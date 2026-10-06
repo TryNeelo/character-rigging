@@ -59,7 +59,8 @@ for d in sorted(glob.glob(os.path.join(ROOT, 'dialogue', '*', 'cues.json'))):
     json.dump({'id': line, 'audio': 'audio.mp3', 'duration': cues[-1]['end'], 'cues': cues,
                'markers': src.get('markers', []),
                'emphasis': json.load(open(emph)) if os.path.exists(emph) else [],
-               'captions': json.load(open(caps)) if os.path.exists(caps) else []},
+               # the app only needs each caption's text and timing
+               'captions': [{k: c[k] for k in ('start', 'end', 'text')} for c in json.load(open(caps))] if os.path.exists(caps) else []},
               open(os.path.join(out, 'timing.json'), 'w'), indent=1)
     lines.append(line)
 

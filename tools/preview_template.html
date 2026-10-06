@@ -108,7 +108,6 @@ button { font: inherit; cursor: pointer; }
 .section-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
 .section-head h2 { margin: 0; }
 .btn.small { padding: 6px 14px; font-size: 13px; }
-.words { font-style: italic; color: var(--fg) !important; }
 /* Audio files panel: slides in from the right so lines can be switched while watching Nova */
 .lines-panel { position: fixed; top: 0; right: 0; bottom: 0; width: min(360px, 100vw); background: var(--surface); border-left: 1px solid var(--line); box-shadow: -12px 0 32px rgba(0, 0, 0, .18); z-index: 20; display: flex; flex-direction: column; transform: translateX(100%); visibility: hidden; transition: transform .2s ease, visibility .2s; }
 .lines-panel.open { transform: none; visibility: visible; }
@@ -119,6 +118,22 @@ button { font: inherit; cursor: pointer; }
 .line-item[aria-current="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); background: var(--chip); }
 .line-item .t { font-weight: 700; font-size: 14px; }
 .line-item .m { font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.script-panel { width: min(560px, 100vw); }
+.panel-head .sub { font-size: 13px; color: var(--muted); margin: 2px 0 0; }
+.script-legend { display: flex; gap: 12px; flex-wrap: wrap; padding: 10px 16px; font-size: 12.5px; color: var(--muted); border-bottom: 1px solid var(--line); }
+.script-rows { overflow-y: auto; }
+.script-row { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 12px; width: 100%; text-align: left; align-items: baseline; padding: 12px 16px; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--fg); }
+.script-row:hover { background: var(--chip); }
+.script-row.now { background: var(--chip); box-shadow: inset 3px 0 0 var(--accent); }
+.script-row .tm { font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.script-row.now .tm { color: var(--accent); }
+.script-row .tx { font-size: 15px; line-height: 2; }
+.script-row .w-now { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.cue { display: inline-block; font-family: var(--font-mono); font-size: 11px; font-weight: 700; line-height: 1.6; padding: 0 7px; margin: 0 4px 0 0; border-radius: 999px; vertical-align: 1px; white-space: nowrap; }
+.cue.event { background: var(--rust); color: #fff; }
+.cue.action { background: var(--chip); color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.cue.flag { background: transparent; color: var(--rust); box-shadow: inset 0 0 0 1px var(--rust); font-family: var(--font-body); }
+.script-row:focus-visible { outline: 3px solid var(--rust); outline-offset: -3px; }
 .line-item:focus-visible, .panel-head button:focus-visible { outline: 3px solid var(--rust); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { .lines-panel { transition: none; } }
 </style>
@@ -171,9 +186,11 @@ button { font: inherit; cursor: pointer; }
       <section>
         <div class="section-head">
           <h2 id="lineTitle"></h2>
-          <button class="btn ghost small" id="linesBtn" aria-expanded="false" aria-controls="linesPanel">Audio files (<span id="lineCount"></span>)</button>
+          <div class="row">
+            <button class="btn ghost small" id="scriptBtn" aria-expanded="false" aria-controls="scriptPanel">Script</button>
+            <button class="btn ghost small" id="linesBtn" aria-expanded="false" aria-controls="linesPanel">Audio files (<span id="lineCount"></span>)</button>
+          </div>
         </div>
-        <p class="words" id="lineWords" hidden></p>
         <audio id="audio" preload="auto"></audio>
         <div class="strip-wrap"><div class="strip" id="strip"><div class="playhead" id="playhead"></div></div><div class="scale" id="scale"></div><div class="marks" id="marks"></div></div>
         <div class="row" style="margin-top:12px">
@@ -190,11 +207,8 @@ button { font: inherit; cursor: pointer; }
           <label class="slider"><span>Head tilt</span><input type="range" id="poseHead" min="-10" max="10" step="0.5" value="0"><output for="poseHead" id="poseHeadOut">0°</output></label>
           <label class="slider"><span>Left arm</span><input type="range" id="poseArmL" min="-12" max="180" step="1" value="0"><output for="poseArmL" id="poseArmLOut">0°</output></label>
           <label class="slider"><span>Right arm</span><input type="range" id="poseArmR" min="-12" max="180" step="1" value="0"><output for="poseArmR" id="poseArmROut">0°</output></label>
-          <div class="field"><span>Brows</span>
-            <div class="seg-ctl" role="group" aria-label="Brow expression" id="browCtl"></div></div>
           <div class="row">
             <label class="toggle"><input type="checkbox" id="idleOn" checked><span>Idle motion</span></label>
-            <label class="toggle"><input type="checkbox" id="browLiftsOn" checked><span>Brow lifts on stressed words</span></label>
             <label class="toggle"><input type="checkbox" id="appRateOn" checked><span>App frame rate (15 fps idle, 30 talking, 60 during arm and look moves)</span></label>
             <label class="toggle"><input type="checkbox" id="pivotsOn"><span>Show pivots</span></label>
             <button class="btn ghost" id="resetPose">Reset pose</button>
@@ -212,6 +226,9 @@ button { font: inherit; cursor: pointer; }
         </div>
         <div class="field" style="margin-top:18px"><span>Look</span>
           <div class="look-pad" role="group" aria-label="Look direction" id="lookPad"></div></div>
+        <div class="field" style="margin-top:18px"><span>Brows</span>
+          <div class="seg-ctl" role="group" aria-label="Brow expression" id="browCtl"></div>
+          <label class="toggle"><input type="checkbox" id="browLiftsOn" checked><span>Brow lifts on stressed words</span></label></div>
       </section>
 
       <section>
@@ -224,6 +241,11 @@ button { font: inherit; cursor: pointer; }
   </div>
 </div>
 
+<aside class="lines-panel script-panel" id="scriptPanel" aria-label="Script">
+  <div class="panel-head"><div><h2>Script</h2><p class="sub" id="scriptLine"></p></div><button class="btn ghost small" id="scriptClose">Close</button></div>
+  <div class="script-legend"><span><span class="cue event">event</span>the app reacts</span><span><span class="cue action">action</span>Nova moves</span><span>Tap a line to play from there.</span></div>
+  <div class="script-rows" id="scriptRows"></div>
+</aside>
 <aside class="lines-panel" id="linesPanel" aria-label="Audio files">
   <div class="panel-head"><h2>Audio files</h2><button class="btn ghost small" id="linesClose">Close</button></div>
   <div class="lines-list" id="linesList"></div>
@@ -560,9 +582,8 @@ button { font: inherit; cursor: pointer; }
     DURATION = cues[cues.length - 1].end;
     audio.src = line.audio;
     $('lineTitle').textContent = line.title;
-    $('lineWords').textContent = line.words ? `“${line.words}”` : '';
-    $('lineWords').hidden = !line.words;
     buildTimeline();
+    buildScript();
     lineBtns.forEach(b => b.setAttribute('aria-current', b.dataset.id === line.id));
     try { history.replaceState(null, '', `#${line.id}`); } catch (e) {}
   }
@@ -577,19 +598,101 @@ button { font: inherit; cursor: pointer; }
     return b;
   });
   $('lineCount').textContent = LINES.length;
-  function togglePanel(open, returnFocus = true) {
-    $('linesPanel').classList.toggle('open', open);
-    $('linesBtn').setAttribute('aria-expanded', open);
-    if (open) (lineBtns.find(b => b.dataset.id === line.id) || lineBtns[0]).focus();
-    else if (returnFocus) $('linesBtn').focus();
+  // Drawers: Audio files and Script. One open at a time; a click outside or Esc closes it.
+  const DRAWERS = { lines: ['linesPanel', 'linesBtn'], script: ['scriptPanel', 'scriptBtn'] };
+  const isOpen = k => $(DRAWERS[k][0]).classList.contains('open');
+  function togglePanel(key, open, returnFocus = true) {
+    for (const k of Object.keys(DRAWERS)) if (k !== key && open && isOpen(k)) togglePanel(k, false, false);
+    const [panel, btn] = DRAWERS[key];
+    $(panel).classList.toggle('open', open);
+    $(btn).setAttribute('aria-expanded', open);
+    if (open) {
+      const first = key === 'lines' ? (lineBtns.find(b => b.dataset.id === line.id) || lineBtns[0]) : $('scriptRows').querySelector('.script-row');
+      if (first) first.focus();
+    } else if (returnFocus) $(btn).focus();
   }
-  // A click anywhere outside the panel (and its button) closes it
   document.addEventListener('pointerdown', e => {
-    if ($('linesPanel').classList.contains('open') && !$('linesPanel').contains(e.target) && !$('linesBtn').contains(e.target)) togglePanel(false, false);
+    for (const k of Object.keys(DRAWERS)) {
+      const [panel, btn] = DRAWERS[k];
+      if (isOpen(k) && !$(panel).contains(e.target) && !$(btn).contains(e.target)) togglePanel(k, false, false);
+    }
   });
-  $('linesBtn').addEventListener('click', () => togglePanel(!$('linesPanel').classList.contains('open')));
-  $('linesClose').addEventListener('click', () => togglePanel(false));
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('linesPanel').classList.contains('open')) togglePanel(false); });
+  $('linesBtn').addEventListener('click', () => togglePanel('lines', !isOpen('lines')));
+  $('linesClose').addEventListener('click', () => togglePanel('lines', false));
+  $('scriptBtn').addEventListener('click', () => togglePanel('script', !isOpen('script')));
+  $('scriptClose').addEventListener('click', () => togglePanel('script', false));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') for (const k of Object.keys(DRAWERS)) if (isOpen(k)) togglePanel(k, false); });
+
+  // Script view: each caption with its time; cues sit before the word they happen on
+  let scriptRows = [];
+  const cueLabel = mk => mk.type === 'event' ? mk.name : mk.type === 'look' ? `look ${mk.direction}`
+    : mk.type === 'arm' ? `${mk.side} arm ${mk.degrees}°` : `${mk.name} brows`;
+  function buildScript() {
+    $('scriptLine').textContent = line.title;
+    $('scriptRows').replaceChildren();
+    // Words with times; a caption without stored word times spreads its words evenly
+    const caps = captions.map(c => ({ ...c, words: c.words && c.words.length ? c.words
+      : c.text.split(' ').map((w, i, a) => ({ w, s: c.start + (c.end - c.start) * i / a.length, e: c.start + (c.end - c.start) * (i + 1) / a.length })) }));
+    // Each marker goes before the first word still being spoken at its time
+    const placed = caps.map(c => c.words.map(() => []));
+    for (const mk of markers) {
+      let ci = caps.findIndex(c => mk.time >= c.start && mk.time < c.end);
+      if (ci < 0) ci = mk.time < (caps[0] || {}).start ? 0 : caps.length - 1;
+      if (ci < 0) continue;
+      let wi = caps[ci].words.findIndex(w => w.e > mk.time);
+      if (wi < 0) wi = caps[ci].words.length - 1;
+      placed[ci][wi].push(mk);
+    }
+    scriptRows = caps.map((c, ci) => {
+      const row = document.createElement('button');
+      row.type = 'button'; row.className = 'script-row';
+      row.innerHTML = `<span class="tm">${c.start.toFixed(2)} – ${c.end.toFixed(2)}</span><span class="tx"></span>`;
+      const tx = row.querySelector('.tx');
+      const wordEls = c.words.map((w, wi) => {
+        for (const mk of placed[ci][wi]) {
+          const chip = document.createElement('span');
+          chip.className = `cue ${mk.type === 'event' ? 'event' : 'action'}`;
+          chip.textContent = cueLabel(mk);
+          chip.title = mk.type === 'event' ? `${mk.name}: ${mk.does || ''} (${mk.time.toFixed(2)} s)` : `${mk.time.toFixed(2)}–${mk.end.toFixed(2)} s`;
+          tx.appendChild(chip);
+        }
+        const el = document.createElement('span');
+        el.textContent = w.w;
+        tx.appendChild(el);
+        tx.appendChild(document.createTextNode(' '));
+        return el;
+      });
+      if (c.split) {
+        const flag = document.createElement('span');
+        flag.className = 'cue flag'; flag.textContent = 'split for length';
+        flag.title = 'This caption was split automatically because it was too long. Check where it breaks.';
+        tx.appendChild(flag);
+      }
+      row.addEventListener('click', () => startPlayback(c.start));
+      $('scriptRows').appendChild(row);
+      return { row, c, wordEls };
+    });
+  }
+  // While he talks: highlight the caption being said and underline the current word
+  let nowRow = -1, nowWord = null;
+  function followScript(t) {
+    const ri = scriptRows.findIndex(r => t >= r.c.start && t < r.c.end);
+    if (ri !== nowRow) {
+      if (nowRow >= 0 && scriptRows[nowRow]) scriptRows[nowRow].row.classList.remove('now');
+      if (ri >= 0) scriptRows[ri].row.classList.add('now');
+      nowRow = ri;
+    }
+    let w = null;
+    if (ri >= 0) {
+      const wi = scriptRows[ri].c.words.findIndex(x => t >= x.s && t < x.e);
+      if (wi >= 0) w = scriptRows[ri].wordEls[wi];
+    }
+    if (w !== nowWord) {
+      if (nowWord) nowWord.classList.remove('w-now');
+      if (w) w.classList.add('w-now');
+      nowWord = w;
+    }
+  }
   let toastTimer = null;
   function fireEvent(mk, el) {
     $('toast').textContent = `Event: ${mk.name}`;
@@ -613,6 +716,7 @@ button { font: inherit; cursor: pointer; }
     // Caption: the sentence being spoken, as the app would show it
     const cap = captions.find(c => t >= c.start && t < c.end);
     $('caption').textContent = cap ? cap.text : '';
+    followScript(t);
     const idx = cues.findIndex(c => t >= c.start && t < c.end);
     if (idx !== lastSeg) {
       if (lastSeg >= 0) segEls[lastSeg].classList.remove('on');
@@ -634,6 +738,7 @@ button { font: inherit; cursor: pointer; }
     $('play').textContent = 'Play with sound';
     pendingMouth = null;
     $('caption').textContent = '';
+    followScript(-1);
     setMouth('smile');
     $('status').textContent = 'Idle, blinking';
   }
@@ -642,18 +747,21 @@ button { font: inherit; cursor: pointer; }
     else stop();
   });
   $('slow').addEventListener('change', () => { audio.playbackRate = $('slow').checked ? 0.5 : 1; });
-  $('play').addEventListener('click', async () => {
-    if (raf) return stop();
-    lastT = -1; markEls.forEach(el => el.classList.remove('fired'));
+  $('play').addEventListener('click', () => raf ? stop() : startPlayback(0));
+  // Starts the line at [from] seconds (0 for Play; a caption's start when its script line is tapped)
+  async function startPlayback(from) {
+    if (raf) stop();
+    // Events before the starting point count as already fired
+    lastT = from - 0.001; markEls.forEach((el, i) => el.classList.toggle('fired', markers[i].type === 'event' && markers[i].time < from));
     shapeBtns.forEach(x => x.setAttribute('aria-pressed', 'false'));
-    audio.currentTime = 0;
+    audio.currentTime = from;
     audio.playbackRate = $('slow').checked ? 0.5 : 1;
     if ('preservesPitch' in audio) audio.preservesPitch = true;
     try { await audio.play(); } catch (e) { $('status').textContent = 'Audio could not start. Tap Play again.'; return; }
     $('play').textContent = 'Stop';
     $('status').textContent = 'Speaking';
     raf = requestAnimationFrame(frame);
-  });
+  }
 
   // Theme switch
   const themeBtns = document.querySelectorAll('[data-theme-opt]');
