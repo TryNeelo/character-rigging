@@ -187,7 +187,7 @@ button { font: inherit; cursor: pointer; }
           <div class="row">
             <label class="toggle"><input type="checkbox" id="idleOn" checked><span>Idle motion</span></label>
             <label class="toggle"><input type="checkbox" id="browLiftsOn" checked><span>Brow lifts on stressed words</span></label>
-            <label class="toggle"><input type="checkbox" id="appRateOn" checked><span>App frame rate (15 fps idle, 30 talking)</span></label>
+            <label class="toggle"><input type="checkbox" id="appRateOn" checked><span>App frame rate (15 fps idle, 30 talking, 60 during arm and look moves)</span></label>
             <label class="toggle"><input type="checkbox" id="pivotsOn"><span>Show pivots</span></label>
             <button class="btn ghost" id="resetPose">Reset pose</button>
           </div>
@@ -325,6 +325,8 @@ button { font: inherit; cursor: pointer; }
   const LOOK = S.look;
   let look = 0, lookTarget = 0;
   let raise = { left: 0, right: 0 }, raiseTarget = { left: 0, right: 0 };
+  // Arms ease in and out: each follows a midpoint that follows the target, so moves start softly
+  let raiseMid = { left: 0, right: 0 };
   // Brows: a quick lift on each stressed moment while talking, plus an expression (from the line or the test control)
   const B = S.brows;
   const browEls = ['left', 'right'].map(side => ({ el: $(`brow-${side}`), side, p: pivot($(`brow-${side}`)) }));
@@ -373,14 +375,18 @@ button { font: inherit; cursor: pointer; }
   const I = S.idle;
   // Draw at the app's frame rates (30 fps talking, 15 fps idle) so the preview looks like the app.
   // Unticked, it draws on every screen refresh for comparison.
-  let lastDraw = -1, pendingMouth = null;
+  let lastDraw = -1, pendingMouth = null, drawnPose = { armL: 0, armR: 0 };
   function animate(now) {
     requestAnimationFrame(animate);
     const appRate = $('appRateOn').checked;
-    const fps = raf ? S.frameRate.talking : S.frameRate.idle;
+    // Full frame rate while an arm or the head is on its way somewhere; the move only lasts a moment
+    const moving = Math.abs(raiseTarget.left - raise.left) > 0.3 || Math.abs(raiseTarget.right - raise.right) > 0.3
+      || Math.abs(lookTarget + pose.look - look) > 0.01 || ['left', 'right'].some(k => Math.abs(pose['arm' + k[0].toUpperCase()] - drawnPose['arm' + k[0].toUpperCase()]) > 0.1);
+    const fps = moving ? S.frameRate.moving : raf ? S.frameRate.talking : S.frameRate.idle;
     if (appRate && lastDraw >= 0 && now - lastDraw < 1000 / fps - 4) return;
     const dt = lastDraw < 0 ? 1 / 60 : Math.min((now - lastDraw) / 1000, 0.25);
     lastDraw = now;
+    drawnPose = { armL: pose.armL, armR: pose.armR };
     if (pendingMouth) { setMouth(pendingMouth); pendingMouth = null; }
     // Smoothing amounts are tuned per 60 fps frame; scale them to the real frame time
     const ease = k => 1 - Math.pow(1 - k, dt * 60);
@@ -390,7 +396,10 @@ button { font: inherit; cursor: pointer; }
     const sway = idle ? Math.sin(t * 2 * Math.PI / I.swaySeconds) * I.swayDegrees : 0;
     const swing = idle ? Math.sin(t * 2 * Math.PI / I.breathSeconds + 0.6) * I.armSwingDegrees : 0; // arms follow the breath
     look += (Math.max(-1, Math.min(1, lookTarget + pose.look)) - look) * ease(LOOK.smoothing);
-    for (const side of ['left', 'right']) raise[side] += (raiseTarget[side] - raise[side]) * ease(S.gesture.smoothing);
+    for (const side of ['left', 'right']) {
+      raiseMid[side] += (raiseTarget[side] - raiseMid[side]) * ease(S.gesture.smoothing * 1.6);
+      raise[side] += (raiseMid[side] - raise[side]) * ease(S.gesture.smoothing * 1.6);
+    }
     const expr = B.expressions[testExpression || lineExpression] || { liftPx: 0, tiltDegrees: 0 };
     brow.lift += (expr.liftPx - brow.lift) * ease(B.smoothing);
     brow.tilt += (expr.tiltDegrees - brow.tilt) * ease(B.smoothing);

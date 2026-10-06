@@ -218,7 +218,7 @@ button { font: inherit; cursor: pointer; }
           <div class="row">
             <label class="toggle"><input type="checkbox" id="idleOn" checked><span>Idle motion</span></label>
             <label class="toggle"><input type="checkbox" id="browLiftsOn" checked><span>Brow lifts on stressed words</span></label>
-            <label class="toggle"><input type="checkbox" id="appRateOn" checked><span>App frame rate (15 fps idle, 30 talking)</span></label>
+            <label class="toggle"><input type="checkbox" id="appRateOn" checked><span>App frame rate (15 fps idle, 30 talking, 60 during arm and look moves)</span></label>
             <label class="toggle"><input type="checkbox" id="pivotsOn"><span>Show pivots</span></label>
             <button class="btn ghost" id="resetPose">Reset pose</button>
           </div>
@@ -270,7 +270,7 @@ button { font: inherit; cursor: pointer; }
   let line = LINES.find(l => `#${l.id}` === location.hash) || LINES[0];
   let cues = line.cues, markers = line.markers, emphasis = line.emphasis, DURATION = cues[cues.length - 1].end;
   // Shared with the Flutter component: tools/rig_settings.json
-  const S = {"framing": {"full": {"label": "Full body", "top": 20, "bottom": 855, "width": 370}, "knees": {"label": "Knees up", "top": 20, "bottom": 730, "width": 370}, "waist": {"label": "Waist up", "top": 20, "bottom": 600, "width": 370}, "close": {"label": "Close-up", "top": 30, "bottom": 440, "width": 345}}, "idle": {"breathSeconds": 4.2, "breathPx": 0.8, "swaySeconds": 7.3, "swayDegrees": 0.8, "armSwingDegrees": 1.2}, "look": {"pupilReach": 11, "headDegrees": 2.5, "headPx": 2, "smoothing": 0.12}, "gesture": {"smoothing": 0.1}, "blink": {"halfMs": 40, "closedMs": 80, "halfAgainMs": 50, "minGapMs": 2500, "maxGapMs": 5500, "doubleChance": 0.15, "doubleGapMs": 140}, "outline": {"widthPx": 8}, "brows": {"autoLiftPx": 3.5, "autoRiseSeconds": 0.08, "autoHoldSeconds": 0.1, "autoFallSeconds": 0.3, "smoothing": 0.12, "expressions": {"surprised": {"liftPx": 9, "tiltDegrees": 2}, "happy": {"liftPx": 5, "tiltDegrees": -6}, "concerned": {"liftPx": 2, "tiltDegrees": 6}}}, "talk": {"nodPx": 1.3, "tiltDegrees": 0.8, "riseSeconds": 0.14, "holdSeconds": 0.06, "fallSeconds": 0.5}, "frameRate": {"talking": 30, "idle": 15}};
+  const S = {"framing": {"full": {"label": "Full body", "top": 20, "bottom": 855, "width": 370}, "knees": {"label": "Knees up", "top": 20, "bottom": 730, "width": 370}, "waist": {"label": "Waist up", "top": 20, "bottom": 600, "width": 370}, "close": {"label": "Close-up", "top": 30, "bottom": 440, "width": 345}}, "idle": {"breathSeconds": 4.2, "breathPx": 0.8, "swaySeconds": 7.3, "swayDegrees": 0.8, "armSwingDegrees": 1.2}, "look": {"pupilReach": 11, "headDegrees": 2.5, "headPx": 2, "smoothing": 0.12}, "gesture": {"smoothing": 0.1}, "blink": {"halfMs": 40, "closedMs": 80, "halfAgainMs": 50, "minGapMs": 2500, "maxGapMs": 5500, "doubleChance": 0.15, "doubleGapMs": 140}, "outline": {"widthPx": 8}, "brows": {"autoLiftPx": 3.5, "autoRiseSeconds": 0.08, "autoHoldSeconds": 0.1, "autoFallSeconds": 0.3, "smoothing": 0.12, "expressions": {"surprised": {"liftPx": 9, "tiltDegrees": 2}, "happy": {"liftPx": 5, "tiltDegrees": -6}, "concerned": {"liftPx": 2, "tiltDegrees": 6}}}, "talk": {"nodPx": 1.3, "tiltDegrees": 0.8, "riseSeconds": 0.14, "holdSeconds": 0.06, "fallSeconds": 0.5}, "frameRate": {"talking": 30, "idle": 15, "moving": 60}};
   // Markers: {time, type: "event", name} fires an app event; {time, end, type: "look", direction} turns Nova's gaze;
   // {time, end, type: "arm", side, degrees} raises an arm (side = the screen side it's on) and lowers it at end;
   // {time, end, type: "expression", name} sets the brows (happy, surprised, concerned).
@@ -356,6 +356,8 @@ button { font: inherit; cursor: pointer; }
   const LOOK = S.look;
   let look = 0, lookTarget = 0;
   let raise = { left: 0, right: 0 }, raiseTarget = { left: 0, right: 0 };
+  // Arms ease in and out: each follows a midpoint that follows the target, so moves start softly
+  let raiseMid = { left: 0, right: 0 };
   // Brows: a quick lift on each stressed moment while talking, plus an expression (from the line or the test control)
   const B = S.brows;
   const browEls = ['left', 'right'].map(side => ({ el: $(`brow-${side}`), side, p: pivot($(`brow-${side}`)) }));
@@ -404,14 +406,18 @@ button { font: inherit; cursor: pointer; }
   const I = S.idle;
   // Draw at the app's frame rates (30 fps talking, 15 fps idle) so the preview looks like the app.
   // Unticked, it draws on every screen refresh for comparison.
-  let lastDraw = -1, pendingMouth = null;
+  let lastDraw = -1, pendingMouth = null, drawnPose = { armL: 0, armR: 0 };
   function animate(now) {
     requestAnimationFrame(animate);
     const appRate = $('appRateOn').checked;
-    const fps = raf ? S.frameRate.talking : S.frameRate.idle;
+    // Full frame rate while an arm or the head is on its way somewhere; the move only lasts a moment
+    const moving = Math.abs(raiseTarget.left - raise.left) > 0.3 || Math.abs(raiseTarget.right - raise.right) > 0.3
+      || Math.abs(lookTarget + pose.look - look) > 0.01 || ['left', 'right'].some(k => Math.abs(pose['arm' + k[0].toUpperCase()] - drawnPose['arm' + k[0].toUpperCase()]) > 0.1);
+    const fps = moving ? S.frameRate.moving : raf ? S.frameRate.talking : S.frameRate.idle;
     if (appRate && lastDraw >= 0 && now - lastDraw < 1000 / fps - 4) return;
     const dt = lastDraw < 0 ? 1 / 60 : Math.min((now - lastDraw) / 1000, 0.25);
     lastDraw = now;
+    drawnPose = { armL: pose.armL, armR: pose.armR };
     if (pendingMouth) { setMouth(pendingMouth); pendingMouth = null; }
     // Smoothing amounts are tuned per 60 fps frame; scale them to the real frame time
     const ease = k => 1 - Math.pow(1 - k, dt * 60);
@@ -421,7 +427,10 @@ button { font: inherit; cursor: pointer; }
     const sway = idle ? Math.sin(t * 2 * Math.PI / I.swaySeconds) * I.swayDegrees : 0;
     const swing = idle ? Math.sin(t * 2 * Math.PI / I.breathSeconds + 0.6) * I.armSwingDegrees : 0; // arms follow the breath
     look += (Math.max(-1, Math.min(1, lookTarget + pose.look)) - look) * ease(LOOK.smoothing);
-    for (const side of ['left', 'right']) raise[side] += (raiseTarget[side] - raise[side]) * ease(S.gesture.smoothing);
+    for (const side of ['left', 'right']) {
+      raiseMid[side] += (raiseTarget[side] - raiseMid[side]) * ease(S.gesture.smoothing * 1.6);
+      raise[side] += (raiseMid[side] - raise[side]) * ease(S.gesture.smoothing * 1.6);
+    }
     const expr = B.expressions[testExpression || lineExpression] || { liftPx: 0, tiltDegrees: 0 };
     brow.lift += (expr.liftPx - brow.lift) * ease(B.smoothing);
     brow.tilt += (expr.tiltDegrees - brow.tilt) * ease(B.smoothing);

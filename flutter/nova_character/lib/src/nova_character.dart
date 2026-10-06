@@ -67,6 +67,8 @@ class _NovaCharacterState extends State<NovaCharacter> {
   // and stops entirely when he's still.
   Timer? _frameTimer;
   final Stopwatch _clock = Stopwatch()..start();
+  // Arms ease in and out: each follows a midpoint that follows the target, so moves start softly
+  double _midLeft = 0, _midRight = 0;
   double _t = 0, _lastFrame = -1, _look = 0, _raiseLeft = 0, _raiseRight = 0, _browLift = 0, _browTilt = 0;
   _Eye _eye = _Eye.open;
   Timer? _blinkTimer;
@@ -102,10 +104,17 @@ class _NovaCharacterState extends State<NovaCharacter> {
     if (_frameTimer == null && mounted) _nextFrame();
   }
 
+  // True while an arm or the head is on its way somewhere: those moves get full smoothness
+  bool _moving = false;
+
   void _nextFrame() {
     final rig = _rig;
     if (rig == null) return;
-    final fps = widget.controller.isSpeaking ? rig.frameRate('talking') : rig.frameRate('idle');
+    final fps = _moving
+        ? rig.frameRate('moving')
+        : widget.controller.isSpeaking
+            ? rig.frameRate('talking')
+            : rig.frameRate('idle');
     _frameTimer = Timer(Duration(microseconds: (1e6 / fps).round()), _frame);
   }
 
@@ -127,7 +136,7 @@ class _NovaCharacterState extends State<NovaCharacter> {
     if (rig == null || !mounted) return;
     final c = widget.controller;
     final now = _clock.elapsedMicroseconds / 1e6;
-    final fps = c.isSpeaking ? rig.frameRate('talking') : rig.frameRate('idle');
+    final fps = _moving ? rig.frameRate('moving') : c.isSpeaking ? rig.frameRate('talking') : rig.frameRate('idle');
     final dt = _lastFrame < 0 ? 1 / fps : math.min(now - _lastFrame, 0.25);
     _lastFrame = now;
     final lineLook = c.line?.lookAt(c.time) ?? 0;
@@ -139,13 +148,17 @@ class _NovaCharacterState extends State<NovaCharacter> {
     setState(() {
       _t = now;
       _look += (lookTarget - _look) * ease(rig.look('smoothing'));
-      _raiseLeft += (armLeft - _raiseLeft) * ease(rig.gesture('smoothing'));
-      _raiseRight += (armRight - _raiseRight) * ease(rig.gesture('smoothing'));
+      final arm = ease(rig.gesture('smoothing') * 1.6);
+      _midLeft += (armLeft - _midLeft) * arm;
+      _midRight += (armRight - _midRight) * arm;
+      _raiseLeft += (_midLeft - _raiseLeft) * arm;
+      _raiseRight += (_midRight - _raiseRight) * arm;
       _browLift += (lift - _browLift) * ease(rig.brows('smoothing'));
       _browTilt += (tilt - _browTilt) * ease(rig.brows('smoothing'));
     });
     // With movement off and nothing left to settle, stop redrawing until something changes.
     // Blinks redraw on their own.
+    _moving = (lookTarget - _look).abs() > 0.01 || (armLeft - _raiseLeft).abs() > 0.3 || (armRight - _raiseRight).abs() > 0.3;
     final settled = (lookTarget - _look).abs() < 0.002 && (armLeft - _raiseLeft).abs() < 0.05 &&
         (armRight - _raiseRight).abs() < 0.05 && (lift - _browLift).abs() < 0.02 && (tilt - _browTilt).abs() < 0.02;
     if (!widget.idle && !c.isSpeaking && settled) {

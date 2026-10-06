@@ -83,6 +83,7 @@
   },
   "frameRate": {
     "talking": 30,
-    "idle": 15
+    "idle": 15,
+    "moving": 60
   }
 }
