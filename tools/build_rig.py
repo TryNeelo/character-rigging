@@ -10,7 +10,7 @@ source file is re-exported.
 
 Usage: python3 tools/build_rig.py
 """
-import math, os, re
+import json, math, os, re
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, 'art', 'Nova-outfit_1.svg')
 OLD = os.path.join(ROOT, 'art', 'Character.svg')
@@ -155,6 +155,22 @@ def per_outfit(key, pivot=None):
         hide = '' if name == DEFAULT_OUTFIT else ' style="display:none"'
         out += f'<g class="outfit" data-outfit="{name}" data-label="{o["label"]}"{attrs}{hide}>{o[key]}</g>'
     return out
+# White outline, drawn into the art: every outer part again in white, its edge grown by
+# OUTLINE_PX with a round stroke. The app draws these first, then the coloured parts on top.
+OUTLINE_PX = json.load(open(os.path.join(ROOT, 'tools', 'rig_settings.json')))['outline']['widthPx']
+def whiten(fragment):
+    def white(m):
+        tag = m.group(0)
+        attr = lambda name: (re.search(rf'\s{name}="([^"]*)"', tag) or [None, None])[1]
+        fill, stroke_w = attr('fill'), float(attr('stroke-width') or 0) if attr('stroke') not in (None, 'none') else 0
+        tag = re.sub(r'\s(?:fill|fill-opacity|fill-rule|clip-rule|stroke|stroke-width|stroke-linecap|stroke-linejoin|class|style)="[^"]*"', '', tag)
+        return (tag[:-2] + f' fill="{"none" if fill == "none" else "#FFFFFF"}" stroke="#FFFFFF"'
+                f' stroke-width="{2 * OUTLINE_PX + stroke_w:g}" stroke-linejoin="round" stroke-linecap="round"/>')
+    return re.sub(SHAPE, white, fragment)
+for o in OUTFITS.values():
+    for k in ('legs', 'arm_left', 'arm_right', 'body', 'hat', 'hat_back'):
+        o[f'{k}_ol_svg'] = whiten(o[f'{k}_svg'])
+
 hat = '<g id="hat">' + per_outfit('hat_svg') + '</g>'
 hat_back = '<g id="hat-back">' + per_outfit('hat_back_svg') + '</g>'
 
@@ -182,24 +198,23 @@ head = (f'<g id="head" class="part" data-pivot="{HEAD_PIVOT[0]} {HEAD_PIVOT[1]}"
         + els[60] + els[61]                                     # nose
         + hat + '</g>')
 
-# Outline: white edge grown from the character's silhouette, plus the original soft shadow.
-OUTLINE = '''<filter id="outline" x="-0.15" y="-0.1" width="1.3" height="1.2" color-interpolation-filters="sRGB">
-<feGaussianBlur in="SourceAlpha" stdDeviation="5" result="b"/>
-<feComponentTransfer in="b" result="grown"><feFuncA type="linear" slope="40" intercept="-1.6"/></feComponentTransfer>
-<feFlood flood-color="#FFFFFF"/><feComposite in2="grown" operator="in" result="edge"/>
-<feGaussianBlur in="grown" stdDeviation="8" result="sb"/>
-<feColorMatrix in="sb" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0" result="shadow"/>
-<feMerge><feMergeNode in="shadow"/><feMergeNode in="edge"/><feMergeNode in="SourceGraphic"/></feMerge>
-</filter>'''
+# The outline layer mirrors the moving groups (-ol ids); the preview copies their transforms.
+HEAD_OL = whiten(els[0] + els[42] + els[43] + els[44] + J(51, 55))   # ear roots, head fur, ears
+outline = ('<g id="outline">'
+           + '<g id="legs-ol">' + per_outfit('legs_ol_svg') + '</g><g id="upper-ol">'
+           + ''.join(f'<g id="arm-{side}-ol">' + per_outfit(f'arm_{side}_ol_svg') + '</g>' for side in ('left', 'right'))
+           + '<g id="body-ol">' + per_outfit('body_ol_svg') + '</g>'
+           + '<g id="head-ol"><g id="hat-back-ol">' + per_outfit('hat_back_ol_svg') + '</g>' + HEAD_OL
+           + '<g id="hat-ol">' + per_outfit('hat_ol_svg') + '</g></g></g></g>')
 EYE_WHITES = [(232.875, 269.183), (324.259, 269.183)]  # new-art coordinates, radius 24.654
 clips = ('<clipPath id="clip-eyes">' + ''.join(f'<ellipse cx="{x}" cy="{y}" rx="24.654" ry="24.6125"/>' for x, y in EYE_WHITES) + '</clipPath>'
          '<clipPath id="clip-eye-left"><ellipse cx="178.875" cy="437.312" rx="25.4" ry="25.4"/></clipPath>'
          '<clipPath id="clip-eye-right"><ellipse cx="270.259" cy="437.312" rx="25.4" ry="25.4"/></clipPath>' + ''.join(CLIPS))
 
 svg = (f'<svg id="nova" width="556" height="837" viewBox="0 0 556 837" fill="none" xmlns="http://www.w3.org/2000/svg">\n'
-       f'<defs>{OUTLINE}{clips}{OUTFIT_DEFS}</defs>\n'
-       '<g id="character" filter="url(#outline)">\n'
-       f'{legs}\n<g id="upper">\n{arms}\n{body}\n{head}\n</g>\n'
+       f'<defs>{clips}{OUTFIT_DEFS}</defs>\n'
+       '<g id="character">\n'
+       f'{outline}\n{legs}\n<g id="upper">\n{arms}\n{body}\n{head}\n</g>\n'
        '</g>\n</svg>\n')
 open(OUT, 'w').write(svg)
 print('wrote', OUT, len(svg), 'bytes; arm pivots', {n: (o['pivot_left'], o['pivot_right']) for n, o in OUTFITS.items()})
@@ -231,6 +246,8 @@ for name, o in OUTFITS.items():
     for k in ('legs', 'arm_left', 'arm_right', 'body', 'hat', 'hat_back'):
         if o[f'{k}_svg']:
             part(f'{k}_{name}', o[f'{k}_svg'], o.get('defs', '') if k.startswith('hat') else '')
+            part(f'{k}_{name}_outline', o[f'{k}_ol_svg'])
+part('head_outline', HEAD_OL)
 part('head_back', els[0] + els[42] + els[43] + els[44] + J(45, 49))
 part('pupil_left', els[49])
 part('pupil_right', els[50])

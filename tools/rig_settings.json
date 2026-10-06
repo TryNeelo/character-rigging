@@ -51,10 +51,7 @@
     "doubleGapMs": 140
   },
   "outline": {
-    "widthPx": 8,
-    "blur": 5,
-    "shadowBlur": 8,
-    "shadowOpacity": 0.25
+    "widthPx": 8
   },
   "brows": {
     "autoLiftPx": 3.5,

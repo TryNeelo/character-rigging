@@ -297,9 +297,8 @@ button { font: inherit; cursor: pointer; }
   segControl($('alignCtl'), ALIGN, 'align');
   let dots = null;
   const character = $('character');
-  $('outlineOn').addEventListener('change', e => {
-    if (e.target.checked) character.setAttribute('filter', 'url(#outline)'); else character.removeAttribute('filter');
-  });
+  // The outline is drawn into the art as a white layer behind Nova; the toggle shows or hides it
+  $('outlineOn').addEventListener('change', e => { $('outline').style.display = e.target.checked ? '' : 'none'; });
 
   // ---- Pose and idle ----
   const pivot = el => el.dataset.pivot.split(' ').map(Number);
@@ -393,6 +392,8 @@ button { font: inherit; cursor: pointer; }
     head.setAttribute('transform', `translate(${(LOOK.headPx * look).toFixed(2)} ${talk.dip.toFixed(2)}) rotate(${(pose.head + sway + talk.tilt + LOOK.headDegrees * look).toFixed(2)} ${HP[0]} ${HP[1]})`);
     armL.setAttribute('transform', `rotate(${(pose.armL + raise.left + swing).toFixed(2)} ${LP[0]} ${LP[1]})`);
     armR.setAttribute('transform', `rotate(${(-pose.armR - raise.right - swing).toFixed(2)} ${RP[0]} ${RP[1]})`);
+    // The outline layer follows the same moves
+    for (const [ol, el] of [['upper-ol', upper], ['arm-left-ol', armL], ['arm-right-ol', armR], ['head-ol', head]]) $(ol).setAttribute('transform', el.getAttribute('transform'));
     requestAnimationFrame(animate);
   }
 

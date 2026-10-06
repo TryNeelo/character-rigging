@@ -56,7 +56,7 @@ The arms always stay behind the outfit. The shoulder pivots come from the magent
 
 **Hat, eyes and mouth.** The head in the outfit 1 art is the original head moved by (+54, −168.13) at the same scale, so the original hat, eyelids and mouth shapes are reused in their original coordinates inside a `translate(54 -168.129)` group.
 
-**Outline.** `#character` carries `filter="url(#outline)"`: a white edge about 8 px wide grown from the silhouette, plus the original soft shadow. Because it is generated, it follows any pose. Remove the attribute to turn it off.
+**Outline.** Drawn into the art, not made with a blur: `#outline` holds white copies of the outer parts (legs, arms, body, head with ears, hat), each edge grown by 8 px with a round stroke. They move with their parts and sit behind the coloured layers. The app draws the `*_outline.svg` parts the same way. No drop shadow (decided 2026-10-06). Hide `#outline` to turn it off.
 
 **Mouth.** All mouth shapes sit in one group, `#mouth`. Each shape is a child group with the id `mouth-<letter>`, and exactly one is visible at a time. The letters follow Rhubarb Lip Sync's naming, so its output plugs in directly.
 
@@ -121,7 +121,7 @@ To send a new version: bump `version` in `flutter/nova_character/pubspec.yaml`, 
 ## Decisions so far
 
 - Full-body art from outfit 1 replaces the first waist-up rig. The original hat, eyes and mouth shapes are kept.
-- The white outline is generated in code and can be turned off.
+- The white outline is drawn into the art (white copies of the outer parts), not a blur, so it's cheap on budget tablets. No drop shadow. It can be turned off.
 - Teeth are removed.
 - Arms stay behind the outfit. Idle motion stays subtle.
 - Nova will be drawn live in the app from these layers (audio plus cue file per line), not played as pre-rendered video. New lines only need new audio and cues; the character never has to be re-animated.

@@ -36,7 +36,7 @@ NovaCharacter(
   controller: nova,
   framing: NovaFraming.waistUp,   // full, kneesUp, waistUp, closeUp
   align: NovaAlign.right,         // where he stands if the space is wide
-  outline: true,                  // white sticker outline and soft shadow
+  outline: true,                  // white sticker outline
   outfit: 'aviator',              // 'hoodie' (default), 'aviator' or 'construction'
 )
 
@@ -71,7 +71,7 @@ Dispose the controller with your screen (`nova.dispose()`).
 |---|---|---|
 | `framing` | `full` | How much of Nova to show. The crop line sits at the bottom of the widget. |
 | `align` | `center` | Only matters when the widget is wider than the framing needs. |
-| `outline` | `true` | White outline and shadow, generated around any pose. |
+| `outline` | `true` | White sticker outline. It's drawn into the art (white copies of the outer parts), so it follows any pose and costs no blur. |
 | `idle` | `true` | Breathing, slight sway, small nod while talking. Kept subtle. |
 | `blink` | `true` | Random blinks every 2.5 to 5.5 s. |
 | `outfit` | `'hoodie'` | Which outfit Nova wears: `'hoodie'`, `'aviator'` or `'construction'`. Change it any time; his face, lip-sync and motion carry over. |

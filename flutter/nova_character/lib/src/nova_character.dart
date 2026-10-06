@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math' as math;
-import 'dart:ui' as ui;
 
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
@@ -225,24 +224,16 @@ class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProvider
     });
   }
 
+  /// The white outline is drawn into the art: white copies of the outer parts, a little
+  /// bigger, drawn first with the same moves, then the coloured parts on top. No blur.
   Widget _character(NovaRig rig, double s) {
-    final body = _layers(rig, s);
-    if (!widget.outline) return body;
-    // Outline: blur the silhouette, then keep everything above a low alpha as solid white.
-    // The shadow is that white edge, blurred again at 25% black.
-    const white = ColorFilter.matrix([0, 0, 0, 0, 255, 0, 0, 0, 0, 255, 0, 0, 0, 0, 255, 0, 0, 0, 40, -408]);
-    final shadowA = rig.outline('shadowOpacity');
-    final black = ColorFilter.matrix([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, shadowA, 0]);
-    ui.ImageFilter blur(double sigma) => ui.ImageFilter.blur(sigmaX: sigma * s, sigmaY: sigma * s, tileMode: TileMode.decal);
-    final edge = ColorFiltered(colorFilter: white, child: ImageFiltered(imageFilter: blur(rig.outline('blur')), child: body));
-    return Stack(clipBehavior: Clip.none, children: [
-      ImageFiltered(imageFilter: blur(rig.outline('shadowBlur')), child: ColorFiltered(colorFilter: black, child: edge)),
-      edge,
-      body,
-    ]);
+    if (!widget.outline) return _layers(rig, s);
+    return Stack(clipBehavior: Clip.none, children: [_layers(rig, s, outline: true), _layers(rig, s)]);
   }
 
-  Widget _layers(NovaRig rig, double s) {
+  /// Nova's parts, back to front, posed for this frame. With [outline], only the white
+  /// outline copies of the outer parts (legs, arms, body, head, hat).
+  Widget _layers(NovaRig rig, double s, {bool outline = false}) {
     final w = rig.width * s, h = rig.height * s;
     Widget part(String name) => SvgPicture.asset('assets/parts/$name.svg',
         package: novaPackage, width: w, height: h, fit: BoxFit.fill, allowDrawingOutsideViewBox: true);
@@ -264,10 +255,17 @@ class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProvider
     final outfitId = rig.outfits.containsKey(widget.outfit) ? widget.outfit! : rig.defaultOutfit;
     final outfit = rig.outfits[outfitId]!;
 
+    final ol = outline ? '_outline' : '';
     final head = Transform(
       transform: Matrix4.translationValues(rig.look('headPx') * _look * s, dip * s, 0)
         ..multiply(rotateAbout(rig.headPivot, sway + talkTilt + rig.look('headDegrees') * _look)),
-      child: Stack(children: [
+      child: Stack(children: outline
+          ? [
+              if (outfit.hatBack) part('hat_back_${outfitId}_outline'),
+              part('head_outline'),
+              part('hat_${outfitId}_outline'),
+            ]
+          : [
         if (outfit.hatBack) part('hat_back_$outfitId'),
         part('head_back'),
         ClipPath(
@@ -301,14 +299,14 @@ class _NovaCharacterState extends State<NovaCharacter> with SingleTickerProvider
       width: w,
       height: h,
       child: Stack(children: [
-        part('legs_$outfitId'),
+        part('legs_$outfitId$ol'),
         Transform.translate(
           offset: Offset(0, upperY * s),
           child: Stack(children: [
             // Positive raises lift each arm outward, away from the body
-            Transform(transform: rotateAbout(outfit.armLeftPivot, _raiseLeft + swing), child: part('arm_left_$outfitId')),
-            Transform(transform: rotateAbout(outfit.armRightPivot, -_raiseRight - swing), child: part('arm_right_$outfitId')),
-            part('body_$outfitId'),
+            Transform(transform: rotateAbout(outfit.armLeftPivot, _raiseLeft + swing), child: part('arm_left_$outfitId$ol')),
+            Transform(transform: rotateAbout(outfit.armRightPivot, -_raiseRight - swing), child: part('arm_right_$outfitId$ol')),
+            part('body_$outfitId$ol'),
             head,
           ]),
         ),
