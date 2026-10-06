@@ -38,6 +38,23 @@ class NovaMarker {
       degrees: (j['degrees'] as num?)?.toDouble());
 }
 
+/// Decides which of a line's events are due as playback moves on. Each event fires once
+/// per playthrough, even if the reported audio position wobbles backwards for a moment.
+class NovaEventGate {
+  NovaEventGate(this.line);
+  final NovaLine line;
+  final Set<int> _fired = {};
+
+  /// Events whose time has been reached by [t] seconds and that haven't fired yet.
+  List<NovaMarker> due(double t) {
+    final out = <NovaMarker>[];
+    for (final (i, m) in line.markers.indexed) {
+      if (m.type == 'event' && m.name != null && t >= m.time && _fired.add(i)) out.add(m);
+    }
+    return out;
+  }
+}
+
 /// One sentence of a line, to show as a subtitle from [start] to [end] seconds.
 /// The app draws the subtitle in its own style.
 class NovaCaption {
@@ -67,10 +84,13 @@ class NovaLine {
   /// Asset key of this line's audio file.
   String get audioAsset => novaAsset('lines/$id/$audio');
 
-  static Future<NovaLine> load(String id) async {
-    final j = jsonDecode(await rootBundle.loadString(novaAsset('lines/$id/timing.json'))) as Map<String, dynamic>;
+  static Future<NovaLine> load(String id) async =>
+      NovaLine.fromJson(jsonDecode(await rootBundle.loadString(novaAsset('lines/$id/timing.json'))) as Map<String, dynamic>);
+
+  /// A line from its timing.json contents.
+  factory NovaLine.fromJson(Map<String, dynamic> j) {
     return NovaLine._(
-        id,
+        j['id'] as String,
         j['audio'] as String,
         (j['duration'] as num).toDouble(),
         [

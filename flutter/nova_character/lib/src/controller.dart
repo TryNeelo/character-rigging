@@ -59,7 +59,10 @@ class NovaController extends ChangeNotifier {
   final StreamController<NovaEvent> _events = StreamController<NovaEvent>.broadcast();
   Timer? _ticker;
   NovaLine? _line;
-  double _lastTime = -1;
+  NovaEventGate? _gate;
+  // Counts every play and stop; a play that's still loading gives up when a newer one starts
+  int _generation = 0;
+  Future<void> _loading = Future.value();
   NovaLook _look = NovaLook.ahead;
   String? _expression;
   final ValueNotifier<NovaCaption?> _caption = ValueNotifier(null);
@@ -96,24 +99,47 @@ class NovaController extends ChangeNotifier {
 
   /// Speaks a line bundled with the package, by its folder name. [speed] 0.5 plays at
   /// half speed, which is handy for checking timing. Completes when playback starts.
+  /// Calling it again (even before the first call finishes loading) replaces the line:
+  /// only the latest call plays.
   Future<void> play(String lineId, {double speed = 1}) async {
-    await stop();
-    final line = await NovaLine.load(lineId);
-    await _player.setAudioSource(AudioSource.asset(line.audioAsset));
-    await _player.setSpeed(speed);
-    _line = line;
-    _lastTime = -1;
-    _ticker = Timer.periodic(const Duration(milliseconds: 16), (_) => _checkMarkers());
-    notifyListeners();
-    unawaited(_player.play());
+    final generation = ++_generation;
+    // One load at a time: the audio player can get stuck if two loads overlap
+    final previous = _loading;
+    final done = Completer<void>();
+    _loading = done.future;
+    try {
+      await previous;
+      if (generation != _generation) return;   // a newer play or a stop came in meanwhile
+      await _halt();
+      final line = await NovaLine.load(lineId);
+      if (generation != _generation) return;
+      await _player.setAudioSource(AudioSource.asset(line.audioAsset));
+      if (generation != _generation) return;
+      await _player.setSpeed(speed);
+      if (generation != _generation) return;
+      _line = line;
+      _gate = NovaEventGate(line);
+      _ticker?.cancel();
+      _ticker = Timer.periodic(const Duration(milliseconds: 16), (_) => _checkMarkers());
+      notifyListeners();
+      unawaited(_player.play());
+    } finally {
+      done.complete();
+    }
   }
 
-  /// Stops speaking. No [NovaEvent.lineEnd] is sent.
+  /// Stops speaking, including a line that's still loading. No [NovaEvent.lineEnd] is sent.
   Future<void> stop() async {
+    _generation++;
+    await _halt();
+  }
+
+  Future<void> _halt() async {
     _ticker?.cancel();
     _ticker = null;
     if (_line == null) return;
     _line = null;
+    _gate = null;
     _caption.value = null;
     await _player.stop();
     notifyListeners();
@@ -127,12 +153,9 @@ class NovaController extends ChangeNotifier {
     if (line == null) return;
     final t = time;
     _caption.value = line.captionAt(t);
-    for (final m in line.markers) {
-      if (m.type == 'event' && m.name != null && _lastTime < m.time && t >= m.time) {
-        _events.add(NovaEvent(m.name!, line.id, m.time));
-      }
+    for (final m in _gate?.due(t) ?? const <NovaMarker>[]) {
+      _events.add(NovaEvent(m.name!, line.id, m.time));
     }
-    _lastTime = t;
   }
 
   void _finish() {
@@ -141,6 +164,7 @@ class NovaController extends ChangeNotifier {
     _ticker?.cancel();
     _ticker = null;
     _line = null;
+    _gate = null;
     _caption.value = null;
     _events.add(NovaEvent(NovaEvent.lineEnd, line.id, line.duration));
     notifyListeners();
