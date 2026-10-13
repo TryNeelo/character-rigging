@@ -32,6 +32,7 @@ Line id: `ftux_home_return`
 | Time | Event | What the app should do |
 |---|---|---|
 | 5.13 s | `highlight_back_arrow` | Highlight the back arrow ("Tap the back arrow, and let's go!"): spotlight it and point the arrow at it. |
+| 7.60 s | `clear_spotlight` | End only the spotlight: the spotlight fades, the arrow stays and blinks until the child taps the item (or until a later [Stop highlight]). |
 
 ## FTUX: room
 

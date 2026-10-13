@@ -322,6 +322,13 @@
    "direction": "up",
    "source": "script",
    "note": "Script cue: [look up]"
+  },
+  {
+   "time": 7.6,
+   "type": "event",
+   "name": "clear_spotlight",
+   "source": "script",
+   "note": "Script cue: [Stop spotlight]"
   }
  ]
 }
