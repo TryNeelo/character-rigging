@@ -76,7 +76,11 @@ await nova.play('ftux_w1');       // a Skyrian line
 Each line knows who speaks it: `NovaLine.character` (`nova.line?.character` while it
 plays) is `'nova'` or `'skyrian'`, so you can pass it straight to the widget. Every
 character lip-syncs, blinks, looks, raises his arms, sets his brows and sends events
-the same way. Skyrian has one look, so `outfit` doesn't apply to him. All characters
+the same way. Skyrian has one look, so `outfit` doesn't apply to him.
+
+Skyrian's arms bend at the elbow, and his resting pose has his hands behind his back.
+His lines can hold his arms straight down, raise them straight, and bend either elbow.
+The widget handles all of it from the line's markers (below). All characters
 are drawn at the same scale as Nova; Skyrian is a little taller with his hat, so his
 full-body framing is a little taller too.
 
@@ -139,7 +143,10 @@ other than Nova speaks it:
 - `look` markers turn Nova's eyes and head toward one of eight directions on screen between
   `time` and `end`: `left`, `right`, `up`, `down`, `up-left`, `up-right`, `down-left`,
   `down-right`. `arm` markers raise the arm on that side of the screen, then lower it
-  at `end`. `expression` markers set his brows: `happy`, `surprised` or `concerned`. You
+  at `end`. For characters with elbows (Skyrian), an `arm` marker holds a straight arm
+  `degrees` out from straight down (0 is straight down) and `elbow` markers bend the elbow
+  (`{ "type": "elbow", "side": "right", "degrees": 90 }`); with neither, his arms rest
+  behind his back. `expression` markers set his brows: `happy`, `surprised` or `concerned`. You
   don't need to do anything with these; the widget handles them.
 - His brows also lift briefly on the stressed words of each line (the `emphasis` list,
   found from the audio when the line is packaged).

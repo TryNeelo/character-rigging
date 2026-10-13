@@ -28,7 +28,11 @@ class NovaOutfitSpec {
       required this.armLeftPivot,
       required this.armRightPivot,
       this.hatBack = false,
-      this.bodyBack = false});
+      this.bodyBack = false,
+      this.elbowLeftPivot,
+      this.elbowRightPivot,
+      this.armRestLeft,
+      this.armRestRight});
   final String label;
 
   /// Whether the hat has a piece behind the head (hat_back_<id>.svg), like a hard hat's brim.
@@ -36,6 +40,15 @@ class NovaOutfitSpec {
 
   /// Whether the body has a piece behind the arms (body_back.svg), like a cape.
   final bool bodyBack;
+
+  /// Elbows, for arms that bend (forearm_<side>.svg turns about them). Null for arms without elbows.
+  final Offset? elbowLeftPivot, elbowRightPivot;
+
+  /// For arms with elbows, the resting pose as drawn: (shoulder out from straight down,
+  /// elbow bend), in degrees. Skyrian rests with his hands behind his back.
+  final (double, double)? armRestLeft, armRestRight;
+
+  bool get hasElbows => elbowLeftPivot != null;
   final Offset armLeftPivot, armRightPivot;
 }
 
@@ -59,7 +72,11 @@ class NovaRig {
                 armLeftPivot: _offset(e.value['pivots']['armLeft']),
                 armRightPivot: _offset(e.value['pivots']['armRight']),
                 hatBack: e.value['hatBack'] as bool? ?? false,
-                bodyBack: e.value['bodyBack'] as bool? ?? false)
+                bodyBack: e.value['bodyBack'] as bool? ?? false,
+                elbowLeftPivot: e.value['pivots']['elbowLeft'] == null ? null : _offset(e.value['pivots']['elbowLeft']),
+                elbowRightPivot: e.value['pivots']['elbowRight'] == null ? null : _offset(e.value['pivots']['elbowRight']),
+                armRestLeft: _pair(e.value['armRest']?['left']),
+                armRestRight: _pair(e.value['armRest']?['right']))
         },
         eyeCenters = [for (final c in _j['eyes']['centers'] as List) _offset(c)],
         eyeRadius = _num(_j['eyes']['radius']),
@@ -128,4 +145,5 @@ class NovaRig {
 
   static double _num(dynamic v) => (v as num).toDouble();
   static Offset _offset(dynamic v) => Offset(_num((v as List)[0]), _num(v[1]));
+  static (double, double)? _pair(dynamic v) => v == null ? null : (_num((v as List)[0]), _num(v[1]));
 }

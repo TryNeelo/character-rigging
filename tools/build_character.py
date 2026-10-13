@@ -13,7 +13,7 @@ character's own drawn mouth, and eyelids drawn around his eyes in his skin colou
 Usage: python3 tools/build_character.py tools/characters/<name>.json   (build_rig.py runs it for every character)
 """
 import json, os, re, shutil, sys
-from face_rig import (ROOT, clips_used, lid, lid_parts, mouth_group, mouth_shapes, part_writer, path_box,
+from face_rig import (ROOT, arm_joints, clips_used, lid, lid_parts, mouth_group, mouth_shapes, part_writer, path_box,
                       rect_centre, round_rect_centre, capsule_top, shapes_of, whiten, LID_R)
 
 NOVA_SMILE = json.load(open(os.path.join(ROOT, 'tools', 'characters', 'nova.json')))
@@ -80,10 +80,25 @@ def build(config_path):
         o['hat_back_svg'] = pick(o.get('hat_back', []))
         for side in ('left', 'right'):
             a = o[f'arm_{side}']
-            o[f'arm_{side}_svg'] = pick(a['shapes'])
-            o[f'pivot_{side}'] = tuple(a['pivot']) if 'pivot' in a else capsule_top(els[a['capsule']])
-        for kk in ('legs', 'body_back', 'arm_left', 'arm_right', 'body', 'hat', 'hat_back'):
+            fore = set(R(a.get('forearm', [])))
+            o[f'arm_{side}_svg'] = ''.join(els[i] for i in R(a['shapes']) if i not in fore)
+            o[f'forearm_{side}_svg'] = pick(a.get('forearm', []))
+            if fore:
+                # Two-piece arm: the forearm (and hand) bends at the elbow. The art's pose is his rest pose.
+                o[f'pivot_{side}'], o[f'elbow_{side}'], shoulder, bend = arm_joints(els[a['capsule']], els[a['forearmCapsule']], side)
+                o[f'rest_{side}'] = (shoulder, bend)
+            else:
+                o[f'pivot_{side}'] = tuple(a['pivot']) if 'pivot' in a else capsule_top(els[a['capsule']])
+        for kk in ('legs', 'body_back', 'arm_left', 'arm_right', 'forearm_left', 'forearm_right', 'body', 'hat', 'hat_back'):
             o[f'{kk}_ol_svg'] = whiten(o[f'{kk}_svg'])
+        for side in ('left', 'right'):
+            # In the rig, the forearm is a group inside the arm that turns about the elbow
+            for ol in ('', '_ol'):
+                if o[f'forearm_{side}_svg']:
+                    e = o[f'elbow_{side}']
+                    o[f'arm_{side}{ol}_rig'] = o[f'arm_{side}{ol}_svg'] + f'<g class="forearm" data-pivot="{e[0]:g} {e[1]:g}">{o[f"forearm_{side}{ol}_svg"]}</g>'
+                else:
+                    o[f'arm_{side}{ol}_rig'] = o[f'arm_{side}{ol}_svg']
     default = C['defaultOutfit']
     def per_outfit(key, pivot=None):
         out = ''
@@ -101,12 +116,14 @@ def build(config_path):
             + ''.join(rig_layers[l[0]] if len(l) == 1 else pick(l[1]) for l in C['head']) + '</g>')
     head_ol = whiten(pick(C['headOutline']))
     d = outfits[default]
-    arms = ''.join(f'<g id="arm-{side}" class="part" data-pivot="{d["pivot_" + side][0]:g} {d["pivot_" + side][1]:g}">'
-                   + per_outfit(f'arm_{side}_svg', f'pivot_{side}') + '</g>' for side in ('left', 'right'))
+    # data-rest: the arm's resting pose as drawn (shoulder out from straight down, elbow bend), when it has an elbow
+    rest_attr = lambda side: f' data-rest="{d["rest_" + side][0]:g} {d["rest_" + side][1]:g}"' if ('rest_' + side) in d else ''
+    arms = ''.join(f'<g id="arm-{side}" class="part" data-pivot="{d["pivot_" + side][0]:g} {d["pivot_" + side][1]:g}"{rest_attr(side)}>'
+                   + per_outfit(f'arm_{side}_rig', f'pivot_{side}') + '</g>' for side in ('left', 'right'))
     outline = ('<g id="outline">'
                + '<g id="legs-ol">' + per_outfit('legs_ol_svg') + '</g><g id="upper-ol">'
                + '<g id="body-back-ol">' + per_outfit('body_back_ol_svg') + '</g>'
-               + ''.join(f'<g id="arm-{side}-ol">' + per_outfit(f'arm_{side}_ol_svg') + '</g>' for side in ('left', 'right'))
+               + ''.join(f'<g id="arm-{side}-ol">' + per_outfit(f'arm_{side}_ol_rig') + '</g>' for side in ('left', 'right'))
                + '<g id="body-ol">' + per_outfit('body_ol_svg') + '</g>'
                + '<g id="head-ol"><g id="hat-back-ol">' + per_outfit('hat_back_ol_svg') + '</g>' + head_ol
                + '<g id="hat-ol">' + per_outfit('hat_ol_svg') + '</g></g></g></g>')
@@ -126,7 +143,7 @@ def build(config_path):
     shutil.rmtree(parts_dir, ignore_errors=True)
     part = part_writer(parts_dir, W, H)
     for oname, o in outfits.items():
-        for kk in ('legs', 'body_back', 'arm_left', 'arm_right', 'body', 'hat', 'hat_back'):
+        for kk in ('legs', 'body_back', 'arm_left', 'arm_right', 'forearm_left', 'forearm_right', 'body', 'hat', 'hat_back'):
             if o[f'{kk}_svg']:
                 part(f'outfits/{oname}/{kk}', o[f'{kk}_svg'])
                 part(f'outfits/{oname}/{kk}_outline', o[f'{kk}_ol_svg'])
@@ -148,7 +165,10 @@ def build(config_path):
         'anchor': {'x': ax, 'y': ay},
         'pivots': {'head': hp},
         'outfits': {oname: {'label': o['label'], 'hatBack': bool(o['hat_back_svg']), 'bodyBack': bool(o['body_back_svg']),
-                            'pivots': {'armLeft': list(o['pivot_left']), 'armRight': list(o['pivot_right'])}}
+                            'pivots': {'armLeft': list(o['pivot_left']), 'armRight': list(o['pivot_right']),
+                                       **({'elbowLeft': list(o['elbow_left']), 'elbowRight': list(o['elbow_right'])} if 'elbow_left' in o else {})},
+                            # Resting pose of each arm as drawn: (shoulder out from straight down, elbow bend), in degrees
+                            **({'armRest': {'left': list(o['rest_left']), 'right': list(o['rest_right'])}} if 'rest_left' in o else {})}
                     for oname, o in outfits.items()},
         'defaultOutfit': default,
         'eyes': {'centers': [[round(e[0], 3), round(e[1], 3)] for e in eyes.values()], 'radius': r,

@@ -17,6 +17,8 @@ class NovaCue {
 /// Nova does from [time] to [end]: `type: "look"` toward [direction] on screen ("left",
 /// "right", "up", "down", "up-left", "up-right", "down-left", "down-right"), `type: "arm"` raising the arm on the screen's [side] by [degrees], or
 /// `type: "expression"` setting his brows to [name] ("happy", "surprised", "concerned").
+/// Characters with elbows (Skyrian) also have `type: "elbow"`, bending the elbow on [side] by
+/// [degrees]; for them an "arm" marker holds a straight arm at [degrees] out from straight down.
 class NovaMarker {
   const NovaMarker(
       {required this.time, required this.type, this.end, this.name, this.direction, this.side, this.degrees});
@@ -140,6 +142,25 @@ class NovaLine {
       }
     }
     return (left, right);
+  }
+
+  /// The arm on the screen's [side] ("left", "right") at [t] seconds: degrees out from
+  /// straight down, or null when no arm marker is holding it.
+  double? armAt(double t, String side) {
+    double? v;
+    for (final m in markers) {
+      if (m.type == 'arm' && m.side == side && t >= m.time && t < (m.end ?? m.time)) v = m.degrees ?? 0;
+    }
+    return v;
+  }
+
+  /// The elbow bend on the screen's [side] at [t] seconds, in degrees, or null when no elbow
+  /// marker is holding it. Only characters with elbows use these.
+  double? elbowAt(double t, String side) {
+    for (final m in markers) {
+      if (m.type == 'elbow' && m.side == side && t >= m.time && t < (m.end ?? m.time)) return m.degrees ?? 0;
+    }
+    return null;
   }
 
   /// Brow expression at [t] seconds ("happy", "surprised", "concerned"), or null.

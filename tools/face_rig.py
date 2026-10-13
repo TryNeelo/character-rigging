@@ -163,6 +163,29 @@ def capsule_top(tag):
     top = min(pts, key=lambda p: p[1])
     return round(top[0], 1), round(top[1], 1)
 
+def capsule_ends(tag):
+    """For a capsule (a rect with fully rounded ends): the centres of its two round ends, after its transform."""
+    a, b, c, d, e, f = matrix(tag)
+    x = float((re.search(r'\sx="([-\d.]+)"', tag) or [0, 0])[1]); y = float((re.search(r'\sy="([-\d.]+)"', tag) or [0, 0])[1])
+    w, h = num(tag, 'width'), num(tag, 'height')
+    r = w / 2
+    return [(a * px + c * py + e, b * px + d * py + f) for px, py in ((x + r, y + r), (x + r, y + h - r))]
+
+def arm_joints(upper, forearm, side):
+    """Shoulder and elbow of a two-piece arm (upper arm and forearm capsules), and the pose the
+    art shows: the shoulder's angle out from straight down and the elbow's bend inward, in degrees."""
+    shoulder, low = sorted(capsule_ends(upper), key=lambda p: p[1])
+    ends = capsule_ends(forearm)
+    elbow = min(ends, key=lambda p: math.dist(p, low))
+    hand = max(ends, key=lambda p: math.dist(p, low))
+    out = 1 if side == 'right' else -1                     # "outward" is away from the body on screen
+    ux, uy = low[0] - shoulder[0], low[1] - shoulder[1]
+    fx, fy = hand[0] - elbow[0], hand[1] - elbow[1]
+    angle = math.degrees(math.atan2(out * ux, uy))
+    bend = out * math.degrees(math.atan2(ux * fy - uy * fx, ux * fx + uy * fy))
+    r1 = lambda p: (round(p[0], 1), round(p[1], 1))
+    return r1(shoulder), r1(elbow), round(angle, 1), round(bend, 1)
+
 def path_box(tag):
     """Bounding box of a path with absolute commands (from its points and control points,
     which is close enough for the simple shapes in a face)."""

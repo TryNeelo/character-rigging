@@ -14,9 +14,9 @@
       "legs": [[0, 4]],
       "_body_back": "Collar points and cape: behind the arms, they move with the body's breathing.",
       "body_back": [[4, 10]],
-      "_arms": "By screen side. The upper arm is a capsule; the shoulder pivot is the centre of its upper round end.",
-      "arm_left": {"shapes": [[13, 16]], "capsule": 13},
-      "arm_right": {"shapes": [[10, 13]], "capsule": 10},
+      "_arms": "By screen side. Upper arm and forearm are capsules: the shoulder is the centre of the upper arm's top end, the elbow the centre of the forearm's end at the upper arm. The forearm (with the hand) bends at the elbow. As drawn, his hands are behind his back: that is his resting pose.",
+      "arm_left": {"shapes": [[13, 16]], "capsule": 13, "forearm": [[14, 16]], "forearmCapsule": 15},
+      "arm_right": {"shapes": [[10, 13]], "capsule": 10, "forearm": [[11, 13]], "forearmCapsule": 12},
       "_body": "Hidden hand, collar, robe, the dark V under the beard, belt, robe skirt, hem, sash, buttons and buckle.",
       "body": [[16, 21], [48, 61]],
       "hat": [[61, 69]]

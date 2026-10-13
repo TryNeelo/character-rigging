@@ -11,6 +11,8 @@ Script format (dialogue/<line>/script.txt), plain text:
     or the end of the line ("right" and "left" are the screen's sides):
         [look right]  [look up-right]  [look ahead]          eight directions; ahead looks straight again
         [arms up 32]  [right arm up 32]  [arms down]  [left arm down]    degrees; up alone is 32
+        [arms behind]  [left arm behind]                    back to the resting pose (Skyrian: hands behind his back)
+        [left elbow 45]  [elbows 90]  [right elbow 0]       bends the elbow (0 is straight), for characters with elbows
         [happy brows]  [surprised brows]  [concerned brows]  [normal brows]
   - Any caption longer than captions.maxChars (tools/rig_settings.json) is split at a
     sentence end, then a comma, then a space, and is flagged to check.
@@ -53,8 +55,8 @@ DIRECTIONS = {'left', 'right', 'up', 'down', 'up-left', 'up-right', 'down-left',
 ARM_UP = 32   # degrees when a cue says "up" without a number
 
 def action_for(cue):
-    """A move a bracketed cue means: ('look', direction or None for ahead), ('arm', sides, degrees)
-    or ('expression', name or None for normal brows)."""
+    """A move a bracketed cue means: ('look', direction or None for ahead), ('arm', sides, degrees
+    or 'behind'), ('elbow', sides, degrees) or ('expression', name or None for normal brows)."""
     words = plain(cue.replace('°', ' ')).split()
     if len(words) == 2 and words[1] in ('brows', 'brow'):
         if words[0] == 'normal': return ('expression', None)
@@ -70,9 +72,17 @@ def action_for(cue):
     sides = ['left', 'right']
     if words[:1] in (['left'], ['right']):
         sides, words = [words[0]], words[1:]
+    if words[:1] in (['elbow'], ['elbows']):
+        nums = [w for w in words[1:] if w.isdigit()]
+        if words[1:] in (['straight'], ['0']) or nums == ['0']:
+            return ('elbow', sides, 0)
+        if nums:
+            return ('elbow', sides, int(nums[0]))
     if words[:1] in (['arm'], ['arms']):
         rest = words[1:]
         nums = [w for w in rest if w.isdigit()]
+        if rest in (['behind'], ['behind', 'back'], ['behind', 'his', 'back']):
+            return ('arm', sides, 'behind')
         if rest == ['down'] or nums == ['0']:
             return ('arm', sides, 0)
         if nums:
@@ -123,6 +133,11 @@ for line in sorted(lines):
 
     audio = sorted(glob.glob(os.path.join(d, '*.mp3')))[0]
     timing = json.load(open(os.path.join(d, 'cues.json')))
+    # Who speaks the line: a character whose arms rest somewhere other than straight down (Skyrian's
+    # rest behind his back) holds [arms down] as a pose of its own; Nova's [arms down] is his rest
+    speaker = json.load(open(os.path.join(ROOT, 'tools', 'characters', timing.get('character', 'nova') + '.json')))
+    rests_down = not any('forearm' in o.get(f'arm_{side}', {}) for o in speaker['outfits'].values()
+                         for side in ('left', 'right') if isinstance(o.get(f'arm_{side}'), dict))
     duration = timing['mouthCues'][-1]['end']
     segments, _ = model.transcribe(audio, word_timestamps=True, beam_size=5)
     heard = [(norm(w.word), w.start, w.end) for s in segments for w in s.words]
@@ -183,11 +198,20 @@ for line in sorted(lines):
             release('brows', t)
             if action[1]:
                 held['brows'] = (t, {'type': 'expression', 'name': action[1]}, text)
+        elif action[0] == 'elbow':
+            if rests_down:
+                problems.append(f'{line}: [{text}] does nothing: {speaker["label"]} has no elbows')
+            for side in action[1]:
+                release(side + '-elbow', t)
+                held[side + '-elbow'] = (t, {'type': 'elbow', 'side': side, 'degrees': action[2]}, text)
         else:
+            # An arm pose (up, down or behind) also ends any elbow bend on that side
             for side in action[1]:
                 release(side, t)
-                if action[2]:
-                    held[side] = (t, {'type': 'arm', 'side': side, 'degrees': action[2]}, text)
+                release(side + '-elbow', t)
+                if action[2] == 'behind' or (action[2] == 0 and rests_down):
+                    continue   # back to the resting pose
+                held[side] = (t, {'type': 'arm', 'side': side, 'degrees': action[2]}, text)
     for key in list(held):
         release(key, duration)
     timing['markers'] = sorted(markers, key=lambda m: m['time'])

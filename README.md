@@ -119,7 +119,7 @@ Every character does everything Nova does: lip-sync, blinks, looking in 8 direct
 
 - Parts, back to front: shoes, then (moving with the breath) collar points and cape, arms, robe with belt, sash and buttons, and the head.
 - Head: beard, ears and face, mouth, mustache, eyes, pupils, lids, brows, hair and hat. The beard and hat move with the head, which turns about (180.4, 345), under the mouth.
-- Arms: each upper arm is a capsule, and the shoulder pivot is the centre of its upper round end, (88.3, 432.3) and (274.7, 432.3). The export has no pivot dots, and the round end means the arm needs no sleeve cap.
+- Arms: they bend at the elbow, unlike Nova's. Upper arm and forearm are capsules: the shoulder is the centre of the upper arm's top end, (88.3, 432.3) and (274.7, 432.3), and the elbow is the centre of the forearm's end there, (44.1, 512.2) and (318.9, 512.2). The forearm (with the hand) turns about the elbow. The export has no pivot dots, and the round ends mean no sleeve caps are needed. As drawn, his hands are behind his back (shoulders 30° out from straight down, elbows bent 90° inward): that's his resting pose, and he can also hold his arms straight down, raise them straight, and bend either elbow. The preview's Pose section has elbow sliders and a "Hands behind back" button for him, each with its script tag.
 - Mouth: Nova's exact shapes, scaled 0.575 and centred on Skyrian's drawn mouth, behind the mustache. His drawn mouth is his idle smile. The talking shapes sit 3 units lower than the smile, so the mustache doesn't hide the closed and narrow ones. The rest and closed lines are at least 3 units thick. The round mouth's ring matches his beard.
 - Eyes: lids in his skin colours (light on the screen-left half, darker on the right), sized to his eyes (radius 22.2). Pupil reach is scaled to his eyes (7.5 across, 6.2 up and down).
 - Brows: his "surprised" lift is 7 instead of 9, so his brows stay clear of the hat brim.
@@ -166,6 +166,7 @@ A line's `script.txt` is plain text:
 - **Moves** are cued the same way and hold until the next cue of the same kind, or the end of the line. "Left" and "right" are the screen's sides.
   - `[look right]`, `[look up-right]` and the other eight directions; `[look ahead]` looks straight again.
   - `[arms up 32]`, `[right arm up 32]`, `[left arm up 32]` (degrees; `up` alone is 32), and `[arms down]`, `[right arm down]`.
+  - Characters with elbows (Skyrian): `[arms behind]`, `[left arm behind]` go back to his resting pose (hands behind his back); `[arms down]` holds his arms straight down at his sides; `[arms up 32]` holds a straight arm raised 32° out from straight down. `[left elbow 45]`, `[elbows 90]`, `[right elbow 0]` bend the elbow (0 is straight); put an elbow cue after the arm cue at the same word, since an arm cue straightens the elbow. For Nova, `[arms behind]` is the same as `[arms down]`, and elbow cues do nothing (`build_captions.py` notes them).
   - `[happy brows]`, `[surprised brows]`, `[concerned brows]` hold that brow expression; `[normal brows]` returns to neutral.
 - Captions longer than `captions.maxChars` in `tools/rig_settings.json` (55, the length of "Each world is packed with stories and games to explore.", set by Manaf) are split at a sentence end, then a comma, then a space, and flagged to check.
 

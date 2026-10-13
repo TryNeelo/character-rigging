@@ -59,7 +59,7 @@ section h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.15
 section > p { margin: 0 0 12px; color: var(--muted); font-size: 14px; max-width: 60ch; }
 .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .field { display: grid; gap: 6px; }
-.field[hidden] { display: none; }
+.field[hidden], .fields[hidden] { display: none; }
 .field > span { font-size: 13px; font-weight: 700; color: var(--muted); }
 .fields { display: grid; gap: 18px; }
 
@@ -100,7 +100,7 @@ button { font: inherit; cursor: pointer; }
 .mark { position: absolute; top: 0; font-family: var(--font-mono); font-size: 11px; font-weight: 700; white-space: nowrap; color: var(--rust); border-left: 2px solid var(--rust); padding-left: 4px; line-height: 20px; }
 /* an event near the end of the line hangs its label to the left of its tick, so it never runs off the strip */
 .mark.flip { border-left: 0; border-right: 2px solid var(--rust); padding: 0 4px 0 0; transform: translateX(-100%); }
-.mark.look, .mark.arm, .mark.expression { color: var(--accent); border: 0; background: var(--chip); border-radius: 4px; padding: 0 4px; overflow: hidden; text-overflow: ellipsis; }
+.mark.look, .mark.arm, .mark.elbow, .mark.expression { color: var(--accent); border: 0; background: var(--chip); border-radius: 4px; padding: 0 4px; overflow: hidden; text-overflow: ellipsis; }
 .mark.fired { background: var(--rust); color: #fff; border-radius: 4px; }
 .toast { position: absolute; left: 50%; top: 12px; translate: -50% 0; background: var(--rust); color: #fff; font-family: var(--font-mono); font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; transition: opacity .3s; }
 .toast[hidden] { display: block; opacity: 0; }
@@ -236,6 +236,13 @@ button { font: inherit; cursor: pointer; }
           <label class="slider tagged"><span>Head tilt</span><input type="range" id="poseHead" min="-10" max="10" step="0.5" value="0"><output for="poseHead" id="poseHeadOut">0°</output></label>
           <label class="slider tagged"><span>Left arm</span><input type="range" id="poseArmL" min="0" max="180" step="1" value="0"><button type="button" class="tag" id="poseArmLOut" title="Script tag for this pose. Click to copy.">[left arm down]</button></label>
           <label class="slider tagged"><span>Right arm</span><input type="range" id="poseArmR" min="0" max="180" step="1" value="0"><button type="button" class="tag" id="poseArmROut" title="Script tag for this pose. Click to copy.">[right arm down]</button></label>
+          <!-- Characters with elbows (Skyrian): elbow bends, and his resting pose with his hands behind his back -->
+          <div class="fields" id="elbowRows" hidden>
+            <label class="slider tagged"><span>Left elbow</span><input type="range" id="poseElbowL" min="0" max="150" step="1" value="0"><button type="button" class="tag" id="poseElbowLOut" title="Script tag for this pose. Click to copy.">[left elbow 0]</button></label>
+            <label class="slider tagged"><span>Right elbow</span><input type="range" id="poseElbowR" min="0" max="150" step="1" value="0"><button type="button" class="tag" id="poseElbowROut" title="Script tag for this pose. Click to copy.">[right elbow 0]</button></label>
+            <div class="look-row"><button class="btn ghost" id="armsBehind">Hands behind back</button>
+              <button type="button" class="tag" title="Script tag for this pose. Click to copy.">[arms behind]</button></div>
+          </div>
           <div class="row">
             <label class="toggle"><input type="checkbox" id="idleOn" checked><span>Idle motion</span></label>
             <label class="toggle"><input type="checkbox" id="appRateOn" checked><span>App frame rate (15 fps idle, 30 talking, 60 during arm and look moves)</span></label>
@@ -378,6 +385,7 @@ button { font: inherit; cursor: pointer; }
   const pivot = el => el.dataset.pivot.split(' ').map(Number);
   // The character's moving parts. Set again by bindRig() when the character changes.
   let upper, head, armL, armR, HP, LP, RP, pupils, browEls, mouths, lids, closedEyes, OPEN_Y, HALF;
+  let REST = { left: null, right: null }, forearms = { left: [], right: [] };
   let LOOK, B, TK, I;
   const NS = 'http://www.w3.org/2000/svg';
   function bindRig() {
@@ -386,6 +394,12 @@ button { font: inherit; cursor: pointer; }
     ANCHOR_X = svg.dataset.anchorX ? +svg.dataset.anchorX : 278;
     upper = $('upper'); head = $('head'); armL = $('arm-left'); armR = $('arm-right');
     HP = pivot(head); LP = pivot(armL); RP = pivot(armR);
+    // Arms with elbows: their resting pose, and every forearm group (each outfit's, and the outline's)
+    REST = { left: armL.dataset.rest ? pivot({ dataset: { pivot: armL.dataset.rest } }) : null,
+             right: armR.dataset.rest ? pivot({ dataset: { pivot: armR.dataset.rest } }) : null };
+    forearms = Object.fromEntries(['left', 'right'].map(side => [side,
+      [...svg.querySelectorAll(`#arm-${side} .forearm, #arm-${side}-ol .forearm`)].map(el => ({ el, p: pivot(el) }))]));
+    $('elbowRows').hidden = !REST.left;
     dots = document.createElementNS(NS, 'g');
     dots.setAttribute('display', $('pivotsOn').checked ? 'inline' : 'none');
     [HP, LP, RP].forEach(([x, y]) => {
@@ -427,6 +441,9 @@ button { font: inherit; cursor: pointer; }
     svg = next; who = k; scene.character = k; S = CHARACTERS[k].settings;
     $('characterCtl').querySelectorAll('button').forEach((b, i) => b.setAttribute('aria-pressed', Object.keys(CHARACTERS)[i] === k));
     bindRig();
+    raise = { left: 0, right: 0 }; raiseMid = { left: 0, right: 0 }; raiseTarget = { left: 0, right: 0 };
+    bend = { left: 0, right: 0 }; bendMid = { left: 0, right: 0 }; bendTarget = { left: 0, right: 0 };
+    resetArms();
     current = 'smile';
     setEye('open');
     layout();
@@ -440,6 +457,22 @@ button { font: inherit; cursor: pointer; }
   let raise = { left: 0, right: 0 }, raiseTarget = { left: 0, right: 0 };
   // Arms ease in and out: each follows a midpoint that follows the target, so moves start softly
   let raiseMid = { left: 0, right: 0 };
+  // Characters with elbows (Skyrian): his arms rest as drawn (REST: shoulder out from straight down, elbow bend).
+  // raise and bend are how far each arm is from that rest. Markers: "arm" holds a straight arm at its degrees
+  // (0 is straight down), "elbow" bends the elbow; with neither, the arm rests. The test controls pose him the same way.
+  let bend = { left: 0, right: 0 }, bendMid = { left: 0, right: 0 }, bendTarget = { left: 0, right: 0 };
+  const test = { arm: { left: null, right: null }, elbow: { left: null, right: null } };
+  function armTargets(t) {
+    for (const side of ['left', 'right']) {
+      const rest = REST[side];
+      const on = type => t == null ? null : markers.find(mk => mk.type === type && mk.side === side && t >= mk.time && t < mk.end);
+      const arm = on('arm'), el = on('elbow');
+      const shoulder = arm ? arm.degrees : test.arm[side] ?? rest[0];
+      const elbow = el ? el.degrees : arm ? 0 : test.arm[side] != null ? (test.elbow[side] ?? 0) : (test.elbow[side] ?? rest[1]);
+      raiseTarget[side] = shoulder - rest[0];
+      bendTarget[side] = elbow - rest[1];
+    }
+  }
   // Brows: a quick lift on each stressed moment while talking, plus an expression (from the line or the test control)
   let lineExpression = null, testExpression = null, brow = { lift: 0, tilt: 0 };
   // A smooth bump around a stressed moment, d seconds after it: quick rise, short hold, slower fall
@@ -476,11 +509,29 @@ button { font: inherit; cursor: pointer; }
   });
   // What each slider shows: the arms show the script tag for that pose (sides are the screen's); the head shows degrees
   const sliderLabel = { head: v => `${v}°`, armL: v => armTag('left', v), armR: v => armTag('right', v) };
-  function armTag(side, v) { return +v > 0 ? `[${side} arm up ${v}]` : `[${side} arm down]`; }
+  function armTag(side, v) {
+    if (REST.left && test.arm[side] == null) return `[${side} arm behind]`;
+    return +v > 0 ? `[${side} arm up ${v}]` : `[${side} arm down]`;
+  }
   Object.entries(SLIDERS).forEach(([k, id]) => {
     const input = $(id), out = $(id + 'Out');
-    input.addEventListener('input', () => { pose[k] = +input.value; out.textContent = sliderLabel[k](input.value); });
+    input.addEventListener('input', () => {
+      pose[k] = +input.value;
+      // With elbows, the arm sliders pose the arm (a straight arm at this angle) instead of adding to it
+      if (REST.left && k !== 'head') { const side = k === 'armL' ? 'left' : 'right'; test.arm[side] = +input.value; armTargets(raf ? audio.currentTime : null); }
+      out.textContent = sliderLabel[k](input.value);
+    });
   });
+  for (const [side, id] of [['left', 'poseElbowL'], ['right', 'poseElbowR']]) {
+    $(id).addEventListener('input', () => { test.elbow[side] = +$(id).value; $(id + 'Out').textContent = `[${side} elbow ${$(id).value}]`; armTargets(raf ? audio.currentTime : null); });
+  }
+  function resetArms() {
+    for (const side of ['left', 'right']) { test.arm[side] = null; test.elbow[side] = null; }
+    for (const [k, id] of [['armL', 'poseArmL'], ['armR', 'poseArmR']]) { pose[k] = 0; $(id).value = 0; $(id + 'Out').textContent = sliderLabel[k](0); }
+    for (const [side, id] of [['left', 'poseElbowL'], ['right', 'poseElbowR']]) { $(id).value = 0; $(id + 'Out').textContent = `[${side} elbow 0]`; }
+    if (REST.left) armTargets(raf ? audio.currentTime : null);
+  }
+  $('armsBehind').addEventListener('click', resetArms);
   // Click a tag to copy it for a script
   document.addEventListener('click', async e => {
     const tag = e.target.closest('.tag');
@@ -510,6 +561,7 @@ button { font: inherit; cursor: pointer; }
   $('resetPose').addEventListener('click', () => {
     testExpression = null; browBtns.forEach((x, i) => x.setAttribute('aria-pressed', i === 0)); $('browTag').textContent = '[normal brows]';
     Object.entries(SLIDERS).forEach(([k, id]) => { pose[k] = 0; $(id).value = 0; $(id + 'Out').textContent = sliderLabel[k](0); });
+    resetArms();
     pose.look = [0, 0]; padBtns.forEach(x => x.setAttribute('aria-pressed', x.title === 'ahead')); $('lookTag').textContent = '[look ahead]';
   });
 
@@ -521,6 +573,7 @@ button { font: inherit; cursor: pointer; }
     const appRate = $('appRateOn').checked;
     // Full frame rate while an arm or the head is on its way somewhere; the move only lasts a moment
     const moving = Math.abs(raiseTarget.left - raise.left) > 0.3 || Math.abs(raiseTarget.right - raise.right) > 0.3
+      || Math.abs(bendTarget.left - bend.left) > 0.3 || Math.abs(bendTarget.right - bend.right) > 0.3
       || [0, 1].some(i => Math.abs((lineLooking ? lookTarget[i] : pose.look[i]) - look[i]) > 0.01) || ['left', 'right'].some(k => Math.abs(pose['arm' + k[0].toUpperCase()] - drawnPose['arm' + k[0].toUpperCase()]) > 0.1);
     const fps = moving ? S.frameRate.moving : raf ? S.frameRate.talking : S.frameRate.idle;
     if (appRate && lastDraw >= 0 && now - lastDraw < 1000 / fps - 4) return;
@@ -541,6 +594,8 @@ button { font: inherit; cursor: pointer; }
     for (const side of ['left', 'right']) {
       raiseMid[side] += (raiseTarget[side] - raiseMid[side]) * ease(S.gesture.smoothing * 1.6);
       raise[side] += (raiseMid[side] - raise[side]) * ease(S.gesture.smoothing * 1.6);
+      bendMid[side] += (bendTarget[side] - bendMid[side]) * ease(S.gesture.smoothing * 1.6);
+      bend[side] += (bendMid[side] - bend[side]) * ease(S.gesture.smoothing * 1.6);
     }
     const expr = B.expressions[testExpression || lineExpression] || { liftPx: 0, tiltDegrees: 0 };
     brow.lift += (expr.liftPx - brow.lift) * ease(B.smoothing);
@@ -556,8 +611,13 @@ button { font: inherit; cursor: pointer; }
     dots.setAttribute('transform', upper.getAttribute('transform'));
     const talk = (raf && idle) ? talkHead(audio.currentTime) : { dip: 0, tilt: 0 };
     head.setAttribute('transform', `translate(${(LOOK.headPx * look[0]).toFixed(2)} ${(talk.dip + LOOK.headPxY * look[1]).toFixed(2)}) rotate(${(pose.head + sway + talk.tilt + LOOK.headDegrees * look[0]).toFixed(2)} ${HP[0]} ${HP[1]})`);
-    armL.setAttribute('transform', `rotate(${(pose.armL + raise.left + swing).toFixed(2)} ${LP[0]} ${LP[1]})`);
-    armR.setAttribute('transform', `rotate(${(-pose.armR - raise.right - swing).toFixed(2)} ${RP[0]} ${RP[1]})`);
+    // (with elbows, the sliders already set the arm's target, so they aren't added here)
+    const addL = REST.left ? 0 : pose.armL, addR = REST.left ? 0 : pose.armR;
+    armL.setAttribute('transform', `rotate(${(addL + raise.left + swing).toFixed(2)} ${LP[0]} ${LP[1]})`);
+    armR.setAttribute('transform', `rotate(${(-addR - raise.right - swing).toFixed(2)} ${RP[0]} ${RP[1]})`);
+    // Elbows bend inward: the screen-left forearm turns anticlockwise, the right one clockwise (outlines too)
+    for (const side of ['left', 'right'])
+      forearms[side].forEach(f => f.el.setAttribute('transform', `rotate(${((side === 'left' ? -1 : 1) * bend[side]).toFixed(2)} ${f.p[0]} ${f.p[1]})`));
     // The outline layer follows the same moves
     for (const [ol, el] of [['upper-ol', upper], ['arm-left-ol', armL], ['arm-right-ol', armR], ['head-ol', head]]) $(ol).setAttribute('transform', el.getAttribute('transform'));
   }
@@ -753,20 +813,23 @@ button { font: inherit; cursor: pointer; }
   const eventTag = Object.fromEntries(EVENT_TAGS.events.map(ev => [ev.name, ev.tag]));
   const cueLabel = mk => mk.type === 'event' ? (eventTag[mk.name] || mk.name)
     : mk.type === 'look' ? `look ${mk.direction}` : mk.type === 'lookEnd' ? 'look ahead'
-    : mk.type === 'arm' ? `${mk.both ? 'arms' : mk.side + ' arm'} up ${mk.degrees}`
-    : mk.type === 'armEnd' ? `${mk.both ? 'arms' : mk.side + ' arm'} down`
+    : mk.type === 'arm' ? `${mk.both ? 'arms' : mk.side + ' arm'} ${mk.degrees ? 'up ' + mk.degrees : 'down'}`
+    : mk.type === 'armEnd' ? `${mk.both ? 'arms' : mk.side + ' arm'} ${REST.left ? 'behind' : 'down'}`
+    : mk.type === 'elbow' ? `${mk.both ? 'elbows' : mk.side + ' elbow'} ${mk.degrees}`
     : mk.type === 'expressionEnd' ? 'normal brows' : `${mk.name} brows`;
   function scriptItems() {
     const items = [];
     for (const mk of markers) {
       items.push(mk);
-      if ((mk.type === 'look' || mk.type === 'arm' || mk.type === 'expression') && mk.end < DURATION - 0.05)
+      // (an end is shown unless the next move of its kind starts right there, like [arms up 32] then [arms down])
+      if ((mk.type === 'look' || mk.type === 'arm' || mk.type === 'expression') && mk.end < DURATION - 0.05
+        && !markers.some(o => o !== mk && o.type === mk.type && o.side === mk.side && Math.abs(o.time - mk.end) < 0.005))
         items.push({ ...mk, type: mk.type + 'End', time: mk.end });
     }
     // Both arms moving together read as one tag, like [arms up 32] and [arms down]
     const out = [];
     for (const it of items) {
-      const twin = (it.type === 'arm' || it.type === 'armEnd') && out.find(o => o.type === it.type && !o.both && o.side !== it.side
+      const twin = (it.type === 'arm' || it.type === 'armEnd' || it.type === 'elbow') && out.find(o => o.type === it.type && !o.both && o.side !== it.side
         && Math.abs(o.time - it.time) < 0.005 && (it.type === 'armEnd' || o.degrees === it.degrees));
       if (twin) twin.both = true;
       else out.push({ ...it });
@@ -862,6 +925,7 @@ button { font: inherit; cursor: pointer; }
     const ex = markers.find(mk => mk.type === 'expression' && t >= mk.time && t < mk.end);
     lineExpression = ex ? ex.name : null;
     markers.forEach(mk => { if (mk.type === 'arm' && t >= mk.time && t < mk.end) raiseTarget[mk.side] = mk.degrees; });
+    if (REST.left) armTargets(t);
     // Caption: the sentence being spoken, as the app would show it
     const cap = captions.find(c => t >= c.start && t < c.end);
     $('caption').textContent = cap ? cap.text : '';
@@ -883,6 +947,7 @@ button { font: inherit; cursor: pointer; }
     lastSeg = -1;
     $('playhead').style.left = '0%';
     lookTarget = [0, 0]; lineLooking = false; lastT = -1; raiseTarget = { left: 0, right: 0 }; lineExpression = null;
+    if (REST.left) armTargets(null);
     markEls.forEach(el => el.classList.remove('fired'));
     $('play').textContent = 'Play with sound';
     pendingMouth = null;

@@ -75,6 +75,8 @@ class _NovaCharacterState extends State<NovaCharacter> {
   final Stopwatch _clock = Stopwatch()..start();
   // Arms ease in and out: each follows a midpoint that follows the target, so moves start softly
   double _midLeft = 0, _midRight = 0;
+  // Elbows (characters whose arms bend): how far each is from its resting bend, eased the same way
+  double _bendLeft = 0, _bendRight = 0, _bendMidLeft = 0, _bendMidRight = 0;
   double _t = 0, _lastFrame = -1, _lookX = 0, _lookY = 0, _raiseLeft = 0, _raiseRight = 0, _browLift = 0, _browTilt = 0;
   _Eye _eye = _Eye.open;
   Timer? _blinkTimer;
@@ -156,7 +158,19 @@ class _NovaCharacterState extends State<NovaCharacter> {
     final dir = c.line?.lookAt(c.time) ?? c.look;
     final diag = dir.x != 0 && dir.y != 0 ? rig.look('diagonal') : 1.0;
     final (lookX, lookY) = (dir.x * diag, dir.y * diag);
-    final (armLeft, armRight) = c.line?.armsAt(c.time) ?? (0.0, 0.0);
+    var (armLeft, armRight) = c.line?.armsAt(c.time) ?? (0.0, 0.0);
+    var (bendLeft, bendRight) = (0.0, 0.0);
+    final spec = rig.outfits[rig.outfits.containsKey(widget.outfit) ? widget.outfit! : rig.defaultOutfit]!;
+    if (spec.hasElbows) {
+      // Arms rest as drawn; an arm marker holds a straight arm, an elbow marker bends the elbow
+      (double, double) target(String side, (double, double) rest) {
+        final arm = c.line?.armAt(c.time, side);
+        final elbow = c.line?.elbowAt(c.time, side) ?? (arm != null ? 0.0 : rest.$2);
+        return ((arm ?? rest.$1) - rest.$1, elbow - rest.$2);
+      }
+      (armLeft, bendLeft) = target('left', spec.armRestLeft!);
+      (armRight, bendRight) = target('right', spec.armRestRight!);
+    }
     final (lift, tilt) = rig.browExpressions[c.expression ?? c.line?.expressionAt(c.time)] ?? (0.0, 0.0);
     // Smoothing amounts are tuned per 60 fps frame; scale them to the real frame time
     double ease(double perFrame) => 1 - math.pow(1 - perFrame, dt * 60).toDouble();
@@ -169,15 +183,21 @@ class _NovaCharacterState extends State<NovaCharacter> {
       _midRight += (armRight - _midRight) * arm;
       _raiseLeft += (_midLeft - _raiseLeft) * arm;
       _raiseRight += (_midRight - _raiseRight) * arm;
+      _bendMidLeft += (bendLeft - _bendMidLeft) * arm;
+      _bendMidRight += (bendRight - _bendMidRight) * arm;
+      _bendLeft += (_bendMidLeft - _bendLeft) * arm;
+      _bendRight += (_bendMidRight - _bendRight) * arm;
       _browLift += (lift - _browLift) * ease(rig.brows('smoothing'));
       _browTilt += (tilt - _browTilt) * ease(rig.brows('smoothing'));
     });
     // With movement off and nothing left to settle, stop redrawing until something changes.
     // Blinks redraw on their own.
     final lookOff = math.max((lookX - _lookX).abs(), (lookY - _lookY).abs());
-    _moving = lookOff > 0.01 || (armLeft - _raiseLeft).abs() > 0.3 || (armRight - _raiseRight).abs() > 0.3;
+    final bendOff = math.max((bendLeft - _bendLeft).abs(), (bendRight - _bendRight).abs());
+    _moving = lookOff > 0.01 || (armLeft - _raiseLeft).abs() > 0.3 || (armRight - _raiseRight).abs() > 0.3 || bendOff > 0.3;
     final settled = lookOff < 0.002 && (armLeft - _raiseLeft).abs() < 0.05 &&
-        (armRight - _raiseRight).abs() < 0.05 && (lift - _browLift).abs() < 0.02 && (tilt - _browTilt).abs() < 0.02;
+        (armRight - _raiseRight).abs() < 0.05 && (lift - _browLift).abs() < 0.02 && (tilt - _browTilt).abs() < 0.02 &&
+        bendOff < 0.05;
     if (!widget.idle && !c.isSpeaking && settled) {
       _lastFrame = -1;
     } else {
@@ -395,9 +415,25 @@ class _NovaCharacterState extends State<NovaCharacter> {
           child: Stack(children: [
             // A body piece behind the arms, like a cape
             if (outfit.bodyBack) wear('body_back$ol'),
-            // Positive raises lift each arm outward, away from the body
-            Transform(transform: rotateAbout(outfit.armLeftPivot, _raiseLeft + swing), child: wear('arm_left$ol')),
-            Transform(transform: rotateAbout(outfit.armRightPivot, -_raiseRight - swing), child: wear('arm_right$ol')),
+            // Positive raises lift each arm outward, away from the body. Elbows bend inward.
+            Transform(
+                transform: rotateAbout(outfit.armLeftPivot, _raiseLeft + swing),
+                child: outfit.hasElbows
+                    ? Stack(children: [
+                        wear('arm_left$ol'),
+                        Transform(
+                            transform: rotateAbout(outfit.elbowLeftPivot!, -_bendLeft), child: wear('forearm_left$ol')),
+                      ])
+                    : wear('arm_left$ol')),
+            Transform(
+                transform: rotateAbout(outfit.armRightPivot, -_raiseRight - swing),
+                child: outfit.hasElbows
+                    ? Stack(children: [
+                        wear('arm_right$ol'),
+                        Transform(
+                            transform: rotateAbout(outfit.elbowRightPivot!, _bendRight), child: wear('forearm_right$ol')),
+                      ])
+                    : wear('arm_right$ol')),
             wear('body$ol'),
             head,
           ]),
