@@ -20,6 +20,14 @@
     ],
     "scene": "Home"
   },
+  "highlight_back_arrow": {
+    "does": "Highlight the back arrow (\"Tap the back arrow, and let's go!\"): spotlight it and point the arrow at it.",
+    "cues": [
+      "Highlight the back arrow",
+      "Highlight the back button"
+    ],
+    "scene": "Home"
+  },
   "highlight_sticker_book": {
     "does": "Highlight the sticker book in the room: spotlight it and point the arrow at it.",
     "cues": [
@@ -31,14 +39,6 @@
     "does": "Highlight the closet: spotlight it and point the arrow at it.",
     "cues": [
       "Highlight the closet"
-    ],
-    "scene": "Room"
-  },
-  "highlight_back_arrow": {
-    "does": "Highlight the back arrow (\"Tap the back arrow, and let's go!\"): spotlight it and point the arrow at it.",
-    "cues": [
-      "Highlight the back arrow",
-      "Highlight the back button"
     ],
     "scene": "Room"
   },
