@@ -229,7 +229,6 @@ button { font: inherit; cursor: pointer; }
         <div class="row">
           <label class="toggle"><input type="checkbox" id="blinkOn" checked><span>Auto blink</span></label>
           <button class="btn ghost" id="blinkNow">Blink now</button>
-          <button class="btn ghost" id="holdClosed" aria-pressed="false">Hold closed</button>
         </div>
         <div class="field" style="margin-top:18px"><span>Look</span>
           <div class="look-row"><div class="look-pad" role="group" aria-label="Look direction" id="lookPad"></div>
@@ -518,14 +517,14 @@ button { font: inherit; cursor: pointer; }
     closedEyes.forEach(e => e.style.display = state === 'closed' ? '' : 'none');
   }
   const wait = ms => new Promise(r => setTimeout(r, ms));
-  let held = false, blinking = false, blinkTimer = null;
+  let blinking = false, blinkTimer = null;
   async function blink() {
-    if (held || blinking) return;
+    if (blinking) return;
     blinking = true;
     setEye('half'); await wait(S.blink.halfMs);
     setEye('closed'); await wait(S.blink.closedMs);
     setEye('half'); await wait(S.blink.halfAgainMs);
-    if (!held) setEye('open');
+    setEye('open');
     blinking = false;
   }
   function scheduleBlink() {
@@ -539,12 +538,6 @@ button { font: inherit; cursor: pointer; }
   }
   $('blinkOn').addEventListener('change', scheduleBlink);
   $('blinkNow').addEventListener('click', blink);
-  $('holdClosed').addEventListener('click', e => {
-    held = !held;
-    e.currentTarget.setAttribute('aria-pressed', held);
-    e.currentTarget.textContent = held ? 'Open eyes' : 'Hold closed';
-    setEye(held ? 'closed' : 'open');
-  });
 
   // Shape gallery
   const shapeBtns = SHAPES.map(([v, name, sounds]) => {
