@@ -4,6 +4,6 @@
 That's your sticker book!
 [look ahead] [left arm down] You earn stickers as you go on adventures in Neelo.
 When you get a new sticker, you can come home to see it.
-[look left] [Highlight the closet] And this is your closet.
-[look ahead] Wanna choose a new look for your avatar?
+[look left] [left arm up 32] [Highlight the closet] And this is your closet.
+[look ahead] [left arm down] Wanna choose a new look for your avatar?
 Let's open it up! [Stop spotlight]

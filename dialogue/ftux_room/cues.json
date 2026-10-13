@@ -770,6 +770,15 @@
    "note": "Script cue: [look left]"
   },
   {
+   "time": 13.57,
+   "end": 15.63,
+   "type": "arm",
+   "side": "left",
+   "degrees": 32,
+   "source": "script",
+   "note": "Script cue: [left arm up 32]"
+  },
+  {
    "time": 18.38,
    "type": "event",
    "name": "clear_spotlight",
