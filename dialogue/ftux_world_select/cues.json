@@ -524,7 +524,7 @@
  "markers": [
   {
    "time": 0.0,
-   "end": 2.95,
+   "end": 1.08,
    "type": "arm",
    "side": "left",
    "degrees": 32,
@@ -533,7 +533,7 @@
   },
   {
    "time": 0.0,
-   "end": 2.95,
+   "end": 1.08,
    "type": "arm",
    "side": "right",
    "degrees": 32,
