@@ -136,9 +136,6 @@ button { font: inherit; cursor: pointer; }
 .event-item { display: grid; gap: 4px; justify-items: start; padding: 10px 0; border-bottom: 1px solid var(--line); }
 .event-item p { margin: 0; font-size: 13.5px; color: var(--fg); line-height: 1.45; }
 .event-item .tag { justify-self: start; }
-.event-item .head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.kind { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; }
-.kind.tap { color: var(--rust); border-color: var(--rust); }
 .panel-head .sub { font-size: 13px; color: var(--muted); margin: 2px 0 0; }
 .script-legend { display: flex; gap: 12px; flex-wrap: wrap; padding: 10px 16px; font-size: 12.5px; color: var(--muted); border-bottom: 1px solid var(--line); }
 .script-rows { overflow-y: auto; }
@@ -680,10 +677,8 @@ button { font: inherit; cursor: pointer; }
         const item = document.createElement('div'); item.className = 'event-item';
         const tag = document.createElement('button'); tag.type = 'button'; tag.className = 'tag'; tag.textContent = `[${ev.tag}]`;
         tag.title = `Copy. The app receives "${ev.name}".`;
-        const head = document.createElement('div'); head.className = 'head'; head.appendChild(tag);
-        if (ev.kind) { const k = document.createElement('span'); k.className = `kind ${ev.kind}`; k.textContent = ev.kind === 'tap' ? 'Tap target' : 'Spotlight'; head.appendChild(k); }
         const does = document.createElement('p'); does.textContent = ev.does;
-        item.append(head, does); list.appendChild(item);
+        item.append(tag, does); list.appendChild(item);
       }
     }
   })();

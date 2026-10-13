@@ -37,7 +37,7 @@ def load(line):
 EVENTS = {k: v for k, v in json.load(open(os.path.join(ROOT, 'dialogue', 'events.json'))).items() if not k.startswith('_')}
 # The Events panel: each event a writer can cue, by scene, with the [tag] to copy (its first cue wording)
 event_tags = {'rules': json.load(open(os.path.join(ROOT, 'dialogue', 'events.json'))).get('_rules', []),
-              'events': [{'name': k, 'tag': (v.get('cues') or [k])[0], 'does': v['does'], 'scene': v.get('scene', 'Other'), 'kind': v.get('kind')}
+              'events': [{'name': k, 'tag': (v.get('cues') or [k])[0], 'does': v['does'], 'scene': v.get('scene', 'Other')}
                          for k, v in EVENTS.items() if not v.get('builtIn') and not v.get('sample')]}
 lines = [load(os.path.basename(os.path.dirname(p))) for p in sorted(glob.glob(os.path.join(ROOT, 'dialogue', '*', 'cues.json')))]
 svg = open(os.path.join(ROOT, 'art', 'Nova-rigged.svg')).read().replace(
