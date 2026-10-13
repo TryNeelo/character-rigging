@@ -91,9 +91,10 @@ button { font: inherit; cursor: pointer; }
 .seg.x { background: repeating-linear-gradient(135deg, transparent 0 5px, var(--chip) 5px 7px); }
 .seg.on { background: var(--accent); color: var(--accent-ink); }
 .playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--rust); left: 0; pointer-events: none; }
-.marks { position: relative; height: 46px; margin-top: 4px; }
+.marks { position: relative; height: 22px; margin-top: 4px; }
 .mark { position: absolute; top: 0; font-family: var(--font-mono); font-size: 11px; font-weight: 700; white-space: nowrap; color: var(--rust); border-left: 2px solid var(--rust); padding-left: 4px; line-height: 20px; }
-.mark.arm, .mark.expression { top: 22px; }
+/* an event near the end of the line hangs its label to the left of its tick, so it never runs off the strip */
+.mark.flip { border-left: 0; border-right: 2px solid var(--rust); padding: 0 4px 0 0; transform: translateX(-100%); }
 .mark.look, .mark.arm, .mark.expression { color: var(--accent); border: 0; background: var(--chip); border-radius: 4px; padding: 0 4px; overflow: hidden; text-overflow: ellipsis; }
 .mark.fired { background: var(--rust); color: #fff; border-radius: 4px; }
 .toast { position: absolute; left: 50%; top: 12px; translate: -50% 0; background: var(--rust); color: #fff; font-family: var(--font-mono); font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; transition: opacity .3s; }
@@ -628,21 +629,33 @@ button { font: inherit; cursor: pointer; }
     for (let k = 0; k <= Math.floor(DURATION); k += step) { const t = document.createElement('span'); t.textContent = k + 's'; $('scale').appendChild(t); }
     $('scale').lastChild.textContent = DURATION.toFixed(1) + 's';
     markEls = markers.map(markEl);
+    stackMarks();
   }
   function markEl(mk) {
     const el = document.createElement('div');
     el.className = 'mark' + (mk.type !== 'event' ? ` ${mk.type}` : '');
     el.style.left = `${mk.time / DURATION * 100}%`;
-    if (mk.type !== 'event') {
-      el.style.width = `${(mk.end - mk.time) / DURATION * 100}%`;
-      el.textContent = mk.type === 'look' ? `look ${mk.direction}`
-        : mk.type === 'arm' ? `${mk.side} arm ${mk.degrees}°` : `${mk.name} brows`;
-    }
-    else el.textContent = mk.name;
-    el.title = mk.type === 'event' ? `${mk.name}: ${mk.does || 'not in the event list'}` : (mk.note || '');
+    if (mk.type !== 'event') el.style.width = `${(mk.end - mk.time) / DURATION * 100}%`;
+    else if (mk.time / DURATION > 0.75) el.classList.add('flip');
+    el.textContent = cueLabel(mk);   // same wording as the script's tags
+    el.title = mk.type === 'event' ? `${mk.name}: ${mk.does || 'not in the event list'} (${mk.time.toFixed(2)} s)`
+      : `${mk.time.toFixed(2)}–${mk.end.toFixed(2)} s`;
     $('marks').appendChild(el);
     return el;
   }
+  // Each chip takes the first row where it doesn't overlap another, so nothing stacks on top of something else
+  function stackMarks() {
+    const rows = [];
+    const span = el => { const r = el.getBoundingClientRect(); return [r.left, r.right]; };
+    markEls.map(el => ({ el, s: span(el) })).sort((a, b) => a.s[0] - b.s[0]).forEach(({ el, s }) => {
+      let row = rows.findIndex(end => s[0] >= end + 4);
+      if (row < 0) { rows.push(0); row = rows.length - 1; }
+      rows[row] = s[1];
+      el.style.top = `${row * 22}px`;
+    });
+    $('marks').style.height = `${Math.max(1, rows.length) * 22}px`;
+  }
+  window.addEventListener('resize', () => markEls.length && stackMarks());
 
   // Audio files panel: pick a line to load it onto Nova
   function loadLine(id) {
