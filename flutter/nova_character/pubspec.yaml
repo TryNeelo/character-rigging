@@ -27,5 +27,6 @@ flutter:
     - assets/parts/outfits/construction/
     - assets/parts/outfits/hoodie/
     - assets/lines/ftux_home/
+    - assets/lines/ftux_home_return/
     - assets/lines/ftux_room/
     # END GENERATED ASSETS
