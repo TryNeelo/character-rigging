@@ -76,6 +76,13 @@ button { font: inherit; cursor: pointer; }
 .slider { display: grid; grid-template-columns: 7.5em minmax(0, 1fr) 3.5em; align-items: center; gap: 10px; font-size: 14px; }
 .slider input { width: 100%; accent-color: var(--accent); margin: 0; }
 .slider output { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+/* Script tags: each pose control shows the [tag] that makes the same move in a script; click to copy */
+.slider.tagged { grid-template-columns: 6.5em minmax(0, 1fr) 11.5em; }
+.tag { font-family: var(--font-mono); font-size: 12.5px; font-variant-numeric: tabular-nums; color: var(--accent); background: var(--chip); border: 1px solid transparent; border-radius: 6px; padding: 3px 7px; cursor: copy; justify-self: end; white-space: nowrap; }
+.tag:hover { border-color: var(--accent); }
+.tag:focus-visible { outline: 3px solid var(--rust); outline-offset: 2px; }
+.tag.copied { color: var(--muted); }
+.look-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 
 .strip-wrap { overflow-x: auto; border-radius: 12px; }
 .strip { position: relative; display: flex; height: 52px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
@@ -235,9 +242,9 @@ button { font: inherit; cursor: pointer; }
         <h2>Pose and idle</h2>
         <p>Arms stay behind the outfit and rotate at the shoulder; the head turns at the base of the neck. Idle adds slow breathing and a slight sway, plus a small nod, a slight tilt and a brow lift on each stressed word while he talks.</p>
         <div class="fields">
-          <label class="slider"><span>Head tilt</span><input type="range" id="poseHead" min="-10" max="10" step="0.5" value="0"><output for="poseHead" id="poseHeadOut">0°</output></label>
-          <label class="slider"><span>Left arm</span><input type="range" id="poseArmL" min="-12" max="180" step="1" value="0"><output for="poseArmL" id="poseArmLOut">0°</output></label>
-          <label class="slider"><span>Right arm</span><input type="range" id="poseArmR" min="-12" max="180" step="1" value="0"><output for="poseArmR" id="poseArmROut">0°</output></label>
+          <label class="slider tagged"><span>Head tilt</span><input type="range" id="poseHead" min="-10" max="10" step="0.5" value="0"><output for="poseHead" id="poseHeadOut">0°</output></label>
+          <label class="slider tagged"><span>Left arm</span><input type="range" id="poseArmL" min="0" max="180" step="1" value="0"><button type="button" class="tag" id="poseArmLOut" title="Script tag for this pose. Click to copy.">[left arm down]</button></label>
+          <label class="slider tagged"><span>Right arm</span><input type="range" id="poseArmR" min="0" max="180" step="1" value="0"><button type="button" class="tag" id="poseArmROut" title="Script tag for this pose. Click to copy.">[right arm down]</button></label>
           <div class="row">
             <label class="toggle"><input type="checkbox" id="idleOn" checked><span>Idle motion</span></label>
             <label class="toggle"><input type="checkbox" id="appRateOn" checked><span>App frame rate (15 fps idle, 30 talking, 60 during arm and look moves)</span></label>
@@ -256,7 +263,8 @@ button { font: inherit; cursor: pointer; }
           <button class="btn ghost" id="holdClosed" aria-pressed="false">Hold closed</button>
         </div>
         <div class="field" style="margin-top:18px"><span>Look</span>
-          <div class="look-pad" role="group" aria-label="Look direction" id="lookPad"></div></div>
+          <div class="look-row"><div class="look-pad" role="group" aria-label="Look direction" id="lookPad"></div>
+          <button type="button" class="tag" id="lookTag" title="Script tag for this look. Click to copy.">[look ahead]</button></div></div>
         <div class="field" style="margin-top:18px"><span>Brows</span>
           <div class="seg-ctl" role="group" aria-label="Brow expression" id="browCtl"></div>
           <label class="toggle"><input type="checkbox" id="browLiftsOn" checked><span>Brow lifts on stressed words</span></label></div>
@@ -428,13 +436,31 @@ button { font: inherit; cursor: pointer; }
     const b = document.createElement('button');
     b.type = 'button'; b.textContent = arrow; b.title = name; b.setAttribute('aria-label', `Look ${name}`);
     b.setAttribute('aria-pressed', name === 'ahead');
-    b.addEventListener('click', () => { pose.look = lookVec(name); padBtns.forEach(x => x.setAttribute('aria-pressed', x === b)); });
+    b.addEventListener('click', () => { pose.look = lookVec(name); padBtns.forEach(x => x.setAttribute('aria-pressed', x === b)); $('lookTag').textContent = `[look ${name}]`; });
     $('lookPad').appendChild(b); return b;
   });
+  // What each slider shows: the arms show the script tag for that pose (sides are the screen's); the head shows degrees
+  const sliderLabel = { head: v => `${v}°`, armL: v => armTag('left', v), armR: v => armTag('right', v) };
+  function armTag(side, v) { return +v > 0 ? `[${side} arm up ${v}]` : `[${side} arm down]`; }
   Object.entries(SLIDERS).forEach(([k, id]) => {
     const input = $(id), out = $(id + 'Out');
-    input.addEventListener('input', () => { pose[k] = +input.value; out.textContent = `${input.value}°`; });
+    input.addEventListener('input', () => { pose[k] = +input.value; out.textContent = sliderLabel[k](input.value); });
   });
+  // Click a tag to copy it for a script
+  document.querySelectorAll('.tag').forEach(tag => tag.addEventListener('click', async e => {
+    e.preventDefault();
+    const text = tag.textContent;
+    if (tag.classList.contains('copied')) return;
+    try { await navigator.clipboard.writeText(text); }
+    catch (err) {   // older or locked-down browsers: copy through a hidden text box
+      const box = document.createElement('textarea'); box.value = text; box.style.position = 'fixed'; box.style.opacity = '0';
+      document.body.appendChild(box); box.select();
+      const ok = document.execCommand('copy'); box.remove();
+      if (!ok) return;
+    }
+    tag.classList.add('copied'); tag.textContent = 'Copied';
+    setTimeout(() => { tag.classList.remove('copied'); tag.textContent = text; }, 900);
+  }));
   // Brow test control: Auto follows the line; the others hold an expression
   const browBtns = ['auto', ...Object.keys(B.expressions)].map(name => {
     const b = document.createElement('button');
@@ -445,8 +471,8 @@ button { font: inherit; cursor: pointer; }
   });
   $('resetPose').addEventListener('click', () => {
     testExpression = null; browBtns.forEach((x, i) => x.setAttribute('aria-pressed', i === 0));
-    Object.entries(SLIDERS).forEach(([k, id]) => { pose[k] = 0; $(id).value = 0; $(id + 'Out').textContent = '0°'; });
-    pose.look = [0, 0]; padBtns.forEach(x => x.setAttribute('aria-pressed', x.title === 'ahead'));
+    Object.entries(SLIDERS).forEach(([k, id]) => { pose[k] = 0; $(id).value = 0; $(id + 'Out').textContent = sliderLabel[k](0); });
+    pose.look = [0, 0]; padBtns.forEach(x => x.setAttribute('aria-pressed', x.title === 'ahead')); $('lookTag').textContent = '[look ahead]';
   });
 
   const I = S.idle;
