@@ -25,14 +25,22 @@ Line id: `ftux_home`
 | 13.45 s | `highlight_home` | Highlight the home on the map: spotlight it and point the arrow at it. |
 | 17.30 s | `clear_spotlight` | End only the spotlight: the spotlight fades, the arrow stays and blinks until the child taps the item (or until a later [Stop highlight]). |
 
+## FTUX: room
+
+Line id: `ftux_room`
+
+| Time | Event | What the app should do |
+|---|---|---|
+| 4.23 s | `highlight_sticker_book` | Highlight the sticker book in the room: spotlight it and point the arrow at it. |
+| 13.57 s | `highlight_closet` | Highlight the closet: spotlight it and point the arrow at it. |
+| 18.38 s | `clear_spotlight` | End only the spotlight: the spotlight fades, the arrow stays and blinks until the child taps the item (or until a later [Stop highlight]). |
+
 ## Planned (not in a line yet)
 
 Names agreed for the FTUX flow. They appear in a line once its audio is timed.
 
 | Event | What the app should do |
 |---|---|
-| `highlight_sticker_book` | Highlight the sticker book in the room: spotlight it and point the arrow at it. |
-| `highlight_closet` | Highlight the closet: spotlight it and point the arrow at it. |
 | `highlight_back_arrow` | Highlight the back arrow ("Tap the back arrow, and let's go!"): spotlight it and point the arrow at it. |
 | `highlight_next_world_arrow` | Highlight the arrow that rotates to the next world ("Tap the arrow to keep traveling through worlds"): spotlight it and point the arrow at it. |
 | `highlight_enter` | Highlight the Enter button on the world selection screen: spotlight it and point the arrow at it. |

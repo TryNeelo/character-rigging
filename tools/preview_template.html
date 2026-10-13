@@ -686,43 +686,68 @@ button { font: inherit; cursor: pointer; }
 
   // Script view: each caption with its time; cues sit before the word they happen on
   let scriptRows = [];
-  const cueLabel = mk => mk.type === 'event' ? mk.name : mk.type === 'look' ? `look ${mk.direction}`
-    : mk.type === 'arm' ? `${mk.side} arm ${mk.degrees}°` : `${mk.name} brows`;
+  // Chips read like the script's tags: a move shows where it starts and where it ends ("look ahead", "arm down")
+  const eventTag = Object.fromEntries(EVENT_TAGS.events.map(ev => [ev.name, ev.tag]));
+  const cueLabel = mk => mk.type === 'event' ? (eventTag[mk.name] || mk.name)
+    : mk.type === 'look' ? `look ${mk.direction}` : mk.type === 'lookEnd' ? 'look ahead'
+    : mk.type === 'arm' ? `${mk.both ? 'arms' : mk.side + ' arm'} up ${mk.degrees}`
+    : mk.type === 'armEnd' ? `${mk.both ? 'arms' : mk.side + ' arm'} down`
+    : `${mk.name} brows`;
+  function scriptItems() {
+    const items = [];
+    for (const mk of markers) {
+      items.push(mk);
+      if ((mk.type === 'look' || mk.type === 'arm') && mk.end < DURATION - 0.05)
+        items.push({ ...mk, type: mk.type + 'End', time: mk.end });
+    }
+    // Both arms moving together read as one tag, like [arms up 32] and [arms down]
+    const out = [];
+    for (const it of items) {
+      const twin = (it.type === 'arm' || it.type === 'armEnd') && out.find(o => o.type === it.type && !o.both && o.side !== it.side
+        && Math.abs(o.time - it.time) < 0.005 && (it.type === 'armEnd' || o.degrees === it.degrees));
+      if (twin) twin.both = true;
+      else out.push({ ...it });
+    }
+    return out;
+  }
   function buildScript() {
     $('scriptLine').textContent = line.title;
     $('scriptRows').replaceChildren();
     // Words with times; a caption without stored word times spreads its words evenly
     const caps = captions.map(c => ({ ...c, words: c.words && c.words.length ? c.words
       : c.text.split(' ').map((w, i, a) => ({ w, s: c.start + (c.end - c.start) * i / a.length, e: c.start + (c.end - c.start) * (i + 1) / a.length })) }));
-    // Each marker goes before the first word still being spoken at its time
-    const placed = caps.map(c => c.words.map(() => []));
-    for (const mk of markers) {
+    // Each tag goes before the first word still being spoken at its time, or after the caption's last word
+    const placed = caps.map(c => c.words.map(() => [])), after = caps.map(() => []);
+    for (const mk of scriptItems()) {
       let ci = caps.findIndex(c => mk.time >= c.start && mk.time < c.end);
       if (ci < 0) ci = mk.time < (caps[0] || {}).start ? 0 : caps.length - 1;
       if (ci < 0) continue;
-      let wi = caps[ci].words.findIndex(w => w.e > mk.time);
-      if (wi < 0) wi = caps[ci].words.length - 1;
-      placed[ci][wi].push(mk);
+      // (cues land 30 ms ahead of their word, so allow a little overlap with the word before)
+      const wi = caps[ci].words.findIndex(w => w.e > mk.time + 0.035);
+      (wi < 0 ? after[ci] : placed[ci][wi]).push(mk);
     }
+    const chipFor = mk => {
+      const chip = document.createElement('span');
+      chip.className = `cue ${mk.type === 'event' ? 'event' : 'action'}`;
+      chip.textContent = cueLabel(mk);
+      chip.title = mk.type === 'event' ? `${mk.name}: ${mk.does || ''} (${mk.time.toFixed(2)} s)`
+        : mk.end && !mk.type.endsWith('End') ? `${mk.time.toFixed(2)}–${mk.end.toFixed(2)} s` : `${mk.time.toFixed(2)} s`;
+      return chip;
+    };
     scriptRows = caps.map((c, ci) => {
       const row = document.createElement('button');
       row.type = 'button'; row.className = 'script-row';
       row.innerHTML = `<span class="tm">${c.start.toFixed(2)} – ${c.end.toFixed(2)}</span><span class="tx"></span>`;
       const tx = row.querySelector('.tx');
       const wordEls = c.words.map((w, wi) => {
-        for (const mk of placed[ci][wi]) {
-          const chip = document.createElement('span');
-          chip.className = `cue ${mk.type === 'event' ? 'event' : 'action'}`;
-          chip.textContent = cueLabel(mk);
-          chip.title = mk.type === 'event' ? `${mk.name}: ${mk.does || ''} (${mk.time.toFixed(2)} s)` : `${mk.time.toFixed(2)}–${mk.end.toFixed(2)} s`;
-          tx.appendChild(chip);
-        }
+        for (const mk of placed[ci][wi]) tx.appendChild(chipFor(mk));
         const el = document.createElement('span');
         el.textContent = w.w;
         tx.appendChild(el);
         tx.appendChild(document.createTextNode(' '));
         return el;
       });
+      for (const mk of after[ci]) tx.appendChild(chipFor(mk));
       if (c.split) {
         const flag = document.createElement('span');
         flag.className = 'cue flag'; flag.textContent = 'split for length';

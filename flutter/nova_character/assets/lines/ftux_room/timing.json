@@ -1,0 +1,920 @@
+{
+ "id": "ftux_room",
+ "audio": "audio.mp3",
+ "duration": 18.62,
+ "cues": [
+  {
+   "start": 0.0,
+   "end": 0.11,
+   "shape": "B"
+  },
+  {
+   "start": 0.11,
+   "end": 0.23,
+   "shape": "C"
+  },
+  {
+   "start": 0.23,
+   "end": 0.33,
+   "shape": "B"
+  },
+  {
+   "start": 0.33,
+   "end": 0.42,
+   "shape": "C"
+  },
+  {
+   "start": 0.42,
+   "end": 0.52,
+   "shape": "B"
+  },
+  {
+   "start": 0.52,
+   "end": 0.77,
+   "shape": "E"
+  },
+  {
+   "start": 0.77,
+   "end": 0.89,
+   "shape": "F"
+  },
+  {
+   "start": 0.89,
+   "end": 1.0,
+   "shape": "A"
+  },
+  {
+   "start": 1.0,
+   "end": 1.75,
+   "shape": "X"
+  },
+  {
+   "start": 1.75,
+   "end": 1.8,
+   "shape": "B"
+  },
+  {
+   "start": 1.8,
+   "end": 1.84,
+   "shape": "C"
+  },
+  {
+   "start": 1.84,
+   "end": 1.89,
+   "shape": "A"
+  },
+  {
+   "start": 1.89,
+   "end": 2.03,
+   "shape": "D"
+  },
+  {
+   "start": 2.03,
+   "end": 2.1,
+   "shape": "B"
+  },
+  {
+   "start": 2.1,
+   "end": 2.41,
+   "shape": "X"
+  },
+  {
+   "start": 2.41,
+   "end": 2.49,
+   "shape": "D"
+  },
+  {
+   "start": 2.49,
+   "end": 2.53,
+   "shape": "H"
+  },
+  {
+   "start": 2.53,
+   "end": 2.62,
+   "shape": "B"
+  },
+  {
+   "start": 2.62,
+   "end": 2.68,
+   "shape": "E"
+  },
+  {
+   "start": 2.68,
+   "end": 2.86,
+   "shape": "F"
+  },
+  {
+   "start": 2.86,
+   "end": 2.98,
+   "shape": "C"
+  },
+  {
+   "start": 2.98,
+   "end": 3.15,
+   "shape": "D"
+  },
+  {
+   "start": 3.15,
+   "end": 3.24,
+   "shape": "B"
+  },
+  {
+   "start": 3.24,
+   "end": 4.22,
+   "shape": "X"
+  },
+  {
+   "start": 4.22,
+   "end": 4.49,
+   "shape": "B"
+  },
+  {
+   "start": 4.49,
+   "end": 4.6,
+   "shape": "C"
+  },
+  {
+   "start": 4.6,
+   "end": 4.64,
+   "shape": "B"
+  },
+  {
+   "start": 4.64,
+   "end": 4.7,
+   "shape": "A"
+  },
+  {
+   "start": 4.7,
+   "end": 4.86,
+   "shape": "F"
+  },
+  {
+   "start": 4.86,
+   "end": 4.95,
+   "shape": "B"
+  },
+  {
+   "start": 4.95,
+   "end": 5.41,
+   "shape": "X"
+  },
+  {
+   "start": 5.41,
+   "end": 5.47,
+   "shape": "B"
+  },
+  {
+   "start": 5.47,
+   "end": 5.61,
+   "shape": "C"
+  },
+  {
+   "start": 5.61,
+   "end": 5.75,
+   "shape": "B"
+  },
+  {
+   "start": 5.75,
+   "end": 5.84,
+   "shape": "E"
+  },
+  {
+   "start": 5.84,
+   "end": 6.01,
+   "shape": "B"
+  },
+  {
+   "start": 6.01,
+   "end": 6.09,
+   "shape": "C"
+  },
+  {
+   "start": 6.09,
+   "end": 6.13,
+   "shape": "B"
+  },
+  {
+   "start": 6.13,
+   "end": 6.27,
+   "shape": "E"
+  },
+  {
+   "start": 6.27,
+   "end": 6.33,
+   "shape": "A"
+  },
+  {
+   "start": 6.33,
+   "end": 6.46,
+   "shape": "F"
+  },
+  {
+   "start": 6.46,
+   "end": 6.56,
+   "shape": "B"
+  },
+  {
+   "start": 6.56,
+   "end": 6.95,
+   "shape": "X"
+  },
+  {
+   "start": 6.95,
+   "end": 7.12,
+   "shape": "F"
+  },
+  {
+   "start": 7.12,
+   "end": 7.3,
+   "shape": "E"
+  },
+  {
+   "start": 7.3,
+   "end": 7.55,
+   "shape": "B"
+  },
+  {
+   "start": 7.55,
+   "end": 7.64,
+   "shape": "C"
+  },
+  {
+   "start": 7.64,
+   "end": 7.72,
+   "shape": "B"
+  },
+  {
+   "start": 7.72,
+   "end": 7.84,
+   "shape": "E"
+  },
+  {
+   "start": 7.84,
+   "end": 7.9,
+   "shape": "B"
+  },
+  {
+   "start": 7.9,
+   "end": 7.99,
+   "shape": "C"
+  },
+  {
+   "start": 7.99,
+   "end": 8.04,
+   "shape": "B"
+  },
+  {
+   "start": 8.04,
+   "end": 8.12,
+   "shape": "F"
+  },
+  {
+   "start": 8.12,
+   "end": 8.18,
+   "shape": "B"
+  },
+  {
+   "start": 8.18,
+   "end": 8.34,
+   "shape": "E"
+  },
+  {
+   "start": 8.34,
+   "end": 8.4,
+   "shape": "D"
+  },
+  {
+   "start": 8.4,
+   "end": 8.44,
+   "shape": "B"
+  },
+  {
+   "start": 8.44,
+   "end": 8.49,
+   "shape": "C"
+  },
+  {
+   "start": 8.49,
+   "end": 8.55,
+   "shape": "B"
+  },
+  {
+   "start": 8.55,
+   "end": 8.61,
+   "shape": "G"
+  },
+  {
+   "start": 8.61,
+   "end": 8.68,
+   "shape": "C"
+  },
+  {
+   "start": 8.68,
+   "end": 8.81,
+   "shape": "B"
+  },
+  {
+   "start": 8.81,
+   "end": 8.89,
+   "shape": "E"
+  },
+  {
+   "start": 8.89,
+   "end": 8.96,
+   "shape": "B"
+  },
+  {
+   "start": 8.96,
+   "end": 9.02,
+   "shape": "C"
+  },
+  {
+   "start": 9.02,
+   "end": 9.29,
+   "shape": "B"
+  },
+  {
+   "start": 9.29,
+   "end": 9.33,
+   "shape": "H"
+  },
+  {
+   "start": 9.33,
+   "end": 9.45,
+   "shape": "E"
+  },
+  {
+   "start": 9.45,
+   "end": 9.55,
+   "shape": "F"
+  },
+  {
+   "start": 9.55,
+   "end": 9.95,
+   "shape": "X"
+  },
+  {
+   "start": 9.95,
+   "end": 10.0,
+   "shape": "F"
+  },
+  {
+   "start": 10.0,
+   "end": 10.04,
+   "shape": "C"
+  },
+  {
+   "start": 10.04,
+   "end": 10.1,
+   "shape": "B"
+  },
+  {
+   "start": 10.1,
+   "end": 10.17,
+   "shape": "F"
+  },
+  {
+   "start": 10.17,
+   "end": 10.24,
+   "shape": "B"
+  },
+  {
+   "start": 10.24,
+   "end": 10.32,
+   "shape": "C"
+  },
+  {
+   "start": 10.32,
+   "end": 10.36,
+   "shape": "B"
+  },
+  {
+   "start": 10.36,
+   "end": 10.41,
+   "shape": "C"
+  },
+  {
+   "start": 10.41,
+   "end": 10.51,
+   "shape": "B"
+  },
+  {
+   "start": 10.51,
+   "end": 10.58,
+   "shape": "F"
+  },
+  {
+   "start": 10.58,
+   "end": 10.76,
+   "shape": "B"
+  },
+  {
+   "start": 10.76,
+   "end": 10.85,
+   "shape": "C"
+  },
+  {
+   "start": 10.85,
+   "end": 10.92,
+   "shape": "B"
+  },
+  {
+   "start": 10.92,
+   "end": 11.12,
+   "shape": "E"
+  },
+  {
+   "start": 11.12,
+   "end": 11.33,
+   "shape": "X"
+  },
+  {
+   "start": 11.33,
+   "end": 11.43,
+   "shape": "F"
+  },
+  {
+   "start": 11.43,
+   "end": 11.48,
+   "shape": "B"
+  },
+  {
+   "start": 11.48,
+   "end": 11.52,
+   "shape": "C"
+  },
+  {
+   "start": 11.52,
+   "end": 11.62,
+   "shape": "B"
+  },
+  {
+   "start": 11.62,
+   "end": 11.68,
+   "shape": "C"
+  },
+  {
+   "start": 11.68,
+   "end": 11.75,
+   "shape": "A"
+  },
+  {
+   "start": 11.75,
+   "end": 11.86,
+   "shape": "E"
+  },
+  {
+   "start": 11.86,
+   "end": 11.93,
+   "shape": "A"
+  },
+  {
+   "start": 11.93,
+   "end": 12.27,
+   "shape": "B"
+  },
+  {
+   "start": 12.27,
+   "end": 12.35,
+   "shape": "C"
+  },
+  {
+   "start": 12.35,
+   "end": 12.42,
+   "shape": "B"
+  },
+  {
+   "start": 12.42,
+   "end": 13.58,
+   "shape": "X"
+  },
+  {
+   "start": 13.58,
+   "end": 13.71,
+   "shape": "C"
+  },
+  {
+   "start": 13.71,
+   "end": 13.92,
+   "shape": "B"
+  },
+  {
+   "start": 13.92,
+   "end": 14.09,
+   "shape": "C"
+  },
+  {
+   "start": 14.09,
+   "end": 14.35,
+   "shape": "B"
+  },
+  {
+   "start": 14.35,
+   "end": 14.48,
+   "shape": "C"
+  },
+  {
+   "start": 14.48,
+   "end": 14.53,
+   "shape": "B"
+  },
+  {
+   "start": 14.53,
+   "end": 14.62,
+   "shape": "E"
+  },
+  {
+   "start": 14.62,
+   "end": 14.74,
+   "shape": "B"
+  },
+  {
+   "start": 14.74,
+   "end": 14.79,
+   "shape": "H"
+  },
+  {
+   "start": 14.79,
+   "end": 14.96,
+   "shape": "D"
+  },
+  {
+   "start": 14.96,
+   "end": 15.04,
+   "shape": "B"
+  },
+  {
+   "start": 15.04,
+   "end": 15.13,
+   "shape": "C"
+  },
+  {
+   "start": 15.13,
+   "end": 15.26,
+   "shape": "B"
+  },
+  {
+   "start": 15.26,
+   "end": 15.56,
+   "shape": "X"
+  },
+  {
+   "start": 15.56,
+   "end": 15.63,
+   "shape": "F"
+  },
+  {
+   "start": 15.63,
+   "end": 15.7,
+   "shape": "D"
+  },
+  {
+   "start": 15.7,
+   "end": 15.74,
+   "shape": "B"
+  },
+  {
+   "start": 15.74,
+   "end": 15.79,
+   "shape": "C"
+  },
+  {
+   "start": 15.79,
+   "end": 15.91,
+   "shape": "B"
+  },
+  {
+   "start": 15.91,
+   "end": 16.01,
+   "shape": "F"
+  },
+  {
+   "start": 16.01,
+   "end": 16.06,
+   "shape": "B"
+  },
+  {
+   "start": 16.06,
+   "end": 16.11,
+   "shape": "C"
+  },
+  {
+   "start": 16.11,
+   "end": 16.2,
+   "shape": "B"
+  },
+  {
+   "start": 16.2,
+   "end": 16.3,
+   "shape": "F"
+  },
+  {
+   "start": 16.3,
+   "end": 16.34,
+   "shape": "H"
+  },
+  {
+   "start": 16.34,
+   "end": 16.42,
+   "shape": "E"
+  },
+  {
+   "start": 16.42,
+   "end": 16.5,
+   "shape": "B"
+  },
+  {
+   "start": 16.5,
+   "end": 16.54,
+   "shape": "G"
+  },
+  {
+   "start": 16.54,
+   "end": 16.74,
+   "shape": "E"
+  },
+  {
+   "start": 16.74,
+   "end": 16.89,
+   "shape": "C"
+  },
+  {
+   "start": 16.89,
+   "end": 16.93,
+   "shape": "G"
+  },
+  {
+   "start": 16.93,
+   "end": 16.97,
+   "shape": "C"
+  },
+  {
+   "start": 16.97,
+   "end": 17.04,
+   "shape": "B"
+  },
+  {
+   "start": 17.04,
+   "end": 17.24,
+   "shape": "D"
+  },
+  {
+   "start": 17.24,
+   "end": 17.33,
+   "shape": "E"
+  },
+  {
+   "start": 17.33,
+   "end": 17.58,
+   "shape": "X"
+  },
+  {
+   "start": 17.58,
+   "end": 17.63,
+   "shape": "H"
+  },
+  {
+   "start": 17.63,
+   "end": 17.7,
+   "shape": "C"
+  },
+  {
+   "start": 17.7,
+   "end": 17.79,
+   "shape": "B"
+  },
+  {
+   "start": 17.79,
+   "end": 17.89,
+   "shape": "E"
+  },
+  {
+   "start": 17.89,
+   "end": 17.93,
+   "shape": "A"
+  },
+  {
+   "start": 17.93,
+   "end": 18.32,
+   "shape": "C"
+  },
+  {
+   "start": 18.32,
+   "end": 18.38,
+   "shape": "A"
+  },
+  {
+   "start": 18.38,
+   "end": 18.62,
+   "shape": "X"
+  }
+ ],
+ "markers": [
+  {
+   "time": 0.0,
+   "end": 1.81,
+   "type": "arm",
+   "side": "left",
+   "degrees": 24,
+   "source": "script",
+   "note": "Script cue: [left arm up 24]"
+  },
+  {
+   "time": 0.0,
+   "end": 1.81,
+   "type": "arm",
+   "side": "right",
+   "degrees": 25,
+   "source": "script",
+   "note": "Script cue: [right arm up 25]"
+  },
+  {
+   "time": 4.23,
+   "type": "event",
+   "name": "highlight_sticker_book",
+   "source": "script",
+   "note": "Script cue: [Highlight the sticker book]"
+  },
+  {
+   "time": 4.23,
+   "end": 6.97,
+   "type": "look",
+   "direction": "left",
+   "source": "script",
+   "note": "Script cue: [look left]"
+  },
+  {
+   "time": 4.23,
+   "end": 6.97,
+   "type": "arm",
+   "side": "left",
+   "degrees": 32,
+   "source": "script",
+   "note": "Script cue: [left arm up 32]"
+  },
+  {
+   "time": 13.57,
+   "type": "event",
+   "name": "highlight_closet",
+   "source": "script",
+   "note": "Script cue: [Highlight the closet]"
+  },
+  {
+   "time": 13.57,
+   "end": 15.63,
+   "type": "look",
+   "direction": "left",
+   "source": "script",
+   "note": "Script cue: [look left]"
+  },
+  {
+   "time": 18.38,
+   "type": "event",
+   "name": "clear_spotlight",
+   "source": "script",
+   "note": "Script cue: [Stop spotlight]"
+  }
+ ],
+ "emphasis": [
+  {
+   "time": 0.14,
+   "strength": 0.38
+  },
+  {
+   "time": 0.57,
+   "strength": 0.65
+  },
+  {
+   "time": 1.93,
+   "strength": 0.67
+  },
+  {
+   "time": 2.66,
+   "strength": 0.53
+  },
+  {
+   "time": 4.81,
+   "strength": 0.93
+  },
+  {
+   "time": 5.51,
+   "strength": 0.42
+  },
+  {
+   "time": 6.04,
+   "strength": 0.61
+  },
+  {
+   "time": 7.03,
+   "strength": 0.61
+  },
+  {
+   "time": 7.77,
+   "strength": 0.45
+  },
+  {
+   "time": 8.23,
+   "strength": 0.65
+  },
+  {
+   "time": 8.62,
+   "strength": 0.67
+  },
+  {
+   "time": 9.09,
+   "strength": 0.51
+  },
+  {
+   "time": 10.29,
+   "strength": 0.77
+  },
+  {
+   "time": 10.8,
+   "strength": 0.54
+  },
+  {
+   "time": 11.73,
+   "strength": 0.83
+  },
+  {
+   "time": 12.26,
+   "strength": 0.57
+  },
+  {
+   "time": 14.01,
+   "strength": 0.42
+  },
+  {
+   "time": 14.84,
+   "strength": 0.78
+  },
+  {
+   "time": 15.93,
+   "strength": 0.71
+  },
+  {
+   "time": 16.36,
+   "strength": 0.77
+  },
+  {
+   "time": 17.12,
+   "strength": 0.99
+  },
+  {
+   "time": 18.16,
+   "strength": 1
+  }
+ ],
+ "captions": [
+  {
+   "start": 0.0,
+   "end": 1.46,
+   "text": "This is your room!"
+  },
+  {
+   "start": 1.74,
+   "end": 3.62,
+   "text": "Come on, I'll show you around."
+  },
+  {
+   "start": 4.16,
+   "end": 5.3,
+   "text": "See that book?"
+  },
+  {
+   "start": 5.36,
+   "end": 6.9,
+   "text": "That's your sticker book!"
+  },
+  {
+   "start": 6.9,
+   "end": 9.86,
+   "text": "You earn stickers as you go on adventures in Neelo."
+  },
+  {
+   "start": 9.9,
+   "end": 11.26,
+   "text": "When you get a new sticker,"
+  },
+  {
+   "start": 11.26,
+   "end": 12.94,
+   "text": "you can come home to see it."
+  },
+  {
+   "start": 13.5,
+   "end": 15.5,
+   "text": "And this is your closet."
+  },
+  {
+   "start": 15.56,
+   "end": 17.48,
+   "text": "Want to choose a new look for your avatar?"
+  },
+  {
+   "start": 17.54,
+   "end": 18.62,
+   "text": "Let's open it up!"
+  }
+ ]
+}
