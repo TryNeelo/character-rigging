@@ -29,4 +29,5 @@ flutter:
     - assets/lines/ftux_home/
     - assets/lines/ftux_home_return/
     - assets/lines/ftux_room/
+    - assets/lines/ftux_world_select/
     # END GENERATED ASSETS

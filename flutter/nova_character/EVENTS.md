@@ -44,13 +44,21 @@ Line id: `ftux_room`
 | 13.57 s | `highlight_closet` | Highlight the closet: spotlight it and point the arrow at it. |
 | 18.38 s | `clear_spotlight` | End only the spotlight: the spotlight fades, the arrow stays and blinks until the child taps the item (or until a later [Stop highlight]). |
 
+## FTUX: world select
+
+Line id: `ftux_world_select`
+
+| Time | Event | What the app should do |
+|---|---|---|
+| 9.21 s | `highlight_next_world_arrow` | Highlight the arrow that rotates to the next world ("Tap the arrow to keep traveling through worlds"): spotlight it and point the arrow at it. |
+| 10.84 s | `clear_highlight` | End the highlight: the spotlight and the arrow fade out together. |
+| 14.27 s | `highlight_enter` | Highlight the Enter button on the world selection screen: spotlight it and point the arrow at it. |
+| 15.88 s | `clear_highlight` | End the highlight: the spotlight and the arrow fade out together. |
+
 ## Planned (not in a line yet)
 
 Names agreed for the FTUX flow. They appear in a line once its audio is timed.
 
 | Event | What the app should do |
 |---|---|
-| `highlight_next_world_arrow` | Highlight the arrow that rotates to the next world ("Tap the arrow to keep traveling through worlds"): spotlight it and point the arrow at it. |
-| `highlight_enter` | Highlight the Enter button on the world selection screen: spotlight it and point the arrow at it. |
-| `clear_highlight` | End the highlight: the spotlight and the arrow fade out together. |
 | `nova_exit` | Nova leaves the screen; the scene stays for the child to explore and choose. |
