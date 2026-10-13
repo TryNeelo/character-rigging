@@ -81,6 +81,15 @@ If the widget's height is unbounded, it sizes itself to the framing's proportion
 
 ## What's in a line
 
+This version has the four FTUX lines, all with the final audio:
+
+| Line id | Scene |
+|---|---|
+| `ftux_home` | Home map: shops, then the home |
+| `ftux_room` | Nova's room: sticker book, then the closet |
+| `ftux_home_return` | Back on the home map: the back arrow |
+| `ftux_world_select` | World selection: rotating worlds, next-world arrow, Enter |
+
 Each line is a folder in `assets/lines/<line_id>/` with `audio.mp3` and `timing.json`.
 The timing file holds the mouth shapes and the markers:
 
@@ -89,12 +98,15 @@ The timing file holds the mouth shapes and the markers:
   { "time": 5.65, "type": "event", "name": "highlight_shops" },
   { "time": 5.65, "end": 11.32, "type": "look", "direction": "right" },
   { "time": 5.65, "end": 11.32, "type": "arm", "side": "right", "degrees": 32 },
-  { "time": 0.04, "end": 1.09, "type": "expression", "name": "happy" }
+  { "time": 0.0, "end": 1.85, "type": "expression", "name": "surprised" }
 ]
 ```
 
 - `event` markers become `NovaEvent`s in your app. **`EVENTS.md`** lists every event name,
-  which line sends it and when, and what the app should do on screen.
+  which line sends it and when, and what the app should do on screen. It starts with how
+  highlights work: each highlight is a spotlight plus an arrow, and it stays until
+  `clear_highlight` (both fade) or `clear_spotlight` (the arrow stays and blinks until the
+  child taps), or until the next highlight replaces it.
 - `look` markers turn Nova's eyes and head toward one of eight directions on screen between
   `time` and `end`: `left`, `right`, `up`, `down`, `up-left`, `up-right`, `down-left`,
   `down-right`. `arm` markers raise the arm on that side of the screen, then lower it
