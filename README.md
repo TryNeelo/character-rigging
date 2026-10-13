@@ -131,6 +131,7 @@ A line's `script.txt` is plain text:
 - **Moves** are cued the same way and hold until the next cue of the same kind, or the end of the line. "Left" and "right" are the screen's sides.
   - `[look right]`, `[look up-right]` and the other eight directions; `[look ahead]` looks straight again.
   - `[arms up 32]`, `[right arm up 32]`, `[left arm up 32]` (degrees; `up` alone is 32), and `[arms down]`, `[right arm down]`.
+  - `[happy brows]`, `[surprised brows]`, `[concerned brows]` hold that brow expression; `[normal brows]` returns to neutral.
 - Captions longer than `captions.maxChars` in `tools/rig_settings.json` (55, the length of "Each world is packed with stories and games to explore.", set by Manaf) are split at a sentence end, then a comma, then a space, and flagged to check.
 
 ## Line log

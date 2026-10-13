@@ -11,6 +11,7 @@ Script format (dialogue/<line>/script.txt), plain text:
     or the end of the line ("right" and "left" are the screen's sides):
         [look right]  [look up-right]  [look ahead]          eight directions; ahead looks straight again
         [arms up 32]  [right arm up 32]  [arms down]  [left arm down]    degrees; up alone is 32
+        [happy brows]  [surprised brows]  [concerned brows]  [normal brows]
   - Any caption longer than captions.maxChars (tools/rig_settings.json) is split at a
     sentence end, then a comma, then a space, and is flagged to check.
 
@@ -29,7 +30,9 @@ from faster_whisper import WhisperModel
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LEAD, HOLD = 0.1, 0.4      # show a caption just before its first word; keep it up a moment after the last
 CUE_LEAD = 0.03            # cues land just ahead of their word, like the mouth shapes
-MAX = json.load(open(os.path.join(ROOT, 'tools', 'rig_settings.json')))['captions']['maxChars']
+SETTINGS = json.load(open(os.path.join(ROOT, 'tools', 'rig_settings.json')))
+MAX = SETTINGS['captions']['maxChars']
+EXPRESSIONS = set(SETTINGS['brows']['expressions'])   # happy, surprised, concerned
 EVENTS = {k: v for k, v in json.load(open(os.path.join(ROOT, 'dialogue', 'events.json'))).items() if not k.startswith('_')}
 
 norm = lambda w: re.sub(r"[^a-z0-9']", '', w.lower().replace('’', "'"))
@@ -50,8 +53,12 @@ DIRECTIONS = {'left', 'right', 'up', 'down', 'up-left', 'up-right', 'down-left',
 ARM_UP = 32   # degrees when a cue says "up" without a number
 
 def action_for(cue):
-    """A move a bracketed cue means: ('look', direction or None for ahead) or ('arm', sides, degrees)."""
+    """A move a bracketed cue means: ('look', direction or None for ahead), ('arm', sides, degrees)
+    or ('expression', name or None for normal brows)."""
     words = plain(cue.replace('°', ' ')).split()
+    if len(words) == 2 and words[1] in ('brows', 'brow'):
+        if words[0] == 'normal': return ('expression', None)
+        if words[0] in EXPRESSIONS: return ('expression', words[0])
     if words[:1] == ['look']:
         rest = ['up' if w == 'top' else 'down' if w == 'bottom' else w for w in words[1:]]
         if rest in (['ahead'], ['straight'], ['forward'], ['center']):
@@ -172,6 +179,10 @@ for line in sorted(lines):
             release('look', t)
             if action[1]:
                 held['look'] = (t, {'type': 'look', 'direction': action[1]}, text)
+        elif action[0] == 'expression':
+            release('brows', t)
+            if action[1]:
+                held['brows'] = (t, {'type': 'expression', 'name': action[1]}, text)
         else:
             for side in action[1]:
                 release(side, t)

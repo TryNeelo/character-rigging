@@ -276,7 +276,8 @@ button { font: inherit; cursor: pointer; }
           <div class="look-row"><div class="look-pad" role="group" aria-label="Look direction" id="lookPad"></div>
           <button type="button" class="tag" id="lookTag" title="Script tag for this look. Click to copy.">[look ahead]</button></div></div>
         <div class="field" style="margin-top:18px"><span>Brows</span>
-          <div class="seg-ctl" role="group" aria-label="Brow expression" id="browCtl"></div>
+          <div class="look-row"><div class="seg-ctl" role="group" aria-label="Brow expression" id="browCtl"></div>
+          <button type="button" class="tag" id="browTag" title="Script tag for these brows. Click to copy.">[normal brows]</button></div>
           <label class="toggle"><input type="checkbox" id="browLiftsOn" checked><span>Brow lifts on stressed words</span></label></div>
       </section>
 
@@ -483,11 +484,12 @@ button { font: inherit; cursor: pointer; }
     const b = document.createElement('button');
     b.type = 'button'; b.textContent = name[0].toUpperCase() + name.slice(1);
     b.setAttribute('aria-pressed', name === 'auto');
-    b.addEventListener('click', () => { testExpression = name === 'auto' ? null : name; browBtns.forEach(x => x.setAttribute('aria-pressed', x === b)); });
+    b.addEventListener('click', () => { testExpression = name === 'auto' ? null : name; browBtns.forEach(x => x.setAttribute('aria-pressed', x === b));
+      $('browTag').textContent = `[${name === 'auto' ? 'normal' : name} brows]`; });
     $('browCtl').appendChild(b); return b;
   });
   $('resetPose').addEventListener('click', () => {
-    testExpression = null; browBtns.forEach((x, i) => x.setAttribute('aria-pressed', i === 0));
+    testExpression = null; browBtns.forEach((x, i) => x.setAttribute('aria-pressed', i === 0)); $('browTag').textContent = '[normal brows]';
     Object.entries(SLIDERS).forEach(([k, id]) => { pose[k] = 0; $(id).value = 0; $(id + 'Out').textContent = sliderLabel[k](0); });
     pose.look = [0, 0]; padBtns.forEach(x => x.setAttribute('aria-pressed', x.title === 'ahead')); $('lookTag').textContent = '[look ahead]';
   });
@@ -723,12 +725,12 @@ button { font: inherit; cursor: pointer; }
     : mk.type === 'look' ? `look ${mk.direction}` : mk.type === 'lookEnd' ? 'look ahead'
     : mk.type === 'arm' ? `${mk.both ? 'arms' : mk.side + ' arm'} up ${mk.degrees}`
     : mk.type === 'armEnd' ? `${mk.both ? 'arms' : mk.side + ' arm'} down`
-    : `${mk.name} brows`;
+    : mk.type === 'expressionEnd' ? 'normal brows' : `${mk.name} brows`;
   function scriptItems() {
     const items = [];
     for (const mk of markers) {
       items.push(mk);
-      if ((mk.type === 'look' || mk.type === 'arm') && mk.end < DURATION - 0.05)
+      if ((mk.type === 'look' || mk.type === 'arm' || mk.type === 'expression') && mk.end < DURATION - 0.05)
         items.push({ ...mk, type: mk.type + 'End', time: mk.end });
     }
     // Both arms moving together read as one tag, like [arms up 32] and [arms down]
