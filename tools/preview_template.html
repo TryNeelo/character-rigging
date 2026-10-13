@@ -385,7 +385,7 @@ button { font: inherit; cursor: pointer; }
   const pivot = el => el.dataset.pivot.split(' ').map(Number);
   // The character's moving parts. Set again by bindRig() when the character changes.
   let upper, head, armL, armR, HP, LP, RP, pupils, browEls, mouths, lids, closedEyes, OPEN_Y, HALF;
-  let REST = { left: null, right: null }, forearms = { left: [], right: [] };
+  let REST = { left: null, right: null }, DOWN = { left: 0, right: 0 }, forearms = { left: [], right: [] };
   let LOOK, B, TK, I;
   const NS = 'http://www.w3.org/2000/svg';
   function bindRig() {
@@ -397,6 +397,7 @@ button { font: inherit; cursor: pointer; }
     // Arms with elbows: their resting pose, and every forearm group (each outfit's, and the outline's)
     REST = { left: armL.dataset.rest ? pivot({ dataset: { pivot: armL.dataset.rest } }) : null,
              right: armR.dataset.rest ? pivot({ dataset: { pivot: armR.dataset.rest } }) : null };
+    DOWN = { left: +(armL.dataset.down || 0), right: +(armR.dataset.down || 0) };
     forearms = Object.fromEntries(['left', 'right'].map(side => [side,
       [...svg.querySelectorAll(`#arm-${side} .forearm, #arm-${side}-ol .forearm`)].map(el => ({ el, p: pivot(el) }))]));
     $('elbowRows').hidden = !REST.left;
@@ -467,7 +468,8 @@ button { font: inherit; cursor: pointer; }
       const rest = REST[side];
       const on = type => t == null ? null : markers.find(mk => mk.type === type && mk.side === side && t >= mk.time && t < mk.end);
       const arm = on('arm'), el = on('elbow');
-      const shoulder = arm ? arm.degrees : test.arm[side] ?? rest[0];
+      // 0 degrees is his arms straight down as drawn (a few degrees out from vertical)
+      const shoulder = arm ? (arm.degrees || DOWN[side]) : test.arm[side] != null ? (test.arm[side] || DOWN[side]) : rest[0];
       const elbow = el ? el.degrees : arm ? 0 : test.arm[side] != null ? (test.elbow[side] ?? 0) : (test.elbow[side] ?? rest[1]);
       raiseTarget[side] = shoulder - rest[0];
       bendTarget[side] = elbow - rest[1];

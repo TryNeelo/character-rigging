@@ -17,6 +17,13 @@
       "_arms": "By screen side. Upper arm and forearm are capsules: the shoulder is the centre of the upper arm's top end, the elbow the centre of the forearm's end at the upper arm. The forearm (with the hand) bends at the elbow. As drawn, his hands are behind his back: that is his resting pose.",
       "arm_left": {"shapes": [[13, 16]], "capsule": 13, "forearm": [[14, 16]], "forearmCapsule": 15},
       "arm_right": {"shapes": [[10, 13]], "capsule": 10, "forearm": [[11, 13]], "forearmCapsule": 12},
+      "_armsDown": "The same Skyrian with both arms straight down (Figma). The shoulder and elbow pivots are the points his arms turn about between the two drawings, and this is his [arms down] pose.",
+      "armsDown": "skyrian/poses/arms-down.svg",
+      "_poseChecks": "Figma poses the build must reproduce exactly: one arm raised 45 degrees from vertical.",
+      "poseChecks": [
+        {"file": "skyrian/poses/right-arm-up.svg", "side": "right", "shoulder": 45},
+        {"file": "skyrian/poses/left-arm-up.svg", "side": "left", "shoulder": 45}
+      ],
       "_body": "Hidden hand, collar, robe, the dark V under the beard, belt, robe skirt, hem, sash, buttons and buckle.",
       "body": [[16, 21], [48, 61]],
       "hat": [[61, 69]]

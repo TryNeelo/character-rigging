@@ -163,13 +163,15 @@ class _NovaCharacterState extends State<NovaCharacter> {
     final spec = rig.outfits[rig.outfits.containsKey(widget.outfit) ? widget.outfit! : rig.defaultOutfit]!;
     if (spec.hasElbows) {
       // Arms rest as drawn; an arm marker holds a straight arm, an elbow marker bends the elbow
-      (double, double) target(String side, (double, double) rest) {
+      // (0 degrees is the arm straight down as drawn, a few degrees out from vertical)
+      (double, double) target(String side, (double, double) rest, double down) {
         final arm = c.line?.armAt(c.time, side);
         final elbow = c.line?.elbowAt(c.time, side) ?? (arm != null ? 0.0 : rest.$2);
-        return ((arm ?? rest.$1) - rest.$1, elbow - rest.$2);
+        final shoulder = arm == null ? rest.$1 : (arm == 0 ? down : arm);
+        return (shoulder - rest.$1, elbow - rest.$2);
       }
-      (armLeft, bendLeft) = target('left', spec.armRestLeft!);
-      (armRight, bendRight) = target('right', spec.armRestRight!);
+      (armLeft, bendLeft) = target('left', spec.armRestLeft!, spec.armDownLeft);
+      (armRight, bendRight) = target('right', spec.armRestRight!, spec.armDownRight);
     }
     final (lift, tilt) = rig.browExpressions[c.expression ?? c.line?.expressionAt(c.time)] ?? (0.0, 0.0);
     // Smoothing amounts are tuned per 60 fps frame; scale them to the real frame time

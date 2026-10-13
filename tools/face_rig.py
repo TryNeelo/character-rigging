@@ -186,6 +186,44 @@ def arm_joints(upper, forearm, side):
     r1 = lambda p: (round(p[0], 1), round(p[1], 1))
     return r1(shoulder), r1(elbow), round(angle, 1), round(bend, 1)
 
+# ---- Arm poses from extra exports of the same character (the arms moved, nothing else) ----
+def placement(tag):
+    """A rect's full placement (its transform with its x and y) as an affine (a, b, c, d, e, f)."""
+    a, b, c, d, e, f = matrix(tag)
+    x = float((re.search(r'\sx="([-\d.]+)"', tag) or [0, 0])[1]); y = float((re.search(r'\sy="([-\d.]+)"', tag) or [0, 0])[1])
+    return (a, b, c, d, a * x + c * y + e, b * x + d * y + f)
+
+def compose(m, n):
+    """m after n."""
+    a1, b1, c1, d1, e1, f1 = m; a2, b2, c2, d2, e2, f2 = n
+    return (a1*a2 + c1*b2, b1*a2 + d1*b2, a1*c2 + c1*d2, b1*c2 + d1*d2, a1*e2 + c1*f2 + e1, b1*e2 + d1*f2 + f1)
+
+def inverse(m):
+    a, b, c, d, e, f = m
+    k = a * d - b * c
+    return (d / k, -b / k, -c / k, a / k, (c * f - d * e) / k, (b * e - a * f) / k)
+
+def turn(m):
+    """A rigid move (rotation and shift) as (centre it turns about, degrees clockwise on screen)."""
+    a, b, c, d, e, f = m
+    k = (1 - a) * (1 - d) - b * c
+    return ((e * (1 - d) + c * f) / k, (f * (1 - a) + b * e) / k), math.degrees(math.atan2(b, a))
+
+def arm_from_poses(rest_upper, rest_fore, straight_upper, straight_fore, side):
+    """Shoulder and elbow pivots, and the resting and straight-down poses, from the same arm drawn
+    bent (resting) and straight. Each pivot is the one point the art turns about between the two
+    drawings, so both come out exactly. Angles: shoulder out from vertical, elbow bend inward."""
+    out = 1 if side == 'right' else -1
+    shoulder, turned = turn(compose(placement(straight_upper), inverse(placement(rest_upper))))
+    # the forearm's move relative to the upper arm, seen with the upper arm at rest
+    elbow, bent = turn(compose(compose(placement(rest_upper), inverse(placement(straight_upper))),
+                               compose(placement(straight_fore), inverse(placement(rest_fore)))))
+    def angle(tag):
+        a, b, c, d, e, f = placement(tag)
+        return math.degrees(math.atan2(out * c, d))   # the capsule's long axis, from vertical
+    r1 = lambda p: (round(p[0], 2), round(p[1], 2))
+    return r1(shoulder), r1(elbow), round(angle(rest_upper), 2), round(-out * bent, 2), round(angle(straight_upper), 2)
+
 def path_box(tag):
     """Bounding box of a path with absolute commands (from its points and control points,
     which is close enough for the simple shapes in a face)."""

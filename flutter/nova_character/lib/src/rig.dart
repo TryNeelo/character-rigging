@@ -32,7 +32,9 @@ class NovaOutfitSpec {
       this.elbowLeftPivot,
       this.elbowRightPivot,
       this.armRestLeft,
-      this.armRestRight});
+      this.armRestRight,
+      this.armDownLeft = 0,
+      this.armDownRight = 0});
   final String label;
 
   /// Whether the hat has a piece behind the head (hat_back_<id>.svg), like a hard hat's brim.
@@ -47,6 +49,10 @@ class NovaOutfitSpec {
   /// For arms with elbows, the resting pose as drawn: (shoulder out from straight down,
   /// elbow bend), in degrees. Skyrian rests with his hands behind his back.
   final (double, double)? armRestLeft, armRestRight;
+
+  /// For arms with elbows, the shoulder's angle out from vertical when the arm hangs straight
+  /// down as drawn. An arm marker of 0 degrees means this pose.
+  final double armDownLeft, armDownRight;
 
   bool get hasElbows => elbowLeftPivot != null;
   final Offset armLeftPivot, armRightPivot;
@@ -76,7 +82,9 @@ class NovaRig {
                 elbowLeftPivot: e.value['pivots']['elbowLeft'] == null ? null : _offset(e.value['pivots']['elbowLeft']),
                 elbowRightPivot: e.value['pivots']['elbowRight'] == null ? null : _offset(e.value['pivots']['elbowRight']),
                 armRestLeft: _pair(e.value['armRest']?['left']),
-                armRestRight: _pair(e.value['armRest']?['right']))
+                armRestRight: _pair(e.value['armRest']?['right']),
+                armDownLeft: (e.value['armDown']?['left'] as num?)?.toDouble() ?? 0,
+                armDownRight: (e.value['armDown']?['right'] as num?)?.toDouble() ?? 0)
         },
         eyeCenters = [for (final c in _j['eyes']['centers'] as List) _offset(c)],
         eyeRadius = _num(_j['eyes']['radius']),
