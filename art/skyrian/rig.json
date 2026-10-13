@@ -1,0 +1,114 @@
+{
+ "label": "Skyrian",
+ "canvas": {
+  "width": 362,
+  "height": 869
+ },
+ "anchor": {
+  "x": 180.4,
+  "y": 869
+ },
+ "pivots": {
+  "head": [
+   180.4,
+   345
+  ]
+ },
+ "outfits": {
+  "wizard": {
+   "label": "Wizard",
+   "hatBack": false,
+   "bodyBack": true,
+   "pivots": {
+    "armLeft": [
+     88.3,
+     432.3
+    ],
+    "armRight": [
+     274.7,
+     432.3
+    ]
+   }
+  }
+ },
+ "defaultOutfit": "wizard",
+ "eyes": {
+  "centers": [
+   [
+    147.503,
+    293.579
+   ],
+   [
+    213.347,
+    293.579
+   ]
+  ],
+  "radius": 22.226,
+  "pupilRest": [
+   4.45,
+   -5.08
+  ],
+  "pupilRestY": 1.9
+ },
+ "browPivots": {
+  "left": [
+   139.0,
+   256.4
+  ],
+  "right": [
+   216.5,
+   253.7
+  ]
+ },
+ "headLayers": [
+  "head_back",
+  "mouth",
+  "mustache",
+  "eyes",
+  "pupils",
+  "lids",
+  "brows",
+  "hair",
+  "hat"
+ ],
+ "settings": {
+  "look": {
+   "pupilReach": 7.5,
+   "pupilReachY": 6.2
+  },
+  "_brows": "Surprised lifts a little less than Nova's, so his brows stay clear of the hat brim.",
+  "brows": {
+   "expressions": {
+    "surprised": {
+     "liftPx": 7
+    }
+   }
+  },
+  "framing": {
+   "full": {
+    "label": "Full body",
+    "top": -14,
+    "bottom": 887,
+    "width": 400
+   },
+   "knees": {
+    "label": "Knees up",
+    "top": -14,
+    "bottom": 696,
+    "width": 370
+   },
+   "waist": {
+    "label": "Waist up",
+    "top": -14,
+    "bottom": 566,
+    "width": 370
+   },
+   "close": {
+    "label": "Close-up",
+    "top": -14,
+    "bottom": 396,
+    "width": 345
+   }
+  }
+ }
+}

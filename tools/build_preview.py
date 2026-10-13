@@ -1,13 +1,13 @@
 """Build the preview page with every dialogue line on it.
 
 Usage: python3 tools/build_preview.py
-Reads  art/Nova-rigged.svg and, for each folder in dialogue/: its .mp3, cues.json,
+Reads  art/Nova-rigged.svg, each other character's art/<name>/<Name>-rigged.svg and rig.json, and, for each folder in dialogue/: its .mp3, cues.json,
        emphasis.json (from build_emphasis.py) and script.txt (optional, the exact words)
 Writes preview/index.html  (art, audio and timing all embedded; opens in any browser)
        preview/<line>.html (a short page that opens index.html on that line, so older links keep working)
 
-Each line is listed in the Audio files panel by its name ("title" in cues.json, or the folder
-name), length and number of markers.
+Each line is listed in the Audio files panel by its speaker ("character" in cues.json, Nova if
+not set), name ("title" in cues.json, or the folder name), length and number of markers.
 """
 import base64, glob, json, os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,6 +24,7 @@ def load(line):
     return {
         'id': line,
         'title': timing.get('title') or line.replace('_', ' ').capitalize(),
+        'character': timing.get('character', 'nova'),
         'words': ' '.join(read('script.txt', '').split()),
         'audio': 'data:audio/mpeg;base64,' + base64.b64encode(open(mp3, 'rb').read()).decode(),
         'cues': [{k: c[k] for k in ('start', 'end', 'value')} for c in timing['mouthCues']],
@@ -40,11 +41,29 @@ event_tags = {'rules': json.load(open(os.path.join(ROOT, 'dialogue', 'events.jso
               'events': [{'name': k, 'tag': (v.get('cues') or [k])[0], 'does': v['does'], 'scene': v.get('scene', 'Other')}
                          for k, v in EVENTS.items() if not v.get('builtIn') and not v.get('sample')]}
 lines = [load(os.path.basename(os.path.dirname(p))) for p in sorted(glob.glob(os.path.join(ROOT, 'dialogue', '*', 'cues.json')))]
+SETTINGS = json.load(open(os.path.join(ROOT, 'tools', 'rig_settings.json')))
+def merged(base, change):
+    """Settings with a character's own changes laid over them."""
+    out = dict(base)
+    for k, v in change.items():
+        out[k] = merged(base[k], v) if isinstance(v, dict) and isinstance(base.get(k), dict) and k != 'framing' else v
+    return out
+# Nova is on the page at load; every other character comes with his rigged SVG, swapped in by the character picker
+characters = {'nova': {'label': 'Nova', 'settings': SETTINGS}}
+for path in sorted(glob.glob(os.path.join(ROOT, 'tools', 'characters', '*.json'))):
+    name = os.path.splitext(os.path.basename(path))[0]
+    if name == 'nova': continue
+    rig = json.load(open(os.path.join(ROOT, 'art', name, 'rig.json')))
+    characters[name] = {'label': rig['label'], 'settings': merged(SETTINGS, rig['settings']),
+                        'svg': open(os.path.join(ROOT, 'art', name, f'{rig["label"]}-rigged.svg')).read().replace(
+                            f'<svg id="{name}" ', f'<svg id="{name}" role="img" aria-label="{rig["label"]}" ', 1)}
+for l in lines:
+    assert l['character'] in characters, (l['id'], l['character'])
 svg = open(os.path.join(ROOT, 'art', 'Nova-rigged.svg')).read().replace(
     '<svg id="nova" ', '<svg id="nova" role="img" aria-label="Nova, a bear, in his chosen outfit" ', 1)
 page = (open(os.path.join(ROOT, 'tools', 'preview_template.html')).read()
         .replace('%%SVG%%', svg)
-        .replace('%%SETTINGS%%', json.dumps(json.load(open(os.path.join(ROOT, 'tools', 'rig_settings.json')))))
+        .replace('%%CHARACTERS%%', json.dumps(characters).replace('</', '<\\/'))
         .replace('%%LINES%%', json.dumps(lines))
         .replace('%%EVENTS%%', json.dumps(event_tags)))
 os.makedirs(OUT, exist_ok=True)

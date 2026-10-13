@@ -1,0 +1,166 @@
+"""Build a character other than Nova from his flat Figma export and settings file.
+
+Reads  tools/characters/<name>.json (parts, pivots, face placement, colours; see skyrian.json)
+       and the export it names in art/
+Writes art/<name>/<Name>-rigged.svg   the rig for the preview (same ids and structure as Nova's)
+       art/<name>/parts/              one SVG per part on the full canvas, for the app:
+                                      base/ (head and face) and outfits/<outfit>/
+       art/<name>/rig.json            canvas, pivots, eyes, head layers and setting changes, for the app
+
+The face rig is shared (tools/face_rig.py): Nova's mouth shapes, scaled and centred on the
+character's own drawn mouth, and eyelids drawn around his eyes in his skin colours.
+
+Usage: python3 tools/build_character.py tools/characters/<name>.json   (build_rig.py runs it for every character)
+"""
+import json, os, re, shutil, sys
+from face_rig import (ROOT, clips_used, lid, lid_parts, mouth_group, mouth_shapes, part_writer, path_box,
+                      rect_centre, round_rect_centre, capsule_top, shapes_of, whiten, LID_R)
+
+NOVA_SMILE = json.load(open(os.path.join(ROOT, 'tools', 'characters', 'nova.json')))
+
+def build(config_path):
+    name = os.path.splitext(os.path.basename(config_path))[0]
+    C = json.load(open(config_path))
+    W, H = C['canvas']
+    els = shapes_of(os.path.join(ROOT, 'art', C['source']), C['shapeCount'])
+    R = lambda spans: [i for a, b in spans for i in range(a, b)]
+    pick = lambda spans: ''.join(els[i] for i in R(spans))
+    F = C['face']
+
+    # ---- Eyes: whites (the pupils stay inside them), pupils at rest, lids in his skin colours ----
+    eyes = {side: round_rect_centre(els[F['whites'][side]]) for side in ('left', 'right')}
+    r = round(sum(e[2] for e in eyes.values()) / 2, 3)
+    k = r / LID_R
+    open_y, half_y = round(2 * r + 2 * k, 1), round(15 * k, 1)   # how far the lid sits up: open, half closed
+    rest = {}
+    for side in ('left', 'right'):
+        x0, y0, x1, y1 = path_box(els[F['pupils'][side]])
+        rest[side] = (round((x0 + x1) / 2 - eyes[side][0], 2), round((y0 + y1) / 2 - eyes[side][1], 2))
+    rest_y = round((rest['left'][1] + rest['right'][1]) / 2, 2)
+    lid_eyes = [(side, round(eyes[side][0], 3), round(eyes[side][1], 3), r, F['lidColors'][side]) for side in ('left', 'right')]
+    eyelids = ('<g id="eyelids">' + ''.join(
+        lid(cx, cy, rr, fur, side, f' data-open="{open_y:g}" data-half="{half_y:g}"') for side, cx, cy, rr, fur in lid_eyes) + '</g>')
+    lid_clips = ''.join(f'<clipPath id="clip-eye-{side}"><ellipse cx="{cx}" cy="{cy}" rx="{round(rr + 0.75, 1)}" ry="{round(rr + 0.75, 1)}"/></clipPath>'
+                        for side, cx, cy, rr, fur in lid_eyes)
+    eye_clip = ('<clipPath id="clip-eyes">' + ''.join(f'<ellipse cx="{round(e[0], 3)}" cy="{round(e[1], 3)}" rx="{round(e[2], 3)}" ry="{round(e[3], 3)}"/>'
+                                                     for e in eyes.values()) + '</clipPath>')
+    pupils = ('<g id="pupils" clip-path="url(#clip-eyes)">' + ''.join(
+        f'<g id="pupil-{side}" data-rest="{rest[side][0]:g}" data-rest-y="{rest_y:g}">{els[F["pupils"][side]]}</g>' for side in ('left', 'right')) + '</g>')
+
+    # ---- Brows tilt about their centres ----
+    brow = {side: els[F['brows'][side]] for side in ('left', 'right')}
+    brow_pivot = {side: rect_centre(b) if b.startswith('<rect') else None for side, b in brow.items()}
+    brows = '<g id="brows">' + ''.join(f'<g id="brow-{side}" data-pivot="{p[0]:g} {p[1]:g}">{brow[side]}</g>' for side, p in brow_pivot.items()) + '</g>'
+
+    # ---- Mouth: Nova's shapes, scaled to his drawn mouth and centred on it; his own mouth is the smile ----
+    smile = pick(F['smile'])
+    old = shapes_of(os.path.join(ROOT, 'art', NOVA_SMILE['original']), NOVA_SMILE['originalShapeCount'])
+    box = lambda tags: [f(v) for f, v in zip((min, min, max, max), zip(*[path_box(t) for t in tags]))]
+    nx0, ny0, nx1, ny1 = box([old[i] for i in NOVA_SMILE['originalSmile']])
+    sx0, sy0, sx1, sy1 = box([els[i] for i in R(F['smile'])])
+    s = (sx1 - sx0) / (nx1 - nx0)
+    # (the talking shapes can sit a little lower than the drawn mouth, so a mustache doesn't hide them)
+    tx, ty = (sx0 + sx1) / 2 - s * (nx0 + nx1) / 2, (sy0 + sy1) / 2 - s * (ny0 + ny1) / 2 + F.get('mouthDropY', 0)
+    place = f'translate({tx:.3f} {ty:.3f}) scale({s:.4f})'
+    shapes, clips = mouth_shapes('', F.get('lipColor', '#C8985A'))
+    def thicken(b):
+        # Thin lines (rest and closed mouths) get at least minStroke canvas units once scaled
+        lo = F.get('minStroke', 0) / s
+        return re.sub(r'stroke-width="([\d.]+)"', lambda m: f'stroke-width="{max(float(m.group(1)), lo):.3g}"', b) if lo else b
+    shapes = [(m, smile if m == 'smile' else f'<g transform="{place}">{thicken(b)}</g>') for m, b in shapes]
+    mouth = '<g id="mouth">' + ''.join(mouth_group(m, b, vis=(m == 'smile')) for m, b in shapes) + '</g>'
+
+    # ---- Outfits: legs, the body behind the arms, arms, body and hat ----
+    outfits = C['outfits']
+    for o in outfits.values():
+        o['legs_svg'] = pick(o['legs'])
+        o['body_back_svg'] = pick(o.get('body_back', []))
+        o['body_svg'] = pick(o['body'])
+        o['hat_svg'] = pick(o.get('hat', []))
+        o['hat_back_svg'] = pick(o.get('hat_back', []))
+        for side in ('left', 'right'):
+            a = o[f'arm_{side}']
+            o[f'arm_{side}_svg'] = pick(a['shapes'])
+            o[f'pivot_{side}'] = tuple(a['pivot']) if 'pivot' in a else capsule_top(els[a['capsule']])
+        for kk in ('legs', 'body_back', 'arm_left', 'arm_right', 'body', 'hat', 'hat_back'):
+            o[f'{kk}_ol_svg'] = whiten(o[f'{kk}_svg'])
+    default = C['defaultOutfit']
+    def per_outfit(key, pivot=None):
+        out = ''
+        for oname, o in outfits.items():
+            attrs = f' data-pivot="{o[pivot][0]:g} {o[pivot][1]:g}"' if pivot else ''
+            hide = '' if oname == default else ' style="display:none"'
+            out += f'<g class="outfit" data-outfit="{oname}" data-label="{o["label"]}"{attrs}{hide}>{o[key]}</g>'
+        return out
+
+    # ---- Head, back to front, from the layer list ----
+    rig_layers = {'pupils': pupils, 'lids': eyelids, 'brows': brows, 'mouth': mouth,
+                  'hat': '<g id="hat">' + per_outfit('hat_svg') + '</g>', 'hat_back': '<g id="hat-back">' + per_outfit('hat_back_svg') + '</g>'}
+    hp = C['headPivot']
+    head = (f'<g id="head" class="part" data-pivot="{hp[0]:g} {hp[1]:g}">'
+            + ''.join(rig_layers[l[0]] if len(l) == 1 else pick(l[1]) for l in C['head']) + '</g>')
+    head_ol = whiten(pick(C['headOutline']))
+    d = outfits[default]
+    arms = ''.join(f'<g id="arm-{side}" class="part" data-pivot="{d["pivot_" + side][0]:g} {d["pivot_" + side][1]:g}">'
+                   + per_outfit(f'arm_{side}_svg', f'pivot_{side}') + '</g>' for side in ('left', 'right'))
+    outline = ('<g id="outline">'
+               + '<g id="legs-ol">' + per_outfit('legs_ol_svg') + '</g><g id="upper-ol">'
+               + '<g id="body-back-ol">' + per_outfit('body_back_ol_svg') + '</g>'
+               + ''.join(f'<g id="arm-{side}-ol">' + per_outfit(f'arm_{side}_ol_svg') + '</g>' for side in ('left', 'right'))
+               + '<g id="body-ol">' + per_outfit('body_ol_svg') + '</g>'
+               + '<g id="head-ol"><g id="hat-back-ol">' + per_outfit('hat_back_ol_svg') + '</g>' + head_ol
+               + '<g id="hat-ol">' + per_outfit('hat_ol_svg') + '</g></g></g></g>')
+    ax, ay = C['anchor']
+    svg = (f'<svg id="{name}" data-anchor-x="{ax:g}" width="{W}" height="{H}" viewBox="0 0 {W} {H}" fill="none" xmlns="http://www.w3.org/2000/svg">\n'
+           f'<defs>{eye_clip}{lid_clips}{"".join(clips)}</defs>\n'
+           '<g id="character">\n'
+           f'{outline}\n<g id="legs">{per_outfit("legs_svg")}</g>\n<g id="upper">\n'
+           f'<g id="body-back">{per_outfit("body_back_svg")}</g>\n{arms}\n<g id="body">{per_outfit("body_svg")}</g>\n{head}\n</g>\n'
+           '</g>\n</svg>\n')
+    out_dir = os.path.join(ROOT, 'art', name)
+    out = os.path.join(out_dir, f'{C["label"]}-rigged.svg')
+    open(out, 'w').write(svg)
+
+    # ---- Part files for the app, each on the full canvas ----
+    parts_dir = os.path.join(out_dir, 'parts')
+    shutil.rmtree(parts_dir, ignore_errors=True)
+    part = part_writer(parts_dir, W, H)
+    for oname, o in outfits.items():
+        for kk in ('legs', 'body_back', 'arm_left', 'arm_right', 'body', 'hat', 'hat_back'):
+            if o[f'{kk}_svg']:
+                part(f'outfits/{oname}/{kk}', o[f'{kk}_svg'])
+                part(f'outfits/{oname}/{kk}_outline', o[f'{kk}_ol_svg'])
+    part('base/head_outline', head_ol)
+    for l in C['head']:
+        if len(l) == 2: part(f'base/{l[0]}', pick(l[1]))
+    for side in ('left', 'right'):
+        part(f'base/pupil_{side}', els[F['pupils'][side]])
+        part(f'base/brow_{side}', brow[side])
+    part('base/lids_half', lid_parts(lid_eyes, 'half', half_y), lid_clips)
+    part('base/lids_closed', lid_parts(lid_eyes, 'closed', half_y), lid_clips)
+    for m, b in shapes:
+        part(f'base/mouth_{m}', b, clips_used(clips, b))
+
+    # ---- What the app needs to place and move the parts ----
+    rig = {
+        'label': C['label'],
+        'canvas': {'width': W, 'height': H},
+        'anchor': {'x': ax, 'y': ay},
+        'pivots': {'head': hp},
+        'outfits': {oname: {'label': o['label'], 'hatBack': bool(o['hat_back_svg']), 'bodyBack': bool(o['body_back_svg']),
+                            'pivots': {'armLeft': list(o['pivot_left']), 'armRight': list(o['pivot_right'])}}
+                    for oname, o in outfits.items()},
+        'defaultOutfit': default,
+        'eyes': {'centers': [[round(e[0], 3), round(e[1], 3)] for e in eyes.values()], 'radius': r,
+                 'pupilRest': [rest['left'][0], rest['right'][0]], 'pupilRestY': rest_y},
+        'browPivots': {side: list(p) for side, p in brow_pivot.items()},
+        # The head's layers, back to front: part files in base/, or the face rig (pupils, lids, brows, mouth, hat)
+        'headLayers': [l[0] for l in C['head']],
+        'settings': C.get('settings', {}),
+    }
+    json.dump(rig, open(os.path.join(out_dir, 'rig.json'), 'w'), indent=1)
+    print('wrote', out, len(svg), 'bytes and', sum(len(f) for _, _, f in os.walk(parts_dir)), 'part files;',
+          f'mouth scale {s:.3f}, eye radius {r}, arm pivots {d["pivot_left"]} {d["pivot_right"]}')
+
+if __name__ == '__main__':
+    for p in sys.argv[1:]: build(p)

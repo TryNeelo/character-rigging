@@ -1,6 +1,6 @@
 # Neelo | Character Rig
 
-This folder is the single source for Nova's character rig: the artwork, the lip-sync rig, the dialogue audio and the timing for each line. Prototyping lives in a separate project and reads files from here without changing them.
+This folder is the single source for Neelo's character rigs (Nova, and Skyrian the world 1 wizard): the artwork, the lip-sync rig, the dialogue audio and the timing for each line. Prototyping lives in a separate project and reads files from here without changing them.
 
 ## Folder layout
 
@@ -16,11 +16,16 @@ art/
     base/                       The same in every outfit: head, eyes, brows, mouth shapes, nose.
     outfits/<outfit>/           That outfit's legs, arms, body and hat, each with a white *_outline copy. A new outfit only adds a folder.
   mouth-shapes-reference.png    Sheet of all mouth shapes, in order X A B C D E F G H, smile.
+  skyrian/                      Skyrian, the wizard. Every character other than Nova gets a folder like this.
+    Skyrian.svg                 Full-body Figma export (the assembled wizard). Never edited.
+    Skyrian-rigged.svg          His rig for the preview, with the same ids as Nova's. Built by build_rig.py.
+    parts/                      His part files for the Flutter component: base/ and outfits/wizard/.
+    rig.json                    Canvas, pivots, eyes, head layers and setting changes, for the Flutter packaging.
 dialogue/
   events.json                   Every app event name and what the app should do. Lines may only use events listed here.
   <line_name>/
     <line_name>.mp3             Voice audio for the line.
-    cues.json                   Approved mouth timing and markers (what the app and previews use).
+    cues.json                   Approved mouth timing and markers (what the app and previews use). "character" says who speaks it (Nova if not set).
     cues-rhubarb-raw.json       Untouched output from the lip-sync tool, kept for reference.
     script.txt                  Exact words spoken, one caption per line, with optional [cues]. See "Script format" below.
     emphasis.json               Stressed moments in the audio, from build_emphasis.py.
@@ -28,17 +33,22 @@ dialogue/
 preview/
   index.html                    The rig preview with every line, switched from its Audio files panel. Open in any browser.
   <line_name>.html              Short link that opens index.html on that line.
-flutter/nova_character/         Nova as a ready-made Flutter widget, with a demo app. Its assets/ folder is generated.
+flutter/nova_character/         The characters as a ready-made Flutter widget, with a demo app. Its assets/ folder is generated
+                                (Nova at its top level, every other character in assets/characters/<name>/).
 dist/                           Zips for the developers (not in git). Built by make_handoff.py.
 tools/
-  build_rig.py                  Rebuilds art/Nova-rigged.svg from art/Nova-outfit_1.svg and art/Character.svg.
+  characters/<name>.json        One settings file per character: his export, parts, pivots, face placement and colours,
+                                and his changes to rig_settings.json. nova.json holds the numbers that used to be in build_rig.py.
+  face_rig.py                   The shared face rig (mouth shapes, eyelids) and the white outline, used for every character.
+  build_rig.py                  Rebuilds art/Nova-rigged.svg and art/parts/ from Nova's exports, then every other character.
+  build_character.py            Builds one character other than Nova into art/<name>/ (build_rig.py runs it for each).
   build_preview.py              Builds preview/index.html with every line in dialogue/.
   build_emphasis.py             Finds each line's stressed moments for the brow lifts and head nods.
   build_captions.py             Times each sentence of a line's script for captions (needs faster-whisper; see the file).
   build_events.py               Checks every event in the lines against dialogue/events.json and writes the developers' EVENTS.md.
   preview_template.html         Page template the preview builder fills in.
   rig_settings.json             Framing, idle, look, blink and outline numbers, shared by the preview and the Flutter widget.
-  build_flutter.py              Packages parts, settings and lines into flutter/nova_character/assets/.
+  build_flutter.py              Packages every character's parts and settings, and every line, into flutter/nova_character/assets/.
   make_handoff.py               Runs every build step and writes dist/nova_character-<version>.zip.
 ```
 
@@ -99,7 +109,32 @@ Timing is 40 ms half, 80 ms closed, 50 ms half. Blinks happen at random every 2.
 
 **Markers.** `cues.json` can carry a `markers` list next to the mouth cues. `{"time", "type": "event", "name"}` sends an event to the app at that moment, for example to highlight the shops. `{"time", "end", "type": "look", "direction"}` turns Nova's eyes and head toward one of eight directions on screen (left, right, up, down, up-left, up-right, down-left, down-right; diagonals are scaled to 75% so the pupils stay in the eyes; looking up also lifts the brows 2 px), and `{"time", "end", "type": "arm", "side": "left" | "right", "degrees"}` raises the arm on that side of the screen and lowers it at `end`; each pupil moves from its resting spot to the same spot in its own eye (so the far pupil travels further), and the head turns 2.5°. The preview shows markers under the timeline and pops up each event as it fires.
 
-**Not rigged yet.** Legs, elbows, separate paws, ears, gaze (`pupils`) and brow expressions.
+**Not rigged yet.** Legs, elbows, separate paws and ears.
+
+## Characters
+
+Every character does everything Nova does: lip-sync, blinks, looking in 8 directions, brow expressions, idle motion and talk nods, arm raises, the baked white outline and framing presets, plus every script tag (looks, arms, brows, events). The face rig is shared (`tools/face_rig.py`) and placed on each character from his settings file in `tools/characters/`. All characters are drawn at the same scale as Nova (Manaf sizes them relative to Nova in Figma), so their art is never resized.
+
+**Skyrian** (`art/skyrian/`, `tools/characters/skyrian.json`) is the wizard of world 1. One look ("wizard"), on a 362 × 869 canvas, standing at x = 180.4 with his soles on the bottom edge.
+
+- Parts, back to front: shoes, then (moving with the breath) collar points and cape, arms, robe with belt, sash and buttons, and the head.
+- Head: beard, ears and face, mouth, mustache, eyes, pupils, lids, brows, hair and hat. The beard and hat move with the head, which turns about (180.4, 345), under the mouth.
+- Arms: each upper arm is a capsule, and the shoulder pivot is the centre of its upper round end, (88.3, 432.3) and (274.7, 432.3). The export has no pivot dots, and the round end means the arm needs no sleeve cap.
+- Mouth: Nova's exact shapes, scaled 0.575 and centred on Skyrian's drawn mouth, behind the mustache. His drawn mouth is his idle smile. The talking shapes sit 3 units lower than the smile, so the mustache doesn't hide the closed and narrow ones. The rest and closed lines are at least 3 units thick. The round mouth's ring matches his beard.
+- Eyes: lids in his skin colours (light on the screen-left half, darker on the right), sized to his eyes (radius 22.2). Pupil reach is scaled to his eyes (7.5 across, 6.2 up and down).
+- Brows: his "surprised" lift is 7 instead of 9, so his brows stay clear of the hat brim.
+- Framing: full body is -14 to 887 (hat tip to below his shoes). He's taller than Nova with his hat, so in the same frame he shows a little smaller than Nova. The other presets are Nova's sizes, measured from the top of the hat, and aren't tuned yet (waiting on the developers).
+- His export has no layer names, so parts are listed by position, like Nova's. `shapeCount` stops the build if the export changes.
+
+## Adding a character
+
+1. Export the assembled character from Figma as one SVG, sized relative to Nova, and save it as `art/<name>/<Name>.svg`. Never edit it. Ticking "Include 'id' attribute" makes the layers easier to read, but isn't required.
+2. Copy `tools/characters/skyrian.json` to `tools/characters/<name>.json`. List his parts by position in the export (legs, body behind the arms, arms with their upper-arm capsule or a `pivot`, body, hat, the head's layers), his head pivot and anchor, his drawn mouth, eye whites, pupils, brows and lid colours.
+3. Run `python3 tools/build_rig.py`, then `python3 tools/build_preview.py`. He appears in the preview's Character picker.
+4. Check his mouth shapes, blinks, looks, brows and arms in the preview, and tune his settings file (mouth drop, minimum stroke, pupil reach, brow lifts, framing).
+5. Give his lines `"character": "<name>"` in cues.json, and run `python3 tools/build_flutter.py` to package him.
+
+Nova's output must not change when a character is added: compare `art/Nova-rigged.svg`, `art/parts/` and `flutter/nova_character/assets/` (Nova's parts, rig.json and lines) before and after.
 
 ## Adding a new dialogue line
 
@@ -110,7 +145,7 @@ Timing is 40 ms half, 80 ms closed, 50 ms half. Blinks happen at random every 2.
 4. Copy `cues-rhubarb-raw.json` to `cues.json`.
 5. Write `script.txt` (see Script format). Add any new event names to `dialogue/events.json`, then time the captions and cues: `~/whisper-venv/bin/python tools/build_captions.py <line_name>`.
 6. Find the stressed words: `python3 tools/build_emphasis.py <line_name>`, and add a `"title"` to `cues.json`: the line's name in the Audio files panel.
-7. Build the preview: `python3 tools/build_preview.py` and open `preview/index.html`. The new line is in the Audio files panel.
+7. If someone other than Nova speaks the line, add `"character": "<name>"` (for example `"skyrian"`) to `cues.json`. Build the preview: `python3 tools/build_preview.py` and open `preview/index.html`. The new line is in the Audio files panel, and choosing it puts its speaker on stage.
 8. Review at half speed. Fix any mouth holds that look wrong by editing `cues.json` (each cue is `{"start", "end", "value"}` in seconds), then rebuild the preview.
 
 Giving Rhubarb the script text (step 3) usually improves accuracy a lot. The first line was timed from audio alone because no script was available.
@@ -144,7 +179,7 @@ A line's `script.txt` is plain text:
 
 **ftux_world_select** "FTUX: world select" (16.3 s, 103 cues). Final recording, with Manaf's script and cues. Raised 18.6 dB to match ftux_home (peaks at -1.9 dBFS). Mouth track hand-timed the same way (closures on "made", "explore", "packed", "games", "Tap", "exploring"; G on "different", "find"; X in every pause; nothing under 40 ms). "When you find a world you like, tap Enter to start exploring!" is 61 characters, so it splits at the comma, right where the Enter highlight starts. Moves: both arms up 32° on "We made it!", down right after it; look right and the right arm up 32° through "Tap the arrow to see the next world!"; look up-right from "tap Enter" to the end. Events: `start_world_rotation` on "Neelo has…" and `stop_world_rotation` after "games!" (the app rotates the worlds on its own timer in between), `highlight_next_world_arrow` on "Tap", `clear_highlight` after "world!", `highlight_enter` on "tap Enter", `clear_highlight` at the end.
 
-**ftux_w1** "FTUX: world 1" (9.7 s, 82 cues). Spoken by **Skyrian**, the world 1 wizard (`"character": "skyrian"` in cues.json). Final recording, with Manaf's script; no tags yet. Raised 10.1 dB to match ftux_home (peaks at -1 dBFS). Mouth track hand-timed the same way (closures on "I'm", "welcome", "Tap"; G on "for", "discover", "flag"; X in every pause; nothing under 40 ms). "Welcome to Aetheris, where we look out for one another." is exactly 55 characters, so it stays one caption. Until Skyrian is rigged, the preview plays this line on Nova.
+**ftux_w1** "FTUX: world 1" (9.7 s, 82 cues). Spoken by **Skyrian**, the world 1 wizard (`"character": "skyrian"` in cues.json). Final recording, with Manaf's script; no tags yet. Raised 10.1 dB to match ftux_home (peaks at -1 dBFS). Mouth track hand-timed the same way (closures on "I'm", "welcome", "Tap"; G on "for", "discover", "flag"; X in every pause; nothing under 40 ms). "Welcome to Aetheris, where we look out for one another." is exactly 55 characters, so it stays one caption. The preview plays it on Skyrian.
 
 The two earlier sample lines (onboarding_nova_dialogue1, voice_line_1) and their sample events (show_logo, show_path) were removed on 2026-10-13, when the final FTUX audio arrived. They're in git history.
 

@@ -1,0 +1,204 @@
+{
+ "label": "Skyrian",
+ "partsDir": "characters/skyrian/parts",
+ "headLayers": [
+  "head_back",
+  "mouth",
+  "mustache",
+  "eyes",
+  "pupils",
+  "lids",
+  "brows",
+  "hair",
+  "hat"
+ ],
+ "canvas": {
+  "width": 362,
+  "height": 869
+ },
+ "anchor": {
+  "x": 180.4,
+  "y": 869
+ },
+ "pivots": {
+  "head": [
+   180.4,
+   345
+  ]
+ },
+ "outfits": {
+  "wizard": {
+   "label": "Wizard",
+   "hatBack": false,
+   "bodyBack": true,
+   "pivots": {
+    "armLeft": [
+     88.3,
+     432.3
+    ],
+    "armRight": [
+     274.7,
+     432.3
+    ]
+   }
+  }
+ },
+ "defaultOutfit": "wizard",
+ "eyes": {
+  "centers": [
+   [
+    147.503,
+    293.579
+   ],
+   [
+    213.347,
+    293.579
+   ]
+  ],
+  "radius": 22.226,
+  "pupilRest": [
+   4.45,
+   -5.08
+  ],
+  "pupilRestY": 1.9
+ },
+ "framing": {
+  "full": {
+   "label": "Full body",
+   "top": -14,
+   "bottom": 887,
+   "width": 400
+  },
+  "knees": {
+   "label": "Knees up",
+   "top": -14,
+   "bottom": 696,
+   "width": 370
+  },
+  "waist": {
+   "label": "Waist up",
+   "top": -14,
+   "bottom": 566,
+   "width": 370
+  },
+  "close": {
+   "label": "Close-up",
+   "top": -14,
+   "bottom": 396,
+   "width": 345
+  }
+ },
+ "idle": {
+  "breathSeconds": 4.2,
+  "breathPx": 0.8,
+  "swaySeconds": 7.3,
+  "swayDegrees": 0.8,
+  "armSwingDegrees": 1.2
+ },
+ "look": {
+  "pupilReach": 7.5,
+  "headDegrees": 2.5,
+  "headPx": 2,
+  "smoothing": 0.12,
+  "pupilReachY": 6.2,
+  "headPxY": 2,
+  "browLiftUp": 2,
+  "diagonal": 0.75,
+  "directions": {
+   "left": [
+    -1,
+    0
+   ],
+   "right": [
+    1,
+    0
+   ],
+   "up": [
+    0,
+    -1
+   ],
+   "down": [
+    0,
+    1
+   ],
+   "up-left": [
+    -1,
+    -1
+   ],
+   "up-right": [
+    1,
+    -1
+   ],
+   "down-left": [
+    -1,
+    1
+   ],
+   "down-right": [
+    1,
+    1
+   ]
+  }
+ },
+ "gesture": {
+  "smoothing": 0.1
+ },
+ "blink": {
+  "halfMs": 40,
+  "closedMs": 80,
+  "halfAgainMs": 50,
+  "minGapMs": 2500,
+  "maxGapMs": 5500,
+  "doubleChance": 0.15,
+  "doubleGapMs": 140
+ },
+ "outline": {
+  "widthPx": 8
+ },
+ "brows": {
+  "autoLiftPx": 3.5,
+  "autoRiseSeconds": 0.08,
+  "autoHoldSeconds": 0.1,
+  "autoFallSeconds": 0.3,
+  "smoothing": 0.12,
+  "expressions": {
+   "surprised": {
+    "liftPx": 7,
+    "tiltDegrees": 2
+   },
+   "happy": {
+    "liftPx": 5,
+    "tiltDegrees": -6
+   },
+   "concerned": {
+    "liftPx": 2,
+    "tiltDegrees": 6
+   }
+  },
+  "pivots": {
+   "left": [
+    139.0,
+    256.4
+   ],
+   "right": [
+    216.5,
+    253.7
+   ]
+  }
+ },
+ "talk": {
+  "nodPx": 1.3,
+  "tiltDegrees": 0.8,
+  "riseSeconds": 0.14,
+  "holdSeconds": 0.06,
+  "fallSeconds": 0.5
+ },
+ "frameRate": {
+  "talking": 30,
+  "idle": 15,
+  "moving": 60
+ },
+ "captions": {
+  "maxChars": 55
+ },
+ "_brows": "Surprised lifts a little less than Nova's, so his brows stay clear of the hat brim."
+}

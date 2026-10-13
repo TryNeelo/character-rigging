@@ -1,0 +1,67 @@
+{
+  "_about": "Skyrian's rig settings, read by tools/build_character.py. Parts are listed by position in the flat Figma export art/skyrian/Skyrian.svg (0-based, [from, to) ranges). The export has no layer names; shapeCount stops the build if it changes.",
+  "label": "Skyrian",
+  "source": "skyrian/Skyrian.svg",
+  "shapeCount": 69,
+  "canvas": [362, 869],
+  "_anchor": "Where he stands: the centre line of his face, robe and shoes, and his soles.",
+  "anchor": [180.4, 869],
+  "_headPivot": "Under the mouth, where the beard starts: the head nods and sways about this point, and the beard and hat move with it.",
+  "headPivot": [180.4, 345],
+  "outfits": {
+    "wizard": {
+      "label": "Wizard",
+      "legs": [[0, 4]],
+      "_body_back": "Collar points and cape: behind the arms, they move with the body's breathing.",
+      "body_back": [[4, 10]],
+      "_arms": "By screen side. The upper arm is a capsule; the shoulder pivot is the centre of its upper round end.",
+      "arm_left": {"shapes": [[13, 16]], "capsule": 13},
+      "arm_right": {"shapes": [[10, 13]], "capsule": 10},
+      "_body": "Hidden hand, collar, robe, the dark V under the beard, belt, robe skirt, hem, sash, buttons and buckle.",
+      "body": [[16, 21], [48, 61]],
+      "hat": [[61, 69]]
+    }
+  },
+  "defaultOutfit": "wizard",
+  "_head": "The head's layers, back to front. Named layers are part files; pupils, lids, brows, mouth and hat are the shared face rig.",
+  "head": [
+    ["head_back", [[21, 29]]],
+    ["mouth"],
+    ["mustache", [[31, 33]]],
+    ["eyes", [[33, 36], [37, 40]]],
+    ["pupils"],
+    ["lids"],
+    ["brows"],
+    ["hair", [[43, 48]]],
+    ["hat"]
+  ],
+  "_headOutline": "Beard, ears, face, mustache and hair get the white outline.",
+  "headOutline": [[21, 29], [31, 33], [43, 48]],
+  "face": {
+    "_smile": "His drawn mouth (the Mouth frame). It is his idle smile, and the shared mouth shapes are scaled and centred onto it.",
+    "smile": [[29, 31]],
+    "whites": {"left": 35, "right": 39},
+    "pupils": {"left": 36, "right": 40},
+    "brows": {"left": 42, "right": 41},
+    "_lidColors": "Skin around each eye: his face is light on the screen-left half and darker on the right.",
+    "lidColors": {"left": "#FECD96", "right": "#F69F42"},
+    "_lipColor": "Ring around the round mouth (F): Nova's matches his muzzle; Skyrian's matches his beard.",
+    "lipColor": "#FAF5F0",
+    "_minStroke": "Thinnest line for the rest and closed mouths (X, A) at his size, in canvas units.",
+    "minStroke": 3,
+    "_mouthDropY": "The talking shapes sit this much lower than his drawn smile, so the mustache doesn't hide the closed and narrow ones.",
+    "mouthDropY": 3
+  },
+  "_settings": "Changes to tools/rig_settings.json for him only. Pupil reach is scaled to his eyes (a bigger pupil in a slightly smaller eye). Framing is only set for full body so far; the rest are Nova's sizes from the top of the hat.",
+  "settings": {
+    "look": {"pupilReach": 7.5, "pupilReachY": 6.2},
+    "_brows": "Surprised lifts a little less than Nova's, so his brows stay clear of the hat brim.",
+    "brows": {"expressions": {"surprised": {"liftPx": 7}}},
+    "framing": {
+      "full": {"label": "Full body", "top": -14, "bottom": 887, "width": 400},
+      "knees": {"label": "Knees up", "top": -14, "bottom": 696, "width": 370},
+      "waist": {"label": "Waist up", "top": -14, "bottom": 566, "width": 370},
+      "close": {"label": "Close-up", "top": -14, "bottom": 396, "width": 345}
+    }
+  }
+}

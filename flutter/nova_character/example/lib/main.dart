@@ -18,6 +18,9 @@ class _NovaDemoState extends State<NovaDemo> {
   NovaAlign align = NovaAlign.right;
   bool outline = true, halfSpeed = false, movement = true;
   String outfit = 'hoodie';
+  String character = 'nova';
+  // Each character's sample line
+  static const lines = {'nova': 'ftux_home', 'skyrian': 'ftux_w1'};
 
   @override
   void initState() {
@@ -52,7 +55,7 @@ class _NovaDemoState extends State<NovaDemo> {
     final scene = Container(
       decoration: BoxDecoration(color: const Color(0xFFC3DEDB), borderRadius: BorderRadius.circular(16)),
       clipBehavior: Clip.antiAlias,
-      child: Stack(children: [Positioned.fill(child: NovaCharacter(controller: nova, framing: framing, align: align, outline: outline, outfit: outfit, idle: movement)),
+      child: Stack(children: [Positioned.fill(child: NovaCharacter(controller: nova, framing: framing, align: align, outline: outline, outfit: outfit, idle: movement, character: character)),
         Positioned(left: 0, right: 0, bottom: 0, child: Center(child: subtitle)),
       ]),
     );
@@ -63,7 +66,7 @@ class _NovaDemoState extends State<NovaDemo> {
         FilledButton(
           onPressed: () => nova.isSpeaking
               ? nova.stop()
-              : nova.play('ftux_home', speed: halfSpeed ? 0.5 : 1),
+              : nova.play(lines[character]!, speed: halfSpeed ? 0.5 : 1),
           child: Text(nova.isSpeaking ? 'Stop' : 'Play line'),
         ),
         const SizedBox(width: 12),
@@ -72,6 +75,18 @@ class _NovaDemoState extends State<NovaDemo> {
       const SizedBox(height: 16),
       SegmentedButton<String>(
         segments: const [
+          ButtonSegment(value: 'nova', label: Text('Nova')),
+          ButtonSegment(value: 'skyrian', label: Text('Skyrian')),
+        ],
+        selected: {character},
+        onSelectionChanged: (v) => setState(() {
+          character = v.first;
+          nova.stop();
+        }),
+      ),
+      const SizedBox(height: 12),
+      if (character == 'nova') SegmentedButton<String>(
+        segments: const [
           ButtonSegment(value: 'hoodie', label: Text('Hoodie')),
           ButtonSegment(value: 'aviator', label: Text('Aviator')),
           ButtonSegment(value: 'construction', label: Text('Construction')),
@@ -79,7 +94,7 @@ class _NovaDemoState extends State<NovaDemo> {
         selected: {outfit},
         onSelectionChanged: (v) => setState(() => outfit = v.first),
       ),
-      const SizedBox(height: 12),
+      if (character == 'nova') const SizedBox(height: 12),
       SegmentedButton<NovaFraming>(
         segments: const [
           ButtonSegment(value: NovaFraming.full, label: Text('Full')),

@@ -68,8 +68,13 @@ class NovaCaption {
 
 /// A dialogue line (or a whole scene): its audio, mouth timing and markers.
 class NovaLine {
-  NovaLine._(this.id, this.audio, this.duration, this.cues, this.markers, this.emphasis, this.captions);
+  NovaLine._(this.id, this.audio, this.duration, this.cues, this.markers, this.emphasis, this.captions,
+      [this.character = 'nova']);
   final String id, audio;
+
+  /// Who speaks the line: "nova", or another character such as "skyrian". Show it with
+  /// `NovaCharacter(character: line.character)`.
+  final String character;
   final double duration;
   final List<NovaCue> cues;
   final List<NovaMarker> markers;
@@ -105,7 +110,8 @@ class NovaLine {
         [
           for (final c in (j['captions'] as List?) ?? [])
             NovaCaption((c['start'] as num).toDouble(), (c['end'] as num).toDouble(), c['text'] as String)
-        ]);
+        ],
+        j['character'] as String? ?? 'nova');
   }
 
   /// The caption to show at [t] seconds, or null between sentences.

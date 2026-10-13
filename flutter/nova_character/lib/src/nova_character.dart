@@ -21,7 +21,7 @@ enum NovaFraming {
 /// Where Nova stands in the widget when it's wider than he needs.
 enum NovaAlign { left, center, right }
 
-/// Nova, drawn live: lip-sync, blinks, subtle idle motion and looks.
+/// Nova (or another character, see [character]), drawn live: lip-sync, blinks, subtle idle motion and looks.
 ///
 /// Fills the space it's given. If the height is unbounded, it sizes itself to the framing.
 class NovaCharacter extends StatefulWidget {
@@ -34,6 +34,7 @@ class NovaCharacter extends StatefulWidget {
     this.idle = true,
     this.blink = true,
     this.outfit,
+    this.character,
   });
 
   final NovaController controller;
@@ -54,6 +55,11 @@ class NovaCharacter extends StatefulWidget {
   /// Outfit id, such as "hoodie" or "aviator". Null uses the default outfit.
   /// Unknown ids fall back to the default.
   final String? outfit;
+
+  /// Which character to draw: "nova" (the default when null) or another character, such as
+  /// "skyrian". Everything else works the same for every character. A line's speaker is
+  /// in [NovaLine.character]. Unknown ids fall back to Nova.
+  final String? character;
 
   @override
   State<NovaCharacter> createState() => _NovaCharacterState();
@@ -80,8 +86,13 @@ class _NovaCharacterState extends State<NovaCharacter> {
   void initState() {
     super.initState();
     widget.controller.addListener(_wake);
-    NovaRig.load().then((rig) {
-      if (!mounted) return;
+    _loadRig();
+  }
+
+  void _loadRig() {
+    final want = widget.character ?? 'nova';
+    NovaRig.load(want).then((rig) {
+      if (!mounted || (widget.character ?? 'nova') != want) return;
       setState(() => _rig = rig);
       _scheduleBlink();
       _wake();
@@ -92,6 +103,7 @@ class _NovaCharacterState extends State<NovaCharacter> {
   void didUpdateWidget(NovaCharacter old) {
     super.didUpdateWidget(old);
     if (old.blink != widget.blink) _scheduleBlink();
+    if (old.character != widget.character) _loadRig();
     if (old.controller != widget.controller) {
       old.controller.removeListener(_wake);
       widget.controller.addListener(_wake);
@@ -297,7 +309,7 @@ class _NovaCharacterState extends State<NovaCharacter> {
     // Each part is drawn once and kept (RepaintBoundary); moving it only shifts the finished
     // picture, so breathing and sway don't redraw the art.
     Widget part(String name) => RepaintBoundary(
-        child: SvgPicture.asset('assets/parts/$name.svg',
+        child: SvgPicture.asset('assets/${rig.partsDir}/$name.svg',
             package: novaPackage, width: w, height: h, fit: BoxFit.fill, allowDrawingOutsideViewBox: true));
     // Parts that are the same in every outfit live in base/; the outfit's own in outfits/<id>/
     Widget base(String name) => part('base/$name');
@@ -332,34 +344,45 @@ class _NovaCharacterState extends State<NovaCharacter> {
               wear('hat_outline'),
             ]
           : [
-        if (outfit.hatBack) wear('hat_back'),
-        base('head_back'),
-        ClipPath(
-          clipper: _EyesClipper(rig, s),
-          child: Stack(children: [
-            // Each pupil moves from its resting spot to the same spot in its own eye
-            for (final (i, side) in [(0, 'left'), (1, 'right')])
-              Transform.translate(
-                offset: Offset((rig.look('pupilReach') * _lookX - rig.pupilRest[i] * _lookX.abs()) * s,
-                    (rig.look('pupilReachY') * _lookY - rig.pupilRestY * _lookY.abs()) * s),
-                child: base('pupil_$side'),
-              ),
-          ]),
-        ),
-        shown(_eye == _Eye.half, base('lids_half')),
-        shown(_eye == _Eye.closed, base('lids_closed')),
-        base('ears'),
-        // Positive tilt raises the inner ends: the screen-left brow turns anticlockwise, the right one clockwise
-        for (final (side, pivot, sign) in [('left', rig.browLeftPivot, -1.0), ('right', rig.browRightPivot, 1.0)])
-          Transform(
-            transform: Matrix4.translationValues(0, -browLift * s, 0)..multiply(rotateAbout(pivot, sign * _browTilt)),
-            child: base('brow_$side'),
-          ),
-        base('muzzle'),
-        for (final m in _mouths) shown(m == shape, base('mouth_$m')),
-        base('nose'),
-        wear('hat'),
-      ]),
+              // The head's layers, back to front (rig.json headLayers): part files and the face rig
+              for (final layer in rig.headLayers)
+                ...switch (layer) {
+                  'hat_back' => [if (outfit.hatBack) wear('hat_back')],
+                  'hat' => [wear('hat')],
+                  'pupils' => [
+                      ClipPath(
+                        clipper: _EyesClipper(rig, s),
+                        child: Stack(children: [
+                          // Each pupil moves from its resting spot to the same spot in its own eye
+                          for (final (i, side) in [(0, 'left'), (1, 'right')])
+                            Transform.translate(
+                              offset: Offset((rig.look('pupilReach') * _lookX - rig.pupilRest[i] * _lookX.abs()) * s,
+                                  (rig.look('pupilReachY') * _lookY - rig.pupilRestY * _lookY.abs()) * s),
+                              child: base('pupil_$side'),
+                            ),
+                        ]),
+                      ),
+                    ],
+                  'lids' => [
+                      shown(_eye == _Eye.half, base('lids_half')),
+                      shown(_eye == _Eye.closed, base('lids_closed')),
+                    ],
+                  // Positive tilt raises the inner ends: the screen-left brow turns anticlockwise, the right one clockwise
+                  'brows' => [
+                      for (final (side, pivot, sign) in [
+                        ('left', rig.browLeftPivot, -1.0),
+                        ('right', rig.browRightPivot, 1.0)
+                      ])
+                        Transform(
+                          transform: Matrix4.translationValues(0, -browLift * s, 0)
+                            ..multiply(rotateAbout(pivot, sign * _browTilt)),
+                          child: base('brow_$side'),
+                        ),
+                    ],
+                  'mouth' => [for (final m in _mouths) shown(m == shape, base('mouth_$m'))],
+                  _ => [base(layer)],
+                },
+            ]),
     );
 
     return SizedBox(
@@ -370,6 +393,8 @@ class _NovaCharacterState extends State<NovaCharacter> {
         Transform.translate(
           offset: Offset(0, upperY * s),
           child: Stack(children: [
+            // A body piece behind the arms, like a cape
+            if (outfit.bodyBack) wear('body_back$ol'),
             // Positive raises lift each arm outward, away from the body
             Transform(transform: rotateAbout(outfit.armLeftPivot, _raiseLeft + swing), child: wear('arm_left$ol')),
             Transform(transform: rotateAbout(outfit.armRightPivot, -_raiseRight - swing), child: wear('arm_right$ol')),
@@ -398,5 +423,5 @@ class _EyesClipper extends CustomClipper<Path> {
   }
 
   @override
-  bool shouldReclip(_EyesClipper old) => old.s != s;
+  bool shouldReclip(_EyesClipper old) => old.s != s || old.rig != rig;
 }

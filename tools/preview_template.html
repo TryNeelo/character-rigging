@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nova Character Rig</title>
+<title>Neelo Character Rig</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
@@ -59,6 +59,7 @@ section h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.15
 section > p { margin: 0 0 12px; color: var(--muted); font-size: 14px; max-width: 60ch; }
 .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .field { display: grid; gap: 6px; }
+.field[hidden] { display: none; }
 .field > span { font-size: 13px; font-weight: 700; color: var(--muted); }
 .fields { display: grid; gap: 18px; }
 
@@ -120,7 +121,7 @@ button { font: inherit; cursor: pointer; }
 .section-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
 .section-head h2 { margin: 0; }
 .btn.small { padding: 6px 14px; font-size: 13px; }
-/* Audio files panel: slides in from the right so lines can be switched while watching Nova */
+/* Audio files panel: slides in from the right so lines can be switched while watching the character */
 .lines-panel { position: fixed; top: 0; right: 0; bottom: 0; width: min(360px, 100vw); background: var(--surface); border-left: 1px solid var(--line); box-shadow: -12px 0 32px rgba(0, 0, 0, .18); z-index: 20; display: flex; flex-direction: column; transform: translateX(100%); visibility: hidden; transition: transform .2s ease, visibility .2s; }
 .lines-panel.open { transform: none; visibility: visible; }
 .panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px; border-bottom: 1px solid var(--line); }
@@ -174,8 +175,8 @@ button { font: inherit; cursor: pointer; }
 <div class="wrap">
   <header>
     <div>
-      <h1>Nova Character Rig</h1>
-      <p>Full-body Nova in any outfit, placed in a frame of your choice. Lip-sync, blinks, subtle idle motion and posable head and arms.</p>
+      <h1>Neelo Character Rig</h1>
+      <p>Neelo's characters, full body, placed in a frame of your choice. Lip-sync, blinks, subtle idle motion and posable head and arms.</p>
     </div>
     <div class="seg-ctl theme" role="group" aria-label="Color theme">
       <button type="button" data-theme-opt="auto">Auto</button>
@@ -195,7 +196,9 @@ button { font: inherit; cursor: pointer; }
       <section>
         <h2>Scene</h2>
         <div class="fields">
-          <div class="field"><span>Outfit</span>
+          <div class="field"><span>Character</span>
+            <div class="seg-ctl" role="group" aria-label="Character" id="characterCtl"></div></div>
+          <div class="field" id="outfitField"><span>Outfit</span>
             <div class="seg-ctl" role="group" aria-label="Outfit" id="outfitCtl"></div></div>
           <div class="field"><span>Frame</span>
             <div class="seg-ctl" role="group" aria-label="Frame size" id="frameCtl"></div></div>
@@ -270,11 +273,11 @@ button { font: inherit; cursor: pointer; }
 
 <aside class="lines-panel script-panel" id="scriptPanel" aria-label="Script">
   <div class="panel-head"><div><h2>Script</h2><p class="sub" id="scriptLine"></p></div><button class="btn ghost small" id="scriptClose">Close</button></div>
-  <div class="script-legend"><span><span class="cue event">event</span>the app reacts</span><span><span class="cue action">action</span>Nova moves</span><span>Tap a line to play from there.</span></div>
+  <div class="script-legend"><span><span class="cue event">event</span>the app reacts</span><span><span class="cue action">action</span>the character moves</span><span>Tap a line to play from there.</span></div>
   <div class="script-rows" id="scriptRows"></div>
 </aside>
 <aside class="lines-panel events-panel" id="eventsPanel" aria-label="Events">
-  <div class="panel-head"><div><h2>Events</h2><p class="sub">What the app does when Nova reaches a tag. Click a tag to copy it.</p></div><button class="btn ghost small" id="eventsClose">Close</button></div>
+  <div class="panel-head"><div><h2>Events</h2><p class="sub">What the app does when the character reaches a tag. Click a tag to copy it.</p></div><button class="btn ghost small" id="eventsClose">Close</button></div>
   <div class="events-list" id="eventsList"></div>
 </aside>
 <aside class="lines-panel" id="linesPanel" aria-label="Audio files">
@@ -302,8 +305,11 @@ button { font: inherit; cursor: pointer; }
   const EVENT_TAGS = %%EVENTS%%;   // the Events panel: highlight rules and every event a script can cue
   let line = LINES.find(l => `#${l.id}` === location.hash) || LINES[0];
   let cues = line.cues, markers = line.markers, emphasis = line.emphasis, captions = line.captions, DURATION = cues[cues.length - 1].end;
-  // Shared with the Flutter component: tools/rig_settings.json
-  const S = %%SETTINGS%%;
+  // Every character: {label, settings} (tools/rig_settings.json with his own changes), and for all but
+  // the one on the page at load, his rigged SVG. Only one character's SVG is on the page at a time.
+  const CHARACTERS = %%CHARACTERS%%;
+  // Shared with the Flutter component: tools/rig_settings.json, plus the character's own changes
+  let S = CHARACTERS.nova.settings;
   // Markers: {time, type: "event", name} fires an app event; {time, end, type: "look", direction} turns Nova's gaze
   // (left, right, up, down, up-left, up-right, down-left, down-right);
   // {time, end, type: "arm", side, degrees} raises an arm (side = the screen side it's on) and lowers it at end;
@@ -311,22 +317,23 @@ button { font: inherit; cursor: pointer; }
   // Emphasis: stressed moments found in the audio (tools/build_emphasis.py); the brows lift briefly on each.
 
   const $ = id => document.getElementById(id);
-  const svg = $('nova');
+  let svg = $('frame').querySelector('svg'), who = svg.id;
   svg.removeAttribute('width'); svg.removeAttribute('height');
+  CHARACTERS[who].svg = svg.outerHTML;
 
   // ---- Scene: frame size, framing preset, position ----
-  // Framing presets are ranges in character units (artboard 556 x 837, feet at y 837, centre x 278).
-  const ANCHOR_X = 278;
+  // Framing presets are ranges in character units (Nova: artboard 556 x 837, feet at y 837, centre x 278).
+  // Each character has his own, all at the same scale as Nova.
+  let ANCHOR_X = 278;
   const FRAMES = { phone: ['Phone', 390, 844], square: ['Square', 600, 600], wide: ['Landscape', 960, 540], avatar: ['Avatar', 160, 160] };
-  const FRAMING = Object.fromEntries(Object.entries(S.framing).map(([k, f]) => [k, [f.label, f]]));
+  let FRAMING = Object.fromEntries(Object.entries(S.framing).map(([k, f]) => [k, [f.label, f]]));
   const ALIGN = { left: 'Left', center: 'Center', right: 'Right' };
   // Outfits come from the rig: every part that changes with the outfit has one group per outfit
-  const OUTFITS = Object.fromEntries([...document.querySelectorAll('#legs > .outfit')].map(g => [g.dataset.outfit, g.dataset.label]));
-  const scene = { frame: 'phone', framing: 'full', align: 'center',
-    outfit: document.querySelector('#legs > .outfit:not([style*="none"])').dataset.outfit };
+  let OUTFITS = {};
+  const scene = { character: who, frame: 'phone', framing: 'full', align: 'center', outfit: null };
 
   function setOutfit() {
-    document.querySelectorAll('#nova .outfit').forEach(g => { g.style.display = g.dataset.outfit === scene.outfit ? '' : 'none'; });
+    svg.querySelectorAll('.outfit').forEach(g => { g.style.display = g.dataset.outfit === scene.outfit ? '' : 'none'; });
     // Each outfit's sleeves give slightly different shoulder pivots
     LP = pivot(armL.querySelector(`[data-outfit="${scene.outfit}"]`));
     RP = pivot(armR.querySelector(`[data-outfit="${scene.outfit}"]`));
@@ -352,52 +359,88 @@ button { font: inherit; cursor: pointer; }
     const btns = Object.entries(options).map(([k, v]) => {
       const b = document.createElement('button');
       b.type = 'button'; b.textContent = Array.isArray(v) ? v[0] : v;
-      b.addEventListener('click', () => { scene[key] = k; btns.forEach(x => x.setAttribute('aria-pressed', x === b)); layout(); });
+      b.addEventListener('click', () => { scene[key] = k; btns.forEach(x => x.setAttribute('aria-pressed', x === b)); key === 'character' ? setCharacter(k) : layout(); });
       b.setAttribute('aria-pressed', scene[key] === k);
       el.appendChild(b); return b;
     });
   }
-  segControl($('outfitCtl'), OUTFITS, 'outfit');
+  segControl($('characterCtl'), Object.fromEntries(Object.entries(CHARACTERS).map(([k, c]) => [k, c.label])), 'character');
   segControl($('frameCtl'), FRAMES, 'frame');
   segControl($('framingCtl'), FRAMING, 'framing');
   segControl($('alignCtl'), ALIGN, 'align');
   let dots = null;
-  const character = $('character');
   // The outline is drawn into the art as a white layer behind Nova; the toggle shows or hides it
   $('captionsOn').addEventListener('change', e => { $('caption').hidden = !e.target.checked; });
-  $('outlineOn').addEventListener('change', e => { $('outline').style.display = e.target.checked ? '' : 'none'; });
+  const showOutline = () => { $('outline').style.display = $('outlineOn').checked ? '' : 'none'; };
+  $('outlineOn').addEventListener('change', showOutline);
 
   // ---- Pose and idle ----
   const pivot = el => el.dataset.pivot.split(' ').map(Number);
-  const upper = $('upper'), head = $('head'), armL = $('arm-left'), armR = $('arm-right');
-  const HP = pivot(head);
-  let LP = pivot(armL), RP = pivot(armR);
+  // The character's moving parts. Set again by bindRig() when the character changes.
+  let upper, head, armL, armR, HP, LP, RP, pupils, browEls, mouths, lids, closedEyes, OPEN_Y, HALF;
+  let LOOK, B, TK, I;
   const NS = 'http://www.w3.org/2000/svg';
-  dots = document.createElementNS(NS, 'g');
-  dots.setAttribute('display', 'none');
-  [HP, LP, RP].forEach(([x, y]) => {
-    const c = document.createElementNS(NS, 'circle');
-    c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', 5);
-    c.setAttribute('fill', '#F006D8'); c.setAttribute('stroke', '#fff'); c.setAttribute('stroke-width', 2);
-    dots.appendChild(c);
-  });
-  svg.appendChild(dots);
+  function bindRig() {
+    ({ look: LOOK, brows: B, talk: TK, idle: I } = S);
+    FRAMING = Object.fromEntries(Object.entries(S.framing).map(([k, f]) => [k, [f.label, f]]));
+    ANCHOR_X = svg.dataset.anchorX ? +svg.dataset.anchorX : 278;
+    upper = $('upper'); head = $('head'); armL = $('arm-left'); armR = $('arm-right');
+    HP = pivot(head); LP = pivot(armL); RP = pivot(armR);
+    dots = document.createElementNS(NS, 'g');
+    dots.setAttribute('display', $('pivotsOn').checked ? 'inline' : 'none');
+    [HP, LP, RP].forEach(([x, y]) => {
+      const c = document.createElementNS(NS, 'circle');
+      c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', 5);
+      c.setAttribute('fill', '#F006D8'); c.setAttribute('stroke', '#fff'); c.setAttribute('stroke-width', 2);
+      dots.appendChild(c);
+    });
+    svg.appendChild(dots);
+    // Each pupil moves from where it rests in the art to the same spot in its eye
+    pupils = [$('pupil-left'), $('pupil-right')].map(el => ({ el, rest: +el.dataset.rest, restY: +el.dataset.restY }));
+    browEls = ['left', 'right'].map(side => ({ el: $(`brow-${side}`), side, p: pivot($(`brow-${side}`)) }));
+    mouths = {};
+    svg.querySelectorAll('.mouth').forEach(g => { mouths[g.id.replace('mouth-', '')] = g; });
+    lids = svg.querySelectorAll('.lid');
+    closedEyes = svg.querySelectorAll('.eye-closed');
+    // How far the lids sit up when open and half closed (Nova's unless the character's eyes say otherwise)
+    const wrap = svg.querySelector('[data-open]');
+    OPEN_Y = wrap ? -wrap.dataset.open : -51.3; HALF = wrap ? -wrap.dataset.half : -15;
+    // Outfits come from the rig: every part that changes with the outfit has one group per outfit
+    OUTFITS = Object.fromEntries([...svg.querySelectorAll('#legs > .outfit')].map(g => [g.dataset.outfit, g.dataset.label]));
+    scene.outfit = svg.querySelector('#legs > .outfit:not([style*="none"])').dataset.outfit;
+    $('outfitCtl').replaceChildren();
+    segControl($('outfitCtl'), OUTFITS, 'outfit');
+    $('outfitField').hidden = Object.keys(OUTFITS).length < 2;
+    showOutline();
+  }
+  bindRig();
   $('pivotsOn').addEventListener('change', e => dots.setAttribute('display', e.target.checked ? 'inline' : 'none'));
+  // Switch characters: swap the SVG on the page, then find his parts again
+  function setCharacter(k) {
+    if (k === who || !CHARACTERS[k]) return;
+    stop();
+    const box = document.createElement('div');
+    box.innerHTML = CHARACTERS[k].svg;
+    const next = box.firstElementChild;
+    next.removeAttribute('width'); next.removeAttribute('height');
+    svg.replaceWith(next);
+    svg = next; who = k; scene.character = k; S = CHARACTERS[k].settings;
+    $('characterCtl').querySelectorAll('button').forEach((b, i) => b.setAttribute('aria-pressed', Object.keys(CHARACTERS)[i] === k));
+    bindRig();
+    current = 'smile';
+    setEye('open');
+    layout();
+  }
 
   const pose = { head: 0, look: [0, 0], armL: 0, armR: 0 };
-  // Each pupil moves from where it rests in the art to the same spot in its eye
-  const pupils = [$('pupil-left'), $('pupil-right')].map(el => ({ el, rest: +el.dataset.rest, restY: +el.dataset.restY }));
   // Looking: [x, y], x -1 screen left to 1 screen right, y -1 up to 1 down. Diagonals are scaled down a
   // little so the pupils stay inside the eyes. Pupils slide, the head turns and tips slightly.
-  const LOOK = S.look;
   const lookVec = name => { const v = LOOK.directions[name] || [0, 0]; const k = v[0] && v[1] ? LOOK.diagonal : 1; return [v[0] * k, v[1] * k]; };
   let look = [0, 0], lookTarget = [0, 0], lineLooking = false;
   let raise = { left: 0, right: 0 }, raiseTarget = { left: 0, right: 0 };
   // Arms ease in and out: each follows a midpoint that follows the target, so moves start softly
   let raiseMid = { left: 0, right: 0 };
   // Brows: a quick lift on each stressed moment while talking, plus an expression (from the line or the test control)
-  const B = S.brows;
-  const browEls = ['left', 'right'].map(side => ({ el: $(`brow-${side}`), side, p: pivot($(`brow-${side}`)) }));
   let lineExpression = null, testExpression = null, brow = { lift: 0, tilt: 0 };
   // A smooth bump around a stressed moment, d seconds after it: quick rise, short hold, slower fall
   function bump(d, rise, hold, fall) {
@@ -411,7 +454,6 @@ button { font: inherit; cursor: pointer; }
     return Math.max(0, ...emphasis.map(e => bump(t - e.time, B.autoRiseSeconds, B.autoHoldSeconds, B.autoFallSeconds) * e.strength));
   }
   // Talking head: a small nod on each stressed word, with a slight tilt that alternates side to side
-  const TK = S.talk;
   function talkHead(t) {
     let dip = 0, tilt = 0;
     emphasis.forEach((e, i) => {
@@ -471,7 +513,6 @@ button { font: inherit; cursor: pointer; }
     pose.look = [0, 0]; padBtns.forEach(x => x.setAttribute('aria-pressed', x.title === 'ahead')); $('lookTag').textContent = '[look ahead]';
   });
 
-  const I = S.idle;
   // Draw at the app's frame rates (30 fps talking, 15 fps idle) so the preview looks like the app.
   // Unticked, it draws on every screen refresh for comparison.
   let lastDraw = -1, pendingMouth = null, drawnPose = { armL: 0, armR: 0 };
@@ -522,11 +563,6 @@ button { font: inherit; cursor: pointer; }
   }
 
   // ---- Mouth ----
-  const mouths = {};
-  document.querySelectorAll('#nova .mouth').forEach(g => { mouths[g.id.replace('mouth-', '')] = g; });
-  const lids = document.querySelectorAll('#nova .lid');
-  const closedEyes = document.querySelectorAll('#nova .eye-closed');
-  const OPEN_Y = -51.3, HALF = -15;
 
   let current = 'smile';
   function setMouth(v) {
@@ -640,6 +676,7 @@ button { font: inherit; cursor: pointer; }
   function loadLine(id) {
     stop();
     line = LINES.find(l => l.id === id) || LINES[0];
+    setCharacter(line.character);
     ({ cues, markers, emphasis, captions } = line);
     DURATION = cues[cues.length - 1].end;
     audio.src = line.audio;
@@ -654,7 +691,7 @@ button { font: inherit; cursor: pointer; }
     b.type = 'button'; b.className = 'line-item'; b.dataset.id = l.id;
     b.innerHTML = '<span class="t"></span><span class="m"></span>';
     b.querySelector('.t').textContent = l.title;
-    b.querySelector('.m').textContent = `${l.cues[l.cues.length - 1].end.toFixed(1)} s · ${l.markers.length} markers`;
+    b.querySelector('.m').textContent = `${CHARACTERS[l.character].label} · ${l.cues[l.cues.length - 1].end.toFixed(1)} s · ${l.markers.length} markers`;
     b.addEventListener('click', () => loadLine(l.id));
     $('linesList').appendChild(b);
     return b;

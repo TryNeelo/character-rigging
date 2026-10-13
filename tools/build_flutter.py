@@ -1,9 +1,11 @@
-"""Package Nova for the Flutter component in flutter/nova_character/.
+"""Package the characters for the Flutter component in flutter/nova_character/.
 
-Copies the part files from art/parts/ (run tools/build_rig.py first), writes
-assets/rig.json (canvas, pivots, framing, idle, look, blink and outline settings)
-and one folder per dialogue line with its audio and timing.json, then lists the
-asset folders in the package's pubspec.yaml.
+Copies Nova's part files from art/parts/ (run tools/build_rig.py first), writes
+assets/rig.json (canvas, pivots, framing, idle, look, blink and outline settings),
+packages every other character into assets/characters/<name>/ (his parts and rig.json),
+writes one folder per dialogue line with its audio and timing.json (with "character"
+when someone other than Nova speaks it), then lists the asset folders in the package's
+pubspec.yaml.
 
 Usage: python3 tools/build_flutter.py
 """
@@ -45,6 +47,27 @@ rig = {
 rig['brows']['pivots'] = {side: pivot(f'brow-{side}') for side in ('left', 'right')}
 json.dump(rig, open(os.path.join(ASSETS, 'rig.json'), 'w'), indent=1)
 
+def merged(base, change):
+    """Settings with a character's own changes laid over them (framing is replaced whole)."""
+    out = dict(base)
+    for k, v in change.items():
+        out[k] = merged(base[k], v) if isinstance(v, dict) and isinstance(base.get(k), dict) and k != 'framing' else v
+    return out
+# Every other character: assets/characters/<name>/rig.json and parts/ (base/ and outfits/<outfit>/)
+characters = []
+for path in sorted(glob.glob(os.path.join(ROOT, 'tools', 'characters', '*.json'))):
+    name = os.path.splitext(os.path.basename(path))[0]
+    if name == 'nova': continue
+    src = json.load(open(os.path.join(ROOT, 'art', name, 'rig.json')))
+    out = os.path.join(ASSETS, 'characters', name)
+    shutil.copytree(os.path.join(ROOT, 'art', name, 'parts'), os.path.join(out, 'parts'))
+    crig = {'label': src['label'], 'partsDir': f'characters/{name}/parts', 'headLayers': src['headLayers'],
+            **{k: src[k] for k in ('canvas', 'anchor', 'pivots', 'outfits', 'defaultOutfit', 'eyes')},
+            **merged(settings, src['settings'])}
+    crig['brows'] = dict(crig['brows'], pivots=src['browPivots'])
+    json.dump(crig, open(os.path.join(out, 'rig.json'), 'w'), indent=1)
+    characters.append(name)
+
 lines = []
 for d in sorted(glob.glob(os.path.join(ROOT, 'dialogue', '*', 'cues.json'))):
     line = os.path.basename(os.path.dirname(d))
@@ -56,7 +79,9 @@ for d in sorted(glob.glob(os.path.join(ROOT, 'dialogue', '*', 'cues.json'))):
     cues = [{'start': c['start'], 'end': c['end'], 'shape': c['value']} for c in src['mouthCues']]
     emph = os.path.join(os.path.dirname(d), 'emphasis.json')
     caps = os.path.join(os.path.dirname(d), 'captions.json')    # from build_captions.py
-    json.dump({'id': line, 'audio': 'audio.mp3', 'duration': cues[-1]['end'], 'cues': cues,
+    who = src.get('character', 'nova')
+    assert who == 'nova' or who in characters, (line, who)
+    json.dump({'id': line, **({'character': who} if who != 'nova' else {}), 'audio': 'audio.mp3', 'duration': cues[-1]['end'], 'cues': cues,
                'markers': src.get('markers', []),
                'emphasis': json.load(open(emph)) if os.path.exists(emph) else [],
                # the app only needs each caption's text and timing
@@ -68,8 +93,12 @@ pub = os.path.join(PKG, 'pubspec.yaml')
 # Flutter needs every asset folder listed: base parts, one folder per outfit, one per line
 outfit_dirs = sorted(os.listdir(os.path.join(ASSETS, 'parts', 'outfits')))
 block = ('    - assets/\n    - assets/parts/base/\n' + ''.join(f'    - assets/parts/outfits/{o}/\n' for o in outfit_dirs)
+         + ''.join(f'    - assets/characters/{c}/\n    - assets/characters/{c}/parts/base/\n'
+                   + ''.join(f'    - assets/characters/{c}/parts/outfits/{o}/\n'
+                             for o in sorted(os.listdir(os.path.join(ASSETS, 'characters', c, 'parts', 'outfits'))))
+                   for c in characters)
          + ''.join(f'    - assets/lines/{l}/\n' for l in lines))
 s = open(pub).read()
 s = re.sub(r'(    # BEGIN GENERATED ASSETS\n).*?(    # END GENERATED ASSETS)', lambda m: m.group(1) + block + m.group(2), s, flags=re.S)
 open(pub, 'w').write(s)
-print('packaged', len(os.listdir(os.path.join(ASSETS, 'parts', 'base'))), 'base parts, outfits', outfit_dirs, 'and lines', lines)
+print('packaged', len(os.listdir(os.path.join(ASSETS, 'parts', 'base'))), 'base parts, outfits', outfit_dirs, 'characters', characters, 'and lines', lines)

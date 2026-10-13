@@ -1,0 +1,48 @@
+{
+  "_about": "Nova's rig settings, read by tools/build_rig.py. His exports have no layer names, so parts are listed by their position in the flat Figma export (0-based). Re-check the positions if an export changes; the shape counts stop the build if it does.",
+  "label": "Nova",
+  "canvas": [556, 837],
+  "anchor": [278, 837],
+  "source": "Nova-outfit_1.svg",
+  "shapeCount": 64,
+  "original": "Character.svg",
+  "originalShapeCount": 60,
+  "originalSmile": [47, 48],
+  "originalCap": [54, 59],
+  "_faceOffset": "The head in the full-body art is the original head moved by this much, at the same scale, so the hat, eyelids and mouth shapes keep the original coordinates inside a translate.",
+  "faceOffset": [54, -168.129],
+  "headPivot": [278.7, 392],
+  "head": {
+    "earRoots": [0, 42],
+    "fur": [43, 44],
+    "eyes": [45, 49],
+    "pupils": {"left": 49, "right": 50},
+    "ears": [51, 55],
+    "brows": {"left": 56, "right": 55},
+    "muzzle": 57,
+    "nose": [60, 61]
+  },
+  "eyes": {
+    "_whites": "Eye whites in the full-body art; the pupils stay inside them.",
+    "whites": [[232.875, 269.183], [324.259, 269.183]],
+    "radius": 24.654,
+    "radiusY": 24.6125,
+    "_lids": "Eye centres in the original coordinates, and the lid colour of each (the fur around that eye).",
+    "lids": {"left": [178.875, 437.312, "#983820"], "right": [270.259, 437.312, "#84270F"]},
+    "_pupilRest": "How far each pupil sits from its eye's centre at rest (x). The art has them turned slightly inward, so looking sideways moves each pupil a different amount to the same spot.",
+    "pupilRest": [8.2, -7.8],
+    "pupilRestY": 5.9
+  },
+  "_outfits": "Each outfit lists, by position in its own export, the shapes that make its legs, arms (fur, sleeve, then shapes drawn over the sleeve) and body, plus its hat ('cap' is the original cap). hat_back sits behind the head.",
+  "outfits": {
+    "hoodie": {"label": "Hoodie", "file": "Nova-outfit_1.svg", "count": 64, "legs": [[1, 13]],
+               "arm_left": [13, 14, []], "arm_right": [15, 16, []], "body": [[17, 18], [18, 42]], "hat": "cap"},
+    "aviator": {"label": "Aviator", "file": "Nova-outfit_2.svg", "count": 97, "legs": [[0, 16]],
+                "arm_left": [16, 17, [[18, 21]]], "arm_right": [21, 22, [[23, 26]]],
+                "body": [[26, 33], [35, 59]], "hat": [[80, 97]]},
+    "construction": {"label": "Construction", "file": "Nova-outfit_3.svg", "count": 62, "legs": [[1, 15]],
+                     "arm_left": [15, 16, []], "arm_right": [17, 18, []], "body": [[19, 25], [52, 62]],
+                     "hat": [[48, 52]], "hat_back": [[0, 1]]}
+  },
+  "defaultOutfit": "hoodie"
+}

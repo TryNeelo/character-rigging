@@ -7,6 +7,10 @@ set moments in a line ("when Nova says *see those shops*, highlight the shops").
 Everything Nova needs (art, audio, timing) is bundled in the package. You don't
 assemble anything: add the widget, play a line, and listen for events.
 
+The other characters come in the same package and work the same way. Today that's
+**Skyrian**, the world 1 wizard: pass `character: 'skyrian'` (see "Other characters").
+Nothing changes for code that only shows Nova.
+
 ## Try it
 
 ```bash
@@ -14,8 +18,8 @@ cd example
 flutter run -d chrome     # or any device
 ```
 
-The demo screen has a Play button, framing and position controls, and a log of the
-events Nova sends.
+The demo screen has a Play button, a character picker (Nova or Skyrian, each with a
+sample line), framing and position controls, and a log of the events he sends.
 
 ## Add it to your app
 
@@ -54,6 +58,28 @@ await nova.play('ftux_home');
 
 Dispose the controller with your screen (`nova.dispose()`).
 
+### Other characters
+
+Add `character:` to the widget. Leave it out (or pass `'nova'`) and you get Nova, so
+existing code doesn't change. The controller is the same for every character.
+
+```dart
+NovaCharacter(
+  controller: nova,
+  character: 'skyrian',           // 'nova' (default) or 'skyrian'
+  framing: NovaFraming.full,
+)
+
+await nova.play('ftux_w1');       // a Skyrian line
+```
+
+Each line knows who speaks it: `NovaLine.character` (`nova.line?.character` while it
+plays) is `'nova'` or `'skyrian'`, so you can pass it straight to the widget. Every
+character lip-syncs, blinks, looks, raises his arms, sets his brows and sends events
+the same way. Skyrian has one look, so `outfit` doesn't apply to him. All characters
+are drawn at the same scale as Nova; Skyrian is a little taller with his hat, so his
+full-body framing is a little taller too.
+
 ## The controller
 
 | Member | What it does |
@@ -76,22 +102,25 @@ Dispose the controller with your screen (`nova.dispose()`).
 | `idle` | `true` | Movement switch. Nova draws at 15 fps for idle motion, 30 while talking and 60 during arm and look moves (they last a moment). On: breathing and slight sway between lines, nods and brow lifts while talking. Off: he only blinks and lip-syncs, and doesn't redraw between blinks. |
 | `blink` | `true` | Random blinks every 2.5 to 5.5 s. |
 | `outfit` | `'hoodie'` | Which outfit Nova wears: `'hoodie'`, `'aviator'` or `'construction'`. Change it any time; his face, lip-sync and motion carry over. |
+| `character` | `'nova'` | Which character to draw: `'nova'` or `'skyrian'`. Unknown ids fall back to Nova. Change it any time. |
 
 If the widget's height is unbounded, it sizes itself to the framing's proportions.
 
 ## What's in a line
 
-This version has the four FTUX lines, all with the final audio:
+This version has the four Nova FTUX lines and Skyrian's world 1 line, all with the final audio:
 
-| Line id | Scene |
-|---|---|
-| `ftux_home` | Home map: shops, then the home |
-| `ftux_room` | Nova's room: sticker book, then the closet |
-| `ftux_home_return` | Back on the home map: the back arrow |
-| `ftux_world_select` | World selection: rotating worlds, next-world arrow, Enter |
+| Line id | Speaker | Scene |
+|---|---|---|
+| `ftux_home` | Nova | Home map: shops, then the home |
+| `ftux_room` | Nova | Nova's room: sticker book, then the closet |
+| `ftux_home_return` | Nova | Back on the home map: the back arrow |
+| `ftux_world_select` | Nova | World selection: rotating worlds, next-world arrow, Enter |
+| `ftux_w1` | Skyrian | World 1: Skyrian's welcome (no events yet) |
 
 Each line is a folder in `assets/lines/<line_id>/` with `audio.mp3` and `timing.json`.
-The timing file holds the mouth shapes and the markers:
+The timing file holds the mouth shapes and the markers, plus `"character"` when someone
+other than Nova speaks it:
 
 ```json
 "markers": [
@@ -123,8 +152,8 @@ The audio is the clock, so slow devices and speed changes stay in sync.
 
 ## Where this comes from
 
-This package is generated from the Nova character repo, which is the single source for
-his art, lines and timing. New lines, timing fixes and art changes arrive as a new
+This package is generated from the character repo, which is the single source for
+the characters' art, lines and timing. New lines, timing fixes and art changes arrive as a new
 version of this folder; please don't edit `assets/` by hand.
 
 Built and checked with Flutter 3.47 (Dart 3.13). Uses `flutter_svg` and `just_audio`.

@@ -24,19 +24,30 @@ class NovaFramingSpec {
 /// An outfit: its name and the shoulder pivots its sleeves give.
 class NovaOutfitSpec {
   const NovaOutfitSpec(
-      {required this.label, required this.armLeftPivot, required this.armRightPivot, this.hatBack = false});
+      {required this.label,
+      required this.armLeftPivot,
+      required this.armRightPivot,
+      this.hatBack = false,
+      this.bodyBack = false});
   final String label;
 
   /// Whether the hat has a piece behind the head (hat_back_<id>.svg), like a hard hat's brim.
   final bool hatBack;
+
+  /// Whether the body has a piece behind the arms (body_back.svg), like a cape.
+  final bool bodyBack;
   final Offset armLeftPivot, armRightPivot;
 }
 
-/// Nova's rig: canvas, pivots and motion settings, loaded from assets/rig.json.
+/// A character's rig: canvas, pivots and motion settings, loaded from assets/rig.json (Nova)
+/// or assets/characters/<id>/rig.json (every other character).
 /// Generated from the character repo by tools/build_flutter.py.
 class NovaRig {
-  NovaRig._(this._j)
-      : width = _num(_j['canvas']['width']),
+  NovaRig._(this._j, this.character)
+      : label = _j['label'] as String? ?? 'Nova',
+        partsDir = _j['partsDir'] as String? ?? 'parts',
+        headLayers = [for (final l in (_j['headLayers'] as List?) ?? _novaHead) l as String],
+        width = _num(_j['canvas']['width']),
         height = _num(_j['canvas']['height']),
         anchorX = _num(_j['anchor']['x']),
         headPivot = _offset(_j['pivots']['head']),
@@ -47,7 +58,8 @@ class NovaRig {
                 label: e.value['label'] as String,
                 armLeftPivot: _offset(e.value['pivots']['armLeft']),
                 armRightPivot: _offset(e.value['pivots']['armRight']),
-                hatBack: e.value['hatBack'] as bool? ?? false)
+                hatBack: e.value['hatBack'] as bool? ?? false,
+                bodyBack: e.value['bodyBack'] as bool? ?? false)
         },
         eyeCenters = [for (final c in _j['eyes']['centers'] as List) _offset(c)],
         eyeRadius = _num(_j['eyes']['radius']),
@@ -59,6 +71,17 @@ class NovaRig {
         };
 
   final Map<String, dynamic> _j;
+
+  /// The character's id ("nova", "skyrian") and name.
+  final String character, label;
+
+  /// Where this character's part files are, under assets/.
+  final String partsDir;
+
+  /// The head's layers, back to front: part files in base/, or the face rig's moving pieces
+  /// ("pupils", "lids", "brows", "mouth", "hat", "hat_back").
+  final List<String> headLayers;
+  static const _novaHead = ['hat_back', 'head_back', 'pupils', 'lids', 'ears', 'brows', 'muzzle', 'mouth', 'nose', 'hat'];
   final double width, height, anchorX, eyeRadius;
   final Offset headPivot;
 
@@ -94,12 +117,14 @@ class NovaRig {
   late final Offset browLeftPivot = _offset(_j['brows']['pivots']['left']);
   late final Offset browRightPivot = _offset(_j['brows']['pivots']['right']);
 
-  static Future<NovaRig>? _loading;
+  static final Map<String, Future<NovaRig>> _loading = {};
 
-  /// Loads the rig once and shares it between all Nova widgets.
-  static Future<NovaRig> load() => _loading ??= rootBundle
-      .loadString(novaAsset('rig.json'))
-      .then((s) => NovaRig._(jsonDecode(s) as Map<String, dynamic>));
+  /// Loads a character's rig once and shares it between all widgets showing him.
+  /// Nova by default; an unknown character falls back to Nova.
+  static Future<NovaRig> load([String character = 'nova']) => _loading[character] ??= rootBundle
+      .loadString(novaAsset(character == 'nova' ? 'rig.json' : 'characters/$character/rig.json'))
+      .then((s) => NovaRig._(jsonDecode(s) as Map<String, dynamic>, character))
+      .catchError((Object e) => character == 'nova' ? Future<NovaRig>.error(e) : load());
 
   static double _num(dynamic v) => (v as num).toDouble();
   static Offset _offset(dynamic v) => Offset(_num((v as List)[0]), _num(v[1]));
