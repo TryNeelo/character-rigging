@@ -83,6 +83,9 @@ button { font: inherit; cursor: pointer; }
 .tag:hover { border-color: var(--accent); }
 .tag:focus-visible { outline: 3px solid var(--rust); outline-offset: 2px; }
 .tag.copied { color: var(--muted); }
+/* Hands behind back: one button per arm and one for both, stacked, each with its script tag */
+.behind-rows { display: grid; gap: 8px; }
+.behind-rows .btn { min-width: 13.5em; }
 .look-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 
 .strip-wrap { overflow-x: auto; border-radius: 12px; }
@@ -238,10 +241,16 @@ button { font: inherit; cursor: pointer; }
           <label class="slider tagged"><span>Right arm</span><input type="range" id="poseArmR" min="0" max="180" step="1" value="0"><button type="button" class="tag" id="poseArmROut" title="Script tag for this pose. Click to copy.">[right arm down]</button></label>
           <!-- Characters with elbows (Skyrian): elbow bends, and his resting pose with his hands behind his back -->
           <div class="fields" id="elbowRows" hidden>
-            <label class="slider tagged"><span>Left elbow</span><input type="range" id="poseElbowL" min="0" max="150" step="1" value="0"><button type="button" class="tag" id="poseElbowLOut" title="Script tag for this pose. Click to copy.">[left elbow 0]</button></label>
-            <label class="slider tagged"><span>Right elbow</span><input type="range" id="poseElbowR" min="0" max="150" step="1" value="0"><button type="button" class="tag" id="poseElbowROut" title="Script tag for this pose. Click to copy.">[right elbow 0]</button></label>
-            <div class="look-row"><button class="btn ghost" id="armsBehind">Hands behind back</button>
-              <button type="button" class="tag" title="Script tag for this pose. Click to copy.">[arms behind]</button></div>
+            <label class="slider tagged"><span>Left elbow</span><input type="range" id="poseElbowL" min="-150" max="150" step="1" value="0"><button type="button" class="tag" id="poseElbowLOut" title="Script tag for this pose. Click to copy.">[left elbow 0]</button></label>
+            <label class="slider tagged"><span>Right elbow</span><input type="range" id="poseElbowR" min="-150" max="150" step="1" value="0"><button type="button" class="tag" id="poseElbowROut" title="Script tag for this pose. Click to copy.">[right elbow 0]</button></label>
+            <div class="behind-rows">
+              <div class="look-row"><button class="btn ghost" id="armsBehind">Hands behind back</button>
+                <button type="button" class="tag" title="Script tag for this pose. Click to copy.">[arms behind]</button></div>
+              <div class="look-row"><button class="btn ghost" data-behind="left">Left hand behind back</button>
+                <button type="button" class="tag" title="Script tag for this pose. Click to copy.">[left arm behind]</button></div>
+              <div class="look-row"><button class="btn ghost" data-behind="right">Right hand behind back</button>
+                <button type="button" class="tag" title="Script tag for this pose. Click to copy.">[right arm behind]</button></div>
+            </div>
           </div>
           <div class="row">
             <label class="toggle"><input type="checkbox" id="idleOn" checked><span>Idle motion</span></label>
@@ -524,16 +533,24 @@ button { font: inherit; cursor: pointer; }
       out.textContent = sliderLabel[k](input.value);
     });
   });
-  for (const [side, id] of [['left', 'poseElbowL'], ['right', 'poseElbowR']]) {
-    $(id).addEventListener('input', () => { test.elbow[side] = +$(id).value; $(id + 'Out').textContent = `[${side} elbow ${$(id).value}]`; armTargets(raf ? audio.currentTime : null); });
+  // Elbow sliders start straight in the middle: left bends the elbow in (toward the body), right bends it out
+  const elbowTag = (side, v) => +v < 0 ? `[${side} elbow in ${-v}]` : +v > 0 ? `[${side} elbow out ${v}]` : `[${side} elbow 0]`;
+  const ELBOWS = { left: ['armL', 'poseArmL', 'poseElbowL'], right: ['armR', 'poseArmR', 'poseElbowR'] };
+  for (const [side, [, , id]] of Object.entries(ELBOWS)) {
+    $(id).addEventListener('input', () => { test.elbow[side] = -$(id).value; $(id + 'Out').textContent = elbowTag(side, $(id).value); armTargets(raf ? audio.currentTime : null); });
   }
-  function resetArms() {
-    for (const side of ['left', 'right']) { test.arm[side] = null; test.elbow[side] = null; }
-    for (const [k, id] of [['armL', 'poseArmL'], ['armR', 'poseArmR']]) { pose[k] = 0; $(id).value = 0; $(id + 'Out').textContent = sliderLabel[k](0); }
-    for (const [side, id] of [['left', 'poseElbowL'], ['right', 'poseElbowR']]) { $(id).value = 0; $(id + 'Out').textContent = `[${side} elbow 0]`; }
+  // Hands behind back: both arms, or one (sides are the screen's)
+  function resetArms(sides = ['left', 'right']) {
+    for (const side of sides) {
+      const [k, armId, elbowId] = ELBOWS[side];
+      test.arm[side] = null; test.elbow[side] = null;
+      pose[k] = 0; $(armId).value = 0; $(armId + 'Out').textContent = sliderLabel[k](0);
+      $(elbowId).value = 0; $(elbowId + 'Out').textContent = elbowTag(side, 0);
+    }
     if (REST.left) armTargets(raf ? audio.currentTime : null);
   }
-  $('armsBehind').addEventListener('click', resetArms);
+  $('armsBehind').addEventListener('click', () => resetArms());
+  document.querySelectorAll('[data-behind]').forEach(b => b.addEventListener('click', () => resetArms([b.dataset.behind])));
   // Click a tag to copy it for a script
   document.addEventListener('click', async e => {
     const tag = e.target.closest('.tag');
@@ -817,7 +834,7 @@ button { font: inherit; cursor: pointer; }
     : mk.type === 'look' ? `look ${mk.direction}` : mk.type === 'lookEnd' ? 'look ahead'
     : mk.type === 'arm' ? `${mk.both ? 'arms' : mk.side + ' arm'} ${mk.degrees ? 'up ' + mk.degrees : 'down'}`
     : mk.type === 'armEnd' ? `${mk.both ? 'arms' : mk.side + ' arm'} ${REST.left ? 'behind' : 'down'}`
-    : mk.type === 'elbow' ? `${mk.both ? 'elbows' : mk.side + ' elbow'} ${mk.degrees}`
+    : mk.type === 'elbow' ? `${mk.both ? 'elbows' : mk.side + ' elbow'} ${mk.degrees > 0 ? 'in ' + mk.degrees : mk.degrees < 0 ? 'out ' + -mk.degrees : 0}`
     : mk.type === 'expressionEnd' ? 'normal brows' : `${mk.name} brows`;
   function scriptItems() {
     const items = [];

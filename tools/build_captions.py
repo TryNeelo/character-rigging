@@ -12,7 +12,8 @@ Script format (dialogue/<line>/script.txt), plain text:
         [look right]  [look up-right]  [look ahead]          eight directions; ahead looks straight again
         [arms up 32]  [right arm up 32]  [arms down]  [left arm down]    degrees; up alone is 32
         [arms behind]  [left arm behind]                    back to the resting pose (Skyrian: hands behind his back)
-        [left elbow 45]  [elbows 90]  [right elbow 0]       bends the elbow (0 is straight), for characters with elbows
+        [left elbow in 45]  [right elbow out 60]  [elbows 0]   bends the elbow in (toward the body) or out; 0 is
+                                                    straight and a bare number means in. For characters with elbows
         [happy brows]  [surprised brows]  [concerned brows]  [normal brows]
   - Any caption longer than captions.maxChars (tools/rig_settings.json) is split at a
     sentence end, then a comma, then a space, and is flagged to check.
@@ -76,8 +77,8 @@ def action_for(cue):
         nums = [w for w in words[1:] if w.isdigit()]
         if words[1:] in (['straight'], ['0']) or nums == ['0']:
             return ('elbow', sides, 0)
-        if nums:
-            return ('elbow', sides, int(nums[0]))
+        if nums:   # degrees bent in (toward the body), or out when the cue says so
+            return ('elbow', sides, -int(nums[0]) if 'out' in words else int(nums[0]))
     if words[:1] in (['arm'], ['arms']):
         rest = words[1:]
         nums = [w for w in rest if w.isdigit()]

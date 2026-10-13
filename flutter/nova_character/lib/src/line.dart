@@ -154,8 +154,9 @@ class NovaLine {
     return v;
   }
 
-  /// The elbow bend on the screen's [side] at [t] seconds, in degrees, or null when no elbow
-  /// marker is holding it. Only characters with elbows use these.
+  /// The elbow bend on the screen's [side] at [t] seconds, in degrees (positive bends it in
+  /// toward the body, negative out), or null when no elbow marker is holding it. Only
+  /// characters with elbows use these.
   double? elbowAt(double t, String side) {
     for (final m in markers) {
       if (m.type == 'elbow' && m.side == side && t >= m.time && t < (m.end ?? m.time)) return m.degrees ?? 0;
