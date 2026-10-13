@@ -50,6 +50,12 @@ Line id: `ftux_w1`
 
 No events in this line.
 
+## FTUX: world 2
+
+Line id: `ftux_w2`
+
+No events in this line.
+
 ## FTUX: world select
 
 Line id: `ftux_world_select`

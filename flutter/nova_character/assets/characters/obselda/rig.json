@@ -1,0 +1,227 @@
+{
+ "label": "Obselda",
+ "partsDir": "characters/obselda/parts",
+ "headLayers": [
+  "hair_top",
+  "ears",
+  "face",
+  "mouth",
+  "scarf",
+  "bangs",
+  "brows",
+  "eyes",
+  "pupils",
+  "lids"
+ ],
+ "canvas": {
+  "width": 374,
+  "height": 814
+ },
+ "anchor": {
+  "x": 184.4,
+  "y": 814
+ },
+ "pivots": {
+  "head": [
+   184.4,
+   272
+  ]
+ },
+ "outfits": {
+  "explorer": {
+   "label": "Explorer",
+   "hat": false,
+   "hatBack": false,
+   "bodyBack": true,
+   "pivots": {
+    "armLeft": [
+     93.89,
+     307.86
+    ],
+    "armRight": [
+     272.44,
+     307.86
+    ],
+    "elbowLeft": [
+     38.39,
+     404.35
+    ],
+    "elbowRight": [
+     327.94,
+     404.35
+    ]
+   },
+   "armRest": {
+    "left": [
+     30.0,
+     90.0
+    ],
+    "right": [
+     30.0,
+     90.0
+    ]
+   },
+   "armDown": {
+    "left": 6.44,
+    "right": 5.14
+   }
+  }
+ },
+ "defaultOutfit": "explorer",
+ "eyes": {
+  "centers": [
+   [
+    146.888,
+    169.637
+   ],
+   [
+    221.859,
+    169.638
+   ]
+  ],
+  "radius": 25.481,
+  "pupilRest": [
+   5.6,
+   -5.6
+  ],
+  "pupilRestY": -0.51
+ },
+ "framing": {
+  "full": {
+   "label": "Full body",
+   "top": -14,
+   "bottom": 832,
+   "width": 400
+  },
+  "knees": {
+   "label": "Knees up",
+   "top": -14,
+   "bottom": 696,
+   "width": 370
+  },
+  "waist": {
+   "label": "Waist up",
+   "top": -14,
+   "bottom": 566,
+   "width": 370
+  },
+  "close": {
+   "label": "Close-up",
+   "top": -14,
+   "bottom": 396,
+   "width": 345
+  }
+ },
+ "idle": {
+  "breathSeconds": 4.2,
+  "breathPx": 0.8,
+  "swaySeconds": 7.3,
+  "swayDegrees": 0.8,
+  "armSwingDegrees": 1.2
+ },
+ "look": {
+  "pupilReach": 8.8,
+  "headDegrees": 2.5,
+  "headPx": 2,
+  "smoothing": 0.12,
+  "pupilReachY": 6.8,
+  "headPxY": 2,
+  "browLiftUp": 2,
+  "diagonal": 0.75,
+  "directions": {
+   "left": [
+    -1,
+    0
+   ],
+   "right": [
+    1,
+    0
+   ],
+   "up": [
+    0,
+    -1
+   ],
+   "down": [
+    0,
+    1
+   ],
+   "up-left": [
+    -1,
+    -1
+   ],
+   "up-right": [
+    1,
+    -1
+   ],
+   "down-left": [
+    -1,
+    1
+   ],
+   "down-right": [
+    1,
+    1
+   ]
+  }
+ },
+ "gesture": {
+  "smoothing": 0.1
+ },
+ "blink": {
+  "halfMs": 40,
+  "closedMs": 80,
+  "halfAgainMs": 50,
+  "minGapMs": 2500,
+  "maxGapMs": 5500,
+  "doubleChance": 0.15,
+  "doubleGapMs": 140
+ },
+ "outline": {
+  "widthPx": 8
+ },
+ "brows": {
+  "autoLiftPx": 3.5,
+  "autoRiseSeconds": 0.08,
+  "autoHoldSeconds": 0.1,
+  "autoFallSeconds": 0.3,
+  "smoothing": 0.12,
+  "expressions": {
+   "surprised": {
+    "liftPx": 9,
+    "tiltDegrees": 2
+   },
+   "happy": {
+    "liftPx": 5,
+    "tiltDegrees": -6
+   },
+   "concerned": {
+    "liftPx": 2,
+    "tiltDegrees": 6
+   }
+  },
+  "pivots": {
+   "left": [
+    145.0,
+    120.1
+   ],
+   "right": [
+    223.7,
+    121.1
+   ]
+  }
+ },
+ "talk": {
+  "nodPx": 1.3,
+  "tiltDegrees": 0.8,
+  "riseSeconds": 0.14,
+  "holdSeconds": 0.06,
+  "fallSeconds": 0.5
+ },
+ "frameRate": {
+  "talking": 30,
+  "idle": 15,
+  "moving": 60
+ },
+ "captions": {
+  "maxChars": 55
+ }
+}

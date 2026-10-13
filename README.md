@@ -1,6 +1,6 @@
 # Neelo | Character Rig
 
-This folder is the single source for Neelo's character rigs (Nova, and Skyrian the world 1 wizard): the artwork, the lip-sync rig, the dialogue audio and the timing for each line. Prototyping lives in a separate project and reads files from here without changing them.
+This folder is the single source for Neelo's character rigs (Nova, Skyrian the world 1 wizard and Obselda the world 2 explorer): the artwork, the lip-sync rig, the dialogue audio and the timing for each line. Prototyping lives in a separate project and reads files from here without changing them.
 
 ## Folder layout
 
@@ -23,6 +23,7 @@ art/
     Skyrian-rigged.svg          His rig for the preview, with the same ids as Nova's. Built by build_rig.py.
     parts/                      His part files for the Flutter component: base/ and outfits/wizard/.
     rig.json                    Canvas, pivots, eyes, head layers and setting changes, for the Flutter packaging.
+  obselda/                      Obselda, the explorer: Obselda.svg (Figma export, never edited), Obselda-rigged.svg, parts/, rig.json.
 dialogue/
   events.json                   Every app event name and what the app should do. Lines may only use events listed here.
   <line_name>/
@@ -128,6 +129,16 @@ Every character does everything Nova does: lip-sync, blinks, looking in 8 direct
 - Framing: full body is -14 to 887 (hat tip to below his shoes). He's taller than Nova with his hat, so in the same frame he shows a little smaller than Nova. The other presets are Nova's sizes, measured from the top of the hat, and aren't tuned yet (waiting on the developers).
 - His export has no layer names, so parts are listed by position, like Nova's. `shapeCount` stops the build if the export changes.
 
+**Obselda** (`art/obselda/`, `tools/characters/obselda.json`) is the explorer of world 2. One look ("explorer"), on a 374 × 814 canvas, standing at x = 184.4 with her soles on the bottom edge.
+
+- Parts, back to front: legs, trousers and boots; then (moving with the breath) her long hair down her back, arms, tunic with belt and buckle, and the head.
+- Head: hair, ears, face, mouth, scarf and earrings, bangs, brows, eyes, pupils and lids. The scarf, earrings and hair move with the head, which turns about (184.4, 272), under the chin. Her brows sit in front of her bangs (in Figma they're behind), so they stay visible when they lift.
+- Arms: the same as Skyrian's, 1.18 times bigger, so they work the same way: hands behind her back at rest, `[arms down]`, `[arms up 45]`, elbows in and out. There are no pose exports for her: her straight pose and pivots carry over from Skyrian's arms-down drawing (`armsLike` in her settings file). Shoulders (93.89, 307.86) and (272.44, 307.86), elbows (38.39, 404.35) and (327.94, 404.35).
+- Mouth: Nova's shapes scaled 0.425 onto her drawn mouth, with lines at least 2.5 units thick. Nothing covers it, so it isn't lowered. The round mouth's ring matches her face.
+- Eyes: lids in her two face colours, sized to her eyes (radius 25.5). Pupil reach 8.8 across, 6.8 up and down.
+- She has no hat; the app skips hat files for her.
+- Framing: full body is -14 to 832. The other presets aren't tuned yet.
+
 ## Adding a character
 
 1. Export the assembled character from Figma as one SVG, sized relative to Nova, and save it as `art/<name>/<Name>.svg`. Never edit it. Ticking "Include 'id' attribute" makes the layers easier to read, but isn't required.
@@ -183,6 +194,8 @@ A line's `script.txt` is plain text:
 **ftux_world_select** "FTUX: world select" (16.3 s, 103 cues). Final recording, with Manaf's script and cues. Raised 18.6 dB to match ftux_home (peaks at -1.9 dBFS). Mouth track hand-timed the same way (closures on "made", "explore", "packed", "games", "Tap", "exploring"; G on "different", "find"; X in every pause; nothing under 40 ms). "When you find a world you like, tap Enter to start exploring!" is 61 characters, so it splits at the comma, right where the Enter highlight starts. Moves: both arms up 32° on "We made it!", down right after it; look right and the right arm up 32° through "Tap the arrow to see the next world!"; look up-right from "tap Enter" to the end. Events: `start_world_rotation` on "Neelo has…" and `stop_world_rotation` after "games!" (the app rotates the worlds on its own timer in between), `highlight_next_world_arrow` on "Tap", `clear_highlight` after "world!", `highlight_enter` on "tap Enter", `clear_highlight` at the end.
 
 **ftux_w1** "FTUX: world 1" (9.7 s, 82 cues). Spoken by **Skyrian**, the world 1 wizard (`"character": "skyrian"` in cues.json). Final recording, with Manaf's script; no tags yet. Raised 10.1 dB to match ftux_home (peaks at -1 dBFS). Mouth track hand-timed the same way (closures on "I'm", "welcome", "Tap"; G on "for", "discover", "flag"; X in every pause; nothing under 40 ms). "Welcome to Aetheris, where we look out for one another." is exactly 55 characters, so it stays one caption. The preview plays it on Skyrian.
+
+**ftux_w2** "FTUX: world 2" (10.8 s, 76 cues). Spoken by **Obselda** (`"character": "obselda"`). Final recording, with Manaf's script; no tags yet. Raised 3.9 dB to match ftux_home (peaks at -1 dBFS). Mouth track hand-timed the same way (closures on "I'm", the B in "Obselda", "welcome", the P in "Cragspire" and "explore", "Tap"; G on "flag"; X in every pause; nothing under 40 ms). "Welcome to Cragspire and our steady, rocky ground." is 50 characters, so it stays one caption.
 
 The two earlier sample lines (onboarding_nova_dialogue1, voice_line_1) and their sample events (show_logo, show_path) were removed on 2026-10-13, when the final FTUX audio arrived. They're in git history.
 

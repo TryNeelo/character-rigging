@@ -1,0 +1,130 @@
+{
+ "label": "Obselda",
+ "canvas": {
+  "width": 374,
+  "height": 814
+ },
+ "anchor": {
+  "x": 184.4,
+  "y": 814
+ },
+ "pivots": {
+  "head": [
+   184.4,
+   272
+  ]
+ },
+ "outfits": {
+  "explorer": {
+   "label": "Explorer",
+   "hat": false,
+   "hatBack": false,
+   "bodyBack": true,
+   "pivots": {
+    "armLeft": [
+     93.89,
+     307.86
+    ],
+    "armRight": [
+     272.44,
+     307.86
+    ],
+    "elbowLeft": [
+     38.39,
+     404.35
+    ],
+    "elbowRight": [
+     327.94,
+     404.35
+    ]
+   },
+   "armRest": {
+    "left": [
+     30.0,
+     90.0
+    ],
+    "right": [
+     30.0,
+     90.0
+    ]
+   },
+   "armDown": {
+    "left": 6.44,
+    "right": 5.14
+   }
+  }
+ },
+ "defaultOutfit": "explorer",
+ "eyes": {
+  "centers": [
+   [
+    146.888,
+    169.637
+   ],
+   [
+    221.859,
+    169.638
+   ]
+  ],
+  "radius": 25.481,
+  "pupilRest": [
+   5.6,
+   -5.6
+  ],
+  "pupilRestY": -0.51
+ },
+ "browPivots": {
+  "left": [
+   145.0,
+   120.1
+  ],
+  "right": [
+   223.7,
+   121.1
+  ]
+ },
+ "headLayers": [
+  "hair_top",
+  "ears",
+  "face",
+  "mouth",
+  "scarf",
+  "bangs",
+  "brows",
+  "eyes",
+  "pupils",
+  "lids"
+ ],
+ "settings": {
+  "look": {
+   "pupilReach": 8.8,
+   "pupilReachY": 6.8
+  },
+  "framing": {
+   "full": {
+    "label": "Full body",
+    "top": -14,
+    "bottom": 832,
+    "width": 400
+   },
+   "knees": {
+    "label": "Knees up",
+    "top": -14,
+    "bottom": 696,
+    "width": 370
+   },
+   "waist": {
+    "label": "Waist up",
+    "top": -14,
+    "bottom": 566,
+    "width": 370
+   },
+   "close": {
+    "label": "Close-up",
+    "top": -14,
+    "bottom": 396,
+    "width": 345
+   }
+  }
+ }
+}

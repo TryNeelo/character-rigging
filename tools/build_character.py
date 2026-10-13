@@ -14,7 +14,7 @@ Usage: python3 tools/build_character.py tools/characters/<name>.json   (build_ri
 """
 import json, os, re, shutil, sys
 import math
-from face_rig import (ROOT, arm_from_poses, arm_joints, compose, inverse, placement, turn, clips_used, lid, lid_parts, mouth_group, mouth_shapes, part_writer, path_box,
+from face_rig import (ROOT, arm_from_placements, arm_from_poses, arm_joints, straight_like, compose, inverse, placement, turn, clips_used, lid, lid_parts, mouth_group, mouth_shapes, part_writer, path_box,
                       rect_centre, round_rect_centre, capsule_top, shapes_of, whiten, LID_R)
 
 NOVA_SMILE = json.load(open(os.path.join(ROOT, 'tools', 'characters', 'nova.json')))
@@ -91,6 +91,19 @@ def build(config_path):
                 (o[f'pivot_{side}'], o[f'elbow_{side}'], shoulder, bend,
                  o[f'down_{side}']) = arm_from_poses(els[a['capsule']], els[a['forearmCapsule']],
                                                      down[a['capsule']], down[a['forearmCapsule']], side)
+                o[f'rest_{side}'] = (shoulder, bend)
+            elif fore and 'armsLike' in o:
+                # Arms drawn like another character's (the same capsules, scaled): his straight pose carries over
+                like = json.load(open(os.path.join(ROOT, 'tools', 'characters', o['armsLike'] + '.json')))
+                lo = next(iter(like['outfits'].values()))
+                la = lo[f'arm_{side}']
+                lrest = shapes_of(os.path.join(ROOT, 'art', like['source']), like['shapeCount'])
+                ldown = shapes_of(os.path.join(ROOT, 'art', lo['armsDown']), like['shapeCount'])
+                upper, forearm = straight_like(els[a['capsule']], els[a['forearmCapsule']], lrest[la['capsule']],
+                                               ldown[la['capsule']], ldown[la['forearmCapsule']])
+                (o[f'pivot_{side}'], o[f'elbow_{side}'], shoulder, bend,
+                 o[f'down_{side}']) = arm_from_placements(placement(els[a['capsule']]), placement(els[a['forearmCapsule']]),
+                                                          upper, forearm, side)
                 o[f'rest_{side}'] = (shoulder, bend)
             elif fore:
                 # Two-piece arm: the forearm (and hand) bends at the elbow. The art's pose is his rest pose.
@@ -190,7 +203,7 @@ def build(config_path):
         'canvas': {'width': W, 'height': H},
         'anchor': {'x': ax, 'y': ay},
         'pivots': {'head': hp},
-        'outfits': {oname: {'label': o['label'], 'hatBack': bool(o['hat_back_svg']), 'bodyBack': bool(o['body_back_svg']),
+        'outfits': {oname: {'label': o['label'], 'hat': bool(o['hat_svg']), 'hatBack': bool(o['hat_back_svg']), 'bodyBack': bool(o['body_back_svg']),
                             'pivots': {'armLeft': list(o['pivot_left']), 'armRight': list(o['pivot_right']),
                                        **({'elbowLeft': list(o['elbow_left']), 'elbowRight': list(o['elbow_right'])} if 'elbow_left' in o else {})},
                             # Resting pose of each arm as drawn: (shoulder out from straight down, elbow bend), in degrees

@@ -29,6 +29,7 @@
  "outfits": {
   "wizard": {
    "label": "Wizard",
+   "hat": true,
    "hatBack": false,
    "bodyBack": true,
    "pivots": {

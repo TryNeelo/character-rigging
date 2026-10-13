@@ -363,14 +363,14 @@ class _NovaCharacterState extends State<NovaCharacter> {
           ? [
               if (outfit.hatBack) wear('hat_back_outline'),
               base('head_outline'),
-              wear('hat_outline'),
+              if (outfit.hat) wear('hat_outline'),
             ]
           : [
               // The head's layers, back to front (rig.json headLayers): part files and the face rig
               for (final layer in rig.headLayers)
                 ...switch (layer) {
                   'hat_back' => [if (outfit.hatBack) wear('hat_back')],
-                  'hat' => [wear('hat')],
+                  'hat' => [if (outfit.hat) wear('hat')],
                   'pupils' => [
                       ClipPath(
                         clipper: _EyesClipper(rig, s),

@@ -1,0 +1,469 @@
+{
+ "id": "ftux_w2",
+ "character": "obselda",
+ "audio": "audio.mp3",
+ "duration": 10.78,
+ "cues": [
+  {
+   "start": 0.0,
+   "end": 0.13,
+   "shape": "X"
+  },
+  {
+   "start": 0.13,
+   "end": 0.22,
+   "shape": "F"
+  },
+  {
+   "start": 0.22,
+   "end": 0.3,
+   "shape": "C"
+  },
+  {
+   "start": 0.3,
+   "end": 0.38,
+   "shape": "H"
+  },
+  {
+   "start": 0.38,
+   "end": 0.5,
+   "shape": "C"
+  },
+  {
+   "start": 0.5,
+   "end": 0.59,
+   "shape": "H"
+  },
+  {
+   "start": 0.59,
+   "end": 0.7,
+   "shape": "E"
+  },
+  {
+   "start": 0.7,
+   "end": 0.77,
+   "shape": "F"
+  },
+  {
+   "start": 0.77,
+   "end": 0.82,
+   "shape": "B"
+  },
+  {
+   "start": 0.82,
+   "end": 0.95,
+   "shape": "C"
+  },
+  {
+   "start": 0.95,
+   "end": 1.14,
+   "shape": "E"
+  },
+  {
+   "start": 1.14,
+   "end": 1.55,
+   "shape": "X"
+  },
+  {
+   "start": 1.55,
+   "end": 1.69,
+   "shape": "D"
+  },
+  {
+   "start": 1.69,
+   "end": 1.75,
+   "shape": "A"
+  },
+  {
+   "start": 1.75,
+   "end": 1.83,
+   "shape": "C"
+  },
+  {
+   "start": 1.83,
+   "end": 1.88,
+   "shape": "A"
+  },
+  {
+   "start": 1.88,
+   "end": 2.0,
+   "shape": "B"
+  },
+  {
+   "start": 2.0,
+   "end": 2.09,
+   "shape": "C"
+  },
+  {
+   "start": 2.09,
+   "end": 2.16,
+   "shape": "H"
+  },
+  {
+   "start": 2.16,
+   "end": 2.21,
+   "shape": "B"
+  },
+  {
+   "start": 2.21,
+   "end": 2.34,
+   "shape": "C"
+  },
+  {
+   "start": 2.34,
+   "end": 3.24,
+   "shape": "X"
+  },
+  {
+   "start": 3.24,
+   "end": 3.34,
+   "shape": "F"
+  },
+  {
+   "start": 3.34,
+   "end": 3.42,
+   "shape": "C"
+  },
+  {
+   "start": 3.42,
+   "end": 3.49,
+   "shape": "H"
+  },
+  {
+   "start": 3.49,
+   "end": 3.56,
+   "shape": "B"
+  },
+  {
+   "start": 3.56,
+   "end": 3.61,
+   "shape": "C"
+  },
+  {
+   "start": 3.61,
+   "end": 3.72,
+   "shape": "A"
+  },
+  {
+   "start": 3.72,
+   "end": 3.77,
+   "shape": "B"
+  },
+  {
+   "start": 3.77,
+   "end": 3.84,
+   "shape": "F"
+  },
+  {
+   "start": 3.84,
+   "end": 3.98,
+   "shape": "B"
+  },
+  {
+   "start": 3.98,
+   "end": 4.15,
+   "shape": "D"
+  },
+  {
+   "start": 4.15,
+   "end": 4.33,
+   "shape": "B"
+  },
+  {
+   "start": 4.33,
+   "end": 4.38,
+   "shape": "A"
+  },
+  {
+   "start": 4.38,
+   "end": 4.55,
+   "shape": "D"
+  },
+  {
+   "start": 4.55,
+   "end": 4.77,
+   "shape": "E"
+  },
+  {
+   "start": 4.77,
+   "end": 4.85,
+   "shape": "C"
+  },
+  {
+   "start": 4.85,
+   "end": 4.93,
+   "shape": "B"
+  },
+  {
+   "start": 4.93,
+   "end": 5.02,
+   "shape": "D"
+  },
+  {
+   "start": 5.02,
+   "end": 5.09,
+   "shape": "E"
+  },
+  {
+   "start": 5.09,
+   "end": 5.38,
+   "shape": "B"
+  },
+  {
+   "start": 5.38,
+   "end": 5.5,
+   "shape": "C"
+  },
+  {
+   "start": 5.5,
+   "end": 5.9,
+   "shape": "B"
+  },
+  {
+   "start": 5.9,
+   "end": 5.96,
+   "shape": "E"
+  },
+  {
+   "start": 5.96,
+   "end": 6.08,
+   "shape": "D"
+  },
+  {
+   "start": 6.08,
+   "end": 6.33,
+   "shape": "B"
+  },
+  {
+   "start": 6.33,
+   "end": 6.44,
+   "shape": "E"
+  },
+  {
+   "start": 6.44,
+   "end": 6.56,
+   "shape": "D"
+  },
+  {
+   "start": 6.56,
+   "end": 6.61,
+   "shape": "F"
+  },
+  {
+   "start": 6.61,
+   "end": 6.8,
+   "shape": "B"
+  },
+  {
+   "start": 6.8,
+   "end": 7.25,
+   "shape": "X"
+  },
+  {
+   "start": 7.25,
+   "end": 7.3,
+   "shape": "E"
+  },
+  {
+   "start": 7.3,
+   "end": 7.39,
+   "shape": "C"
+  },
+  {
+   "start": 7.39,
+   "end": 7.56,
+   "shape": "B"
+  },
+  {
+   "start": 7.56,
+   "end": 7.71,
+   "shape": "F"
+  },
+  {
+   "start": 7.71,
+   "end": 7.83,
+   "shape": "B"
+  },
+  {
+   "start": 7.83,
+   "end": 7.89,
+   "shape": "A"
+  },
+  {
+   "start": 7.89,
+   "end": 7.94,
+   "shape": "H"
+  },
+  {
+   "start": 7.94,
+   "end": 8.24,
+   "shape": "E"
+  },
+  {
+   "start": 8.24,
+   "end": 8.85,
+   "shape": "X"
+  },
+  {
+   "start": 8.85,
+   "end": 8.9,
+   "shape": "B"
+  },
+  {
+   "start": 8.9,
+   "end": 9.03,
+   "shape": "C"
+  },
+  {
+   "start": 9.03,
+   "end": 9.08,
+   "shape": "A"
+  },
+  {
+   "start": 9.08,
+   "end": 9.17,
+   "shape": "C"
+  },
+  {
+   "start": 9.17,
+   "end": 9.25,
+   "shape": "G"
+  },
+  {
+   "start": 9.25,
+   "end": 9.3,
+   "shape": "H"
+  },
+  {
+   "start": 9.3,
+   "end": 9.53,
+   "shape": "C"
+  },
+  {
+   "start": 9.53,
+   "end": 9.69,
+   "shape": "B"
+  },
+  {
+   "start": 9.69,
+   "end": 9.78,
+   "shape": "C"
+  },
+  {
+   "start": 9.78,
+   "end": 9.92,
+   "shape": "B"
+  },
+  {
+   "start": 9.92,
+   "end": 9.96,
+   "shape": "H"
+  },
+  {
+   "start": 9.96,
+   "end": 10.01,
+   "shape": "C"
+  },
+  {
+   "start": 10.01,
+   "end": 10.19,
+   "shape": "B"
+  },
+  {
+   "start": 10.19,
+   "end": 10.37,
+   "shape": "E"
+  },
+  {
+   "start": 10.37,
+   "end": 10.55,
+   "shape": "F"
+  },
+  {
+   "start": 10.55,
+   "end": 10.78,
+   "shape": "X"
+  }
+ ],
+ "markers": [],
+ "emphasis": [
+  {
+   "time": 0.45,
+   "strength": 0.85
+  },
+  {
+   "time": 1.59,
+   "strength": 0.85
+  },
+  {
+   "time": 2.02,
+   "strength": 0.63
+  },
+  {
+   "time": 3.36,
+   "strength": 0.92
+  },
+  {
+   "time": 4.1,
+   "strength": 0.48
+  },
+  {
+   "time": 4.88,
+   "strength": 0.32
+  },
+  {
+   "time": 5.46,
+   "strength": 0.71
+  },
+  {
+   "time": 5.96,
+   "strength": 0.48
+  },
+  {
+   "time": 6.39,
+   "strength": 0.35
+  },
+  {
+   "time": 7.33,
+   "strength": 0.8
+  },
+  {
+   "time": 8.06,
+   "strength": 0.7
+  },
+  {
+   "time": 9.31,
+   "strength": 1
+  },
+  {
+   "time": 9.71,
+   "strength": 0.84
+  },
+  {
+   "time": 10.24,
+   "strength": 0.99
+  }
+ ],
+ "captions": [
+  {
+   "start": 0.0,
+   "end": 2.72,
+   "text": "Well hello there. I'm Obselda."
+  },
+  {
+   "start": 3.18,
+   "end": 7.14,
+   "text": "Welcome to Cragspire and our steady, rocky ground."
+  },
+  {
+   "start": 7.22,
+   "end": 8.46,
+   "text": "Ready to explore?"
+  },
+  {
+   "start": 8.96,
+   "end": 10.78,
+   "text": "Tap a flag and let\u2019s go!"
+  }
+ ]
+}

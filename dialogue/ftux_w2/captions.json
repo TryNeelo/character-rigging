@@ -1,0 +1,144 @@
+[
+ {
+  "start": 0.0,
+  "end": 2.72,
+  "text": "Well hello there. I'm Obselda.",
+  "words": [
+   {
+    "w": "Well",
+    "s": 0.0,
+    "e": 0.38
+   },
+   {
+    "w": "hello",
+    "s": 0.7,
+    "e": 0.7
+   },
+   {
+    "w": "there.",
+    "s": 0.7,
+    "e": 1.16
+   },
+   {
+    "w": "I'm",
+    "s": 1.6,
+    "e": 1.82
+   },
+   {
+    "w": "Obselda.",
+    "s": 1.82,
+    "e": 2.32
+   }
+  ],
+  "split": false
+ },
+ {
+  "start": 3.18,
+  "end": 7.14,
+  "text": "Welcome to Cragspire and our steady, rocky ground.",
+  "words": [
+   {
+    "w": "Welcome",
+    "s": 3.28,
+    "e": 3.62
+   },
+   {
+    "w": "to",
+    "s": 3.62,
+    "e": 3.92
+   },
+   {
+    "w": "Cragspire",
+    "s": 3.92,
+    "e": 4.6
+   },
+   {
+    "w": "and",
+    "s": 4.6,
+    "e": 4.96
+   },
+   {
+    "w": "our",
+    "s": 4.96,
+    "e": 5.12
+   },
+   {
+    "w": "steady,",
+    "s": 5.12,
+    "e": 5.68
+   },
+   {
+    "w": "rocky",
+    "s": 5.84,
+    "e": 6.18
+   },
+   {
+    "w": "ground.",
+    "s": 6.18,
+    "e": 6.74
+   }
+  ],
+  "split": false
+ },
+ {
+  "start": 7.22,
+  "end": 8.46,
+  "text": "Ready to explore?",
+  "words": [
+   {
+    "w": "Ready",
+    "s": 7.32,
+    "e": 7.44
+   },
+   {
+    "w": "to",
+    "s": 7.44,
+    "e": 7.68
+   },
+   {
+    "w": "explore?",
+    "s": 7.68,
+    "e": 8.06
+   }
+  ],
+  "split": false
+ },
+ {
+  "start": 8.96,
+  "end": 10.78,
+  "text": "Tap a flag and let\u2019s go!",
+  "words": [
+   {
+    "w": "Tap",
+    "s": 9.06,
+    "e": 9.06
+   },
+   {
+    "w": "a",
+    "s": 9.06,
+    "e": 9.24
+   },
+   {
+    "w": "flag",
+    "s": 9.24,
+    "e": 9.54
+   },
+   {
+    "w": "and",
+    "s": 9.54,
+    "e": 9.88
+   },
+   {
+    "w": "let\u2019s",
+    "s": 9.88,
+    "e": 10.2
+   },
+   {
+    "w": "go!",
+    "s": 10.2,
+    "e": 10.48
+   }
+  ],
+  "split": false
+ }
+]

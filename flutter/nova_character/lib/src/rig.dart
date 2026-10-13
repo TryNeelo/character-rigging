@@ -27,6 +27,7 @@ class NovaOutfitSpec {
       {required this.label,
       required this.armLeftPivot,
       required this.armRightPivot,
+      this.hat = true,
       this.hatBack = false,
       this.bodyBack = false,
       this.elbowLeftPivot,
@@ -36,6 +37,9 @@ class NovaOutfitSpec {
       this.armDownLeft = 0,
       this.armDownRight = 0});
   final String label;
+
+  /// Whether there is a hat (hat.svg). Obselda has none.
+  final bool hat;
 
   /// Whether the hat has a piece behind the head (hat_back_<id>.svg), like a hard hat's brim.
   final bool hatBack;
@@ -77,6 +81,7 @@ class NovaRig {
                 label: e.value['label'] as String,
                 armLeftPivot: _offset(e.value['pivots']['armLeft']),
                 armRightPivot: _offset(e.value['pivots']['armRight']),
+                hat: e.value['hat'] as bool? ?? true,
                 hatBack: e.value['hatBack'] as bool? ?? false,
                 bodyBack: e.value['bodyBack'] as bool? ?? false,
                 elbowLeftPivot: e.value['pivots']['elbowLeft'] == null ? null : _offset(e.value['pivots']['elbowLeft']),

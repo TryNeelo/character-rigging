@@ -1,0 +1,66 @@
+{
+  "_about": "Obselda's rig settings, read by tools/build_character.py. Parts are listed by position in the flat Figma export art/obselda/Obselda.svg (0-based, [from, to) ranges). The export has no layer names; shapeCount stops the build if it changes.",
+  "label": "Obselda",
+  "source": "obselda/Obselda.svg",
+  "shapeCount": 75,
+  "canvas": [374, 814],
+  "_anchor": "Where she stands: the centre line of her face and tunic, and her soles.",
+  "anchor": [184.4, 814],
+  "_headPivot": "Under the chin, where the scarf starts: the head nods and sways about this point, and the scarf, earrings and hair move with it.",
+  "headPivot": [184.4, 272],
+  "outfits": {
+    "explorer": {
+      "label": "Explorer",
+      "_legs": "Legs, socks, trousers and boots.",
+      "legs": [[8, 14], [18, 38]],
+      "_body_back": "Her long hair hanging down her back: behind the arms, it moves with the body's breathing.",
+      "body_back": [[0, 2]],
+      "_arms": "By screen side. Upper arm, hand and forearm, drawn like Skyrian's (the same capsules, 1.18 times bigger). Her hands are behind her back as drawn: that is her resting pose. Her straight pose and pivots carry over from Skyrian's arms-down drawing.",
+      "arm_left": {"shapes": [[5, 8]], "capsule": 5, "forearm": [[6, 8]], "forearmCapsule": 7},
+      "arm_right": {"shapes": [[2, 5]], "capsule": 2, "forearm": [[3, 5]], "forearmCapsule": 4},
+      "armsLike": "skyrian",
+      "_body": "Tunic, shoulders, belt and buckle.",
+      "body": [[42, 50], [59, 60], [67, 69]]
+    }
+  },
+  "defaultOutfit": "explorer",
+  "_head": "The head's layers, back to front. Named layers are part files; pupils, lids, brows and mouth are the shared face rig. Her brows sit in front of her bangs (in Figma they're behind), so they stay visible when they lift.",
+  "head": [
+    ["hair_top", [[14, 18]]],
+    ["ears", [[38, 42]]],
+    ["face", [[50, 52]]],
+    ["mouth"],
+    ["scarf", [[56, 59], [60, 64]]],
+    ["bangs", [[64, 67]]],
+    ["brows"],
+    ["eyes", [[69, 71], [72, 74]]],
+    ["pupils"],
+    ["lids"]
+  ],
+  "_headOutline": "Hair, ears, face, scarf and bangs get the white outline.",
+  "headOutline": [[14, 18], [38, 42], [50, 52], [56, 59], [60, 64], [64, 67]],
+  "face": {
+    "_smile": "Her drawn mouth (the Mouth frame). It is her idle smile, and the shared mouth shapes are scaled and centred onto it.",
+    "smile": [[54, 56]],
+    "whites": {"left": 70, "right": 73},
+    "pupils": {"left": 71, "right": 74},
+    "brows": {"left": 52, "right": 53},
+    "_lidColors": "Skin around each eye: her face is lighter on the screen-left half and darker on the right.",
+    "lidColors": {"left": "#A15D38", "right": "#955532"},
+    "_lipColor": "Ring around the round mouth (F): it matches her face.",
+    "lipColor": "#A15D38",
+    "_minStroke": "Thinnest line for the rest and closed mouths (X, A) at her size, in canvas units.",
+    "minStroke": 2.5,
+    "mouthDropY": 0
+  },
+  "_settings": "Changes to tools/rig_settings.json for her only. Pupil reach is scaled to her eyes (a bigger pupil than Nova's). Framing is only set for full body so far; the rest are Nova's sizes from the top of her hair.",
+  "settings": {
+    "look": {"pupilReach": 8.8, "pupilReachY": 6.8},
+    "framing": {
+      "full": {"label": "Full body", "top": -14, "bottom": 832, "width": 400},
+      "knees": {"label": "Knees up", "top": -14, "bottom": 696, "width": 370},
+      "waist": {"label": "Waist up", "top": -14, "bottom": 566, "width": 370},
+      "close": {"label": "Close-up", "top": -14, "bottom": 396, "width": 345}
+    }
+  }
+}

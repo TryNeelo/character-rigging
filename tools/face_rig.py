@@ -140,7 +140,9 @@ def round_rect_centre(tag):
     """Centre and half size of an (untransformed) rounded rect or ellipse, such as an eye white."""
     if tag.startswith('<ellipse') or tag.startswith('<circle'):
         r = num(tag, 'r') if tag.startswith('<circle') else None
-        return num(tag, 'cx'), num(tag, 'cy'), r or num(tag, 'rx'), r or num(tag, 'ry')
+        a, b, c, d, e, f = matrix(tag)   # (a mirrored eye is drawn with a flipping transform)
+        x, y = num(tag, 'cx'), num(tag, 'cy')
+        return a * x + c * y + e, b * x + d * y + f, r or num(tag, 'rx'), r or num(tag, 'ry')
     x, y, w, h = num(tag, 'x'), num(tag, 'y'), num(tag, 'width'), num(tag, 'height')
     return x + w / 2, y + h / 2, w / 2, h / 2
 
@@ -213,13 +215,27 @@ def arm_from_poses(rest_upper, rest_fore, straight_upper, straight_fore, side):
     """Shoulder and elbow pivots, and the resting and straight-down poses, from the same arm drawn
     bent (resting) and straight. Each pivot is the one point the art turns about between the two
     drawings, so both come out exactly. Angles: shoulder out from vertical, elbow bend inward."""
+    return arm_from_placements(*(placement(t) for t in (rest_upper, rest_fore, straight_upper, straight_fore)), side)
+
+def straight_like(rest_upper, rest_fore, model_rest_upper, model_straight_upper, model_straight_fore):
+    """Where an arm drawn like another character's, only bigger or smaller (the same capsules, scaled),
+    sits when straight: the model's straight pose, carried over. Returns the upper arm's and the
+    forearm's placements."""
+    def width(tag): return num(tag, 'width')
+    k = width(rest_upper) / width(model_rest_upper)
+    scale = lambda s: (s, 0, 0, s, 0, 0)
+    carry = compose(compose(placement(rest_upper), scale(k)), inverse(placement(model_rest_upper)))
+    return tuple(compose(compose(carry, placement(m)), scale(1 / k)) for m in (model_straight_upper, model_straight_fore))
+
+def arm_from_placements(rest_upper, rest_fore, straight_upper, straight_fore, side):
+    """arm_from_poses, from placements (see placement)."""
     out = 1 if side == 'right' else -1
-    shoulder, turned = turn(compose(placement(straight_upper), inverse(placement(rest_upper))))
+    shoulder, turned = turn(compose(straight_upper, inverse(rest_upper)))
     # the forearm's move relative to the upper arm, seen with the upper arm at rest
-    elbow, bent = turn(compose(compose(placement(rest_upper), inverse(placement(straight_upper))),
-                               compose(placement(straight_fore), inverse(placement(rest_fore)))))
-    def angle(tag):
-        a, b, c, d, e, f = placement(tag)
+    elbow, bent = turn(compose(compose(rest_upper, inverse(straight_upper)),
+                               compose(straight_fore, inverse(rest_fore))))
+    def angle(m):
+        a, b, c, d, e, f = m
         return math.degrees(math.atan2(out * c, d))   # the capsule's long axis, from vertical
     r1 = lambda p: (round(p[0], 2), round(p[1], 2))
     return r1(shoulder), r1(elbow), round(angle(rest_upper), 2), round(-out * bent, 2), round(angle(straight_upper), 2)

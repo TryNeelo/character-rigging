@@ -8,7 +8,8 @@ Everything Nova needs (art, audio, timing) is bundled in the package. You don't
 assemble anything: add the widget, play a line, and listen for events.
 
 The other characters come in the same package and work the same way. Today that's
-**Skyrian**, the world 1 wizard: pass `character: 'skyrian'` (see "Other characters").
+**Skyrian**, the world 1 wizard, and **Obselda**, the world 2 explorer: pass
+`character: 'skyrian'` or `character: 'obselda'` (see "Other characters").
 Nothing changes for code that only shows Nova.
 
 ## Try it
@@ -18,7 +19,7 @@ cd example
 flutter run -d chrome     # or any device
 ```
 
-The demo screen has a Play button, a character picker (Nova or Skyrian, each with a
+The demo screen has a Play button, a character picker (Nova, Skyrian or Obselda, each with a
 sample line), framing and position controls, and a log of the events he sends.
 
 ## Add it to your app
@@ -66,20 +67,21 @@ existing code doesn't change. The controller is the same for every character.
 ```dart
 NovaCharacter(
   controller: nova,
-  character: 'skyrian',           // 'nova' (default) or 'skyrian'
+  character: 'skyrian',           // 'nova' (default), 'skyrian' or 'obselda'
   framing: NovaFraming.full,
 )
 
-await nova.play('ftux_w1');       // a Skyrian line
+await nova.play('ftux_w1');       // a Skyrian line ('ftux_w2' is Obselda's)
 ```
 
 Each line knows who speaks it: `NovaLine.character` (`nova.line?.character` while it
-plays) is `'nova'` or `'skyrian'`, so you can pass it straight to the widget. Every
+plays) is `'nova'`, `'skyrian'` or `'obselda'`, so you can pass it straight to the widget. Every
 character lip-syncs, blinks, looks, raises his arms, sets his brows and sends events
-the same way. Skyrian has one look, so `outfit` doesn't apply to him.
+the same way. Skyrian and Obselda have one look each, so `outfit` doesn't apply to them.
 
-Skyrian's arms bend at the elbow, and his resting pose has his hands behind his back.
-His lines can hold his arms straight down, raise them straight, and bend either elbow.
+Skyrian's and Obselda's arms bend at the elbow, and their resting pose has their hands
+behind their back. Their lines can hold the arms straight down, raise them straight, and
+bend either elbow.
 The widget handles all of it from the line's markers (below). All characters
 are drawn at the same scale as Nova; Skyrian is a little taller with his hat, so his
 full-body framing is a little taller too.
@@ -106,7 +108,7 @@ full-body framing is a little taller too.
 | `idle` | `true` | Movement switch. Nova draws at 15 fps for idle motion, 30 while talking and 60 during arm and look moves (they last a moment). On: breathing and slight sway between lines, nods and brow lifts while talking. Off: he only blinks and lip-syncs, and doesn't redraw between blinks. |
 | `blink` | `true` | Random blinks every 2.5 to 5.5 s. |
 | `outfit` | `'hoodie'` | Which outfit Nova wears: `'hoodie'`, `'aviator'` or `'construction'`. Change it any time; his face, lip-sync and motion carry over. |
-| `character` | `'nova'` | Which character to draw: `'nova'` or `'skyrian'`. Unknown ids fall back to Nova. Change it any time. |
+| `character` | `'nova'` | Which character to draw: `'nova'`, `'skyrian'` or `'obselda'`. Unknown ids fall back to Nova. Change it any time. |
 
 If the widget's height is unbounded, it sizes itself to the framing's proportions.
 
@@ -121,6 +123,7 @@ This version has the four Nova FTUX lines and Skyrian's world 1 line, all with t
 | `ftux_home_return` | Nova | Back on the home map: the back arrow |
 | `ftux_world_select` | Nova | World selection: rotating worlds, next-world arrow, Enter |
 | `ftux_w1` | Skyrian | World 1: Skyrian's welcome (no events yet) |
+| `ftux_w2` | Obselda | World 2: Obselda's welcome (no events yet) |
 
 Each line is a folder in `assets/lines/<line_id>/` with `audio.mp3` and `timing.json`.
 The timing file holds the mouth shapes and the markers, plus `"character"` when someone
