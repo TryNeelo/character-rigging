@@ -2,8 +2,8 @@ Hi, you're here!
 [arms up 32] Welcome to your neighborhood.
 There's lots to explore. [arms down]
 [look right] [right arm up 32] [Highlight the shops] See those shops?
-[Highlight the coins] As you earn coins, you'll be able to buy
+As you earn coins, you'll be able to buy
 cool clothes, hats, and other fun things! [look ahead] [right arm down]
 [look up-right] But first, let's head inside your [Highlight the home] home.
-I'll show you around,
+[look ahead] I'll show you around,
 and you can make your avatar look the way you want.

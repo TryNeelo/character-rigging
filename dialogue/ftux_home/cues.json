@@ -735,15 +735,8 @@
    "note": "Script cue: [right arm up 32]"
   },
   {
-   "time": 6.95,
-   "type": "event",
-   "name": "highlight_coins",
-   "source": "script",
-   "note": "Script cue: [Highlight the coins]"
-  },
-  {
    "time": 11.83,
-   "end": 17.58,
+   "end": 14.15,
    "type": "look",
    "direction": "up-right",
    "source": "script",

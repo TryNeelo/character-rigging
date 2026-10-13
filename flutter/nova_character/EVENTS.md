@@ -15,7 +15,6 @@ Line id: `ftux_home`
 | Time | Event | What the app should do |
 |---|---|---|
 | 5.65 s | `highlight_shops` | Highlight the shops on the home map ("See those shops?"). |
-| 6.95 s | `highlight_coins` | Highlight the coin counter ("As you earn coins..."). |
 | 13.45 s | `highlight_home` | Highlight the home on the map with the arrow ("let's head inside your home"). It stays until the child taps the home. |
 
 ## Planned (not in a line yet)

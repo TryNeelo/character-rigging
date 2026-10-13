@@ -11,13 +11,6 @@
       "Highlight the stores"
     ]
   },
-  "highlight_coins": {
-    "does": "Highlight the coin counter (\"As you earn coins...\").",
-    "cues": [
-      "Highlight the coins",
-      "Highlight the coin counter"
-    ]
-  },
   "highlight_home": {
     "does": "Highlight the home on the map with the arrow (\"let's head inside your home\"). It stays until the child taps the home.",
     "cues": [
