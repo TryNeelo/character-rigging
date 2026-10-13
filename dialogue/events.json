@@ -1,64 +1,71 @@
 {
-  "_about": "Every app event Nova can send. Each event in a line's markers must be listed here. 'does' is what the app should do on screen. tools/build_events.py builds the developers' reference sheet (EVENTS.md) from this list and the lines that use each event. 'cues' lists how a writer may phrase it in a script's [brackets]; the first is the one the preview's Events panel copies. 'scene' groups it in that panel.",
+  "_about": "Every app event Nova can send. Each event in a line's markers must be listed here. 'does' is what the app should do on screen. tools/build_events.py builds the developers' reference sheet (EVENTS.md) from this list and the lines that use each event. 'cues' lists how a writer may phrase it in a script's [brackets]; the first is the one the preview's Events panel copies. 'scene' groups it in that panel. 'kind' is spotlight or tap (see _rules).",
   "line_end": {
     "does": "Sent automatically when a line finishes. Use it to move to the next step.",
     "builtIn": true
   },
   "highlight_shops": {
-    "does": "Highlight the shops on the home map (\"See those shops?\").",
+    "does": "Spotlight the shops on the home map (\"See those shops?\").",
     "cues": [
       "Highlight the shops",
       "Highlight the stores"
     ],
-    "scene": "Home"
+    "scene": "Home",
+    "kind": "spotlight"
   },
   "highlight_home": {
-    "does": "Highlight the home on the map with the arrow (\"let's head inside your home\"). It stays until the child taps the home.",
+    "does": "Spotlight the home on the map. Tap target: after [Stop highlight] the arrow keeps blinking until the child taps the home.",
     "cues": [
       "Highlight the home",
       "Highlight home"
     ],
-    "scene": "Home"
+    "scene": "Home",
+    "kind": "tap"
   },
   "highlight_sticker_book": {
-    "does": "Highlight the sticker book in the room.",
+    "does": "Spotlight the sticker book in the room.",
     "cues": [
       "Highlight the sticker book"
     ],
-    "scene": "Room"
+    "scene": "Room",
+    "kind": "spotlight"
   },
   "highlight_closet": {
-    "does": "Highlight the closet with the arrow. It stays until the child taps the closet.",
+    "does": "Spotlight the closet. Tap target: after [Stop highlight] the arrow keeps blinking until the child taps the closet.",
     "cues": [
       "Highlight the closet"
     ],
-    "scene": "Room"
+    "scene": "Room",
+    "kind": "tap"
   },
   "highlight_back_arrow": {
-    "does": "Highlight the back arrow (\"Tap the back arrow, and let's go!\"). It stays until the child taps it.",
+    "does": "Spotlight the back arrow (\"Tap the back arrow, and let's go!\"). Tap target: after [Stop highlight] the arrow keeps blinking until the child taps it.",
     "cues": [
       "Highlight the back arrow",
       "Highlight the back button"
     ],
-    "scene": "Room"
+    "scene": "Room",
+    "kind": "tap"
   },
   "highlight_next_world_arrow": {
-    "does": "Highlight the arrow that rotates to the next world (\"Tap the arrow to keep traveling through worlds\").",
+    "does": "Spotlight the arrow that rotates to the next world (\"Tap the arrow to keep traveling through worlds\").",
     "cues": [
       "Highlight the right button",
       "Highlight the right arrow"
     ],
-    "scene": "World select"
+    "scene": "World select",
+    "kind": "spotlight"
   },
   "highlight_enter": {
-    "does": "Highlight the Enter button on the world selection screen.",
+    "does": "Spotlight the Enter button on the world selection screen.",
     "cues": [
       "Highlight the enter button"
     ],
-    "scene": "World select"
+    "scene": "World select",
+    "kind": "spotlight"
   },
   "clear_highlight": {
-    "does": "Remove whatever is highlighted right now. Use it when a highlight should end before the line does.",
+    "does": "End the current highlight: the dim fades out. A spotlight's arrow fades with it; a tap target's arrow stays and blinks until the child taps.",
     "cues": [
       "Stop highlight",
       "Stop highlighting",
@@ -75,8 +82,9 @@
     "scene": "Any scene"
   },
   "_rules": [
-    "A new highlight replaces the one before it.",
-    "Highlights clear when Nova finishes the line (line_end), unless the event says it stays until the child taps.",
-    "clear_highlight removes whatever is highlighted, for a highlight that should end mid-line."
+    "Every highlight dims the screen with a cut-out around the item, and shows an arrow pointing at it. The dim and the arrow appear together.",
+    "A highlight stays until the script says [Stop highlight] (clear_highlight), or until a new highlight replaces it. Finishing the line does not end it.",
+    "Spotlight: at [Stop highlight] the dim and the arrow fade out together.",
+    "Tap target: at [Stop highlight] the dim fades out, but the arrow stays and blinks until the child taps the item."
   ]
 }

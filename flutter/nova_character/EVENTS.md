@@ -4,9 +4,10 @@ Events Nova sends to the app while he talks. Listen for them on `NovaController.
 
 ## Highlights
 
-- A new highlight replaces the one before it.
-- Highlights clear when Nova finishes the line (line_end), unless the event says it stays until the child taps.
-- clear_highlight removes whatever is highlighted, for a highlight that should end mid-line.
+- Every highlight dims the screen with a cut-out around the item, and shows an arrow pointing at it. The dim and the arrow appear together.
+- A highlight stays until the script says [Stop highlight] (clear_highlight), or until a new highlight replaces it. Finishing the line does not end it.
+- Spotlight: at [Stop highlight] the dim and the arrow fade out together.
+- Tap target: at [Stop highlight] the dim fades out, but the arrow stays and blinks until the child taps the item.
 
 ## Every line
 
@@ -20,8 +21,8 @@ Line id: `ftux_home`
 
 | Time | Event | What the app should do |
 |---|---|---|
-| 5.65 s | `highlight_shops` | Highlight the shops on the home map ("See those shops?"). |
-| 13.45 s | `highlight_home` | Highlight the home on the map with the arrow ("let's head inside your home"). It stays until the child taps the home. |
+| 5.65 s | `highlight_shops` | Spotlight the shops on the home map ("See those shops?"). |
+| 13.45 s | `highlight_home` | Spotlight the home on the map. Tap target: after [Stop highlight] the arrow keeps blinking until the child taps the home. |
 
 ## Planned (not in a line yet)
 
@@ -29,10 +30,10 @@ Names agreed for the FTUX flow. They appear in a line once its audio is timed.
 
 | Event | What the app should do |
 |---|---|
-| `highlight_sticker_book` | Highlight the sticker book in the room. |
-| `highlight_closet` | Highlight the closet with the arrow. It stays until the child taps the closet. |
-| `highlight_back_arrow` | Highlight the back arrow ("Tap the back arrow, and let's go!"). It stays until the child taps it. |
-| `highlight_next_world_arrow` | Highlight the arrow that rotates to the next world ("Tap the arrow to keep traveling through worlds"). |
-| `highlight_enter` | Highlight the Enter button on the world selection screen. |
-| `clear_highlight` | Remove whatever is highlighted right now. Use it when a highlight should end before the line does. |
+| `highlight_sticker_book` | Spotlight the sticker book in the room. |
+| `highlight_closet` | Spotlight the closet. Tap target: after [Stop highlight] the arrow keeps blinking until the child taps the closet. |
+| `highlight_back_arrow` | Spotlight the back arrow ("Tap the back arrow, and let's go!"). Tap target: after [Stop highlight] the arrow keeps blinking until the child taps it. |
+| `highlight_next_world_arrow` | Spotlight the arrow that rotates to the next world ("Tap the arrow to keep traveling through worlds"). |
+| `highlight_enter` | Spotlight the Enter button on the world selection screen. |
+| `clear_highlight` | End the current highlight: the dim fades out. A spotlight's arrow fades with it; a tap target's arrow stays and blinks until the child taps. |
 | `nova_exit` | Nova leaves the screen; the scene stays for the child to explore and choose. |
