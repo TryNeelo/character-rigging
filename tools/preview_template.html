@@ -129,7 +129,10 @@ button { font: inherit; cursor: pointer; }
 .events-panel { width: min(420px, 100vw); }
 .events-list { overflow-y: auto; padding: 4px 16px 20px; }
 .events-list h3 { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 18px 0 8px; }
-.events-rules { margin: 12px 0 0; padding: 12px 14px 12px 30px; border-radius: 12px; background: var(--chip); font-size: 13px; color: var(--muted); line-height: 1.5; }
+.events-how { margin: 12px 0 0; font-size: 13px; color: var(--muted); }
+.events-how summary { cursor: pointer; color: var(--accent); font-weight: 600; width: max-content; }
+.events-how summary:focus-visible { outline: 3px solid var(--rust); outline-offset: 2px; border-radius: 4px; }
+.events-rules { margin: 8px 0 0; padding: 12px 14px 12px 30px; border-radius: 12px; background: var(--chip); line-height: 1.5; }
 .event-item { display: grid; gap: 4px; justify-items: start; padding: 10px 0; border-bottom: 1px solid var(--line); }
 .event-item p { margin: 0; font-size: 13.5px; color: var(--fg); line-height: 1.45; }
 .event-item .tag { justify-self: start; }
@@ -664,9 +667,12 @@ button { font: inherit; cursor: pointer; }
   // Events panel: the house rules for highlights, then every event by scene with its [tag]
   (() => {
     const list = $('eventsList');
+    // The rules sit behind a "How highlights work" link so the list stays easy to scan
+    const how = document.createElement('details'); how.className = 'events-how';
+    how.innerHTML = '<summary>How highlights work</summary>';
     const rules = document.createElement('ul'); rules.className = 'events-rules';
     EVENT_TAGS.rules.forEach(r => { const li = document.createElement('li'); li.textContent = r; rules.appendChild(li); });
-    list.appendChild(rules);
+    how.appendChild(rules); list.appendChild(how);
     const scenes = [...new Set(EVENT_TAGS.events.map(ev => ev.scene))];
     for (const sc of scenes) {
       const h = document.createElement('h3'); h.textContent = sc; list.appendChild(h);
