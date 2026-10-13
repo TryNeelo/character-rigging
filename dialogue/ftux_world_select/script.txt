@@ -2,4 +2,4 @@
 Neelo has different worlds to explore.
 Each one is packed with stories and games!
 [look right] [right arm up 32] [Highlight the right button] Tap the arrow to see the next world! [right arm down] [look ahead] [Stop highlight]
-[look up-right] When you find a world you like, [Highlight the enter button] tap Enter to start exploring! [Stop highlight] [look ahead]
+When you find a world you like, [look up-right] [Highlight the enter button] tap Enter to start exploring! [Stop highlight] [look ahead]

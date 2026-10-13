@@ -570,19 +570,19 @@
    "note": "Script cue: [Stop highlight]"
   },
   {
-   "time": 12.55,
-   "end": 15.88,
-   "type": "look",
-   "direction": "up-right",
-   "source": "script",
-   "note": "Script cue: [look up-right]"
-  },
-  {
    "time": 14.27,
    "type": "event",
    "name": "highlight_enter",
    "source": "script",
    "note": "Script cue: [Highlight the enter button]"
+  },
+  {
+   "time": 14.27,
+   "end": 15.88,
+   "type": "look",
+   "direction": "up-right",
+   "source": "script",
+   "note": "Script cue: [look up-right]"
   },
   {
    "time": 15.88,
