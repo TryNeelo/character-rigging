@@ -301,6 +301,14 @@
    "note": "Script cue: [right arm up 32]"
   },
   {
+   "time": 0.0,
+   "end": 1.85,
+   "type": "expression",
+   "name": "surprised",
+   "source": "script",
+   "note": "Script cue: [surprised brows]"
+  },
+  {
    "time": 5.13,
    "type": "event",
    "name": "highlight_back_arrow",
