@@ -35,7 +35,7 @@
 }
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5; margin: 0; }
-.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 48px; display: grid; gap: 24px; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 48px; display: grid; gap: 24px; }
 header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
 header h1 { font-family: var(--font-display); font-weight: 700; font-size: 2rem; line-height: 1.1; margin: 0; text-wrap: balance; }
 header p { margin: 6px 0 0; color: var(--muted); max-width: 62ch; }
@@ -91,7 +91,11 @@ button { font: inherit; cursor: pointer; }
 .seg.x { background: repeating-linear-gradient(135deg, transparent 0 5px, var(--chip) 5px 7px); }
 .seg.on { background: var(--accent); color: var(--accent-ink); }
 .playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--rust); left: 0; pointer-events: none; }
-.marks { position: relative; height: 22px; margin-top: 4px; }
+.marks { position: relative; height: 22px; margin-top: 6px; }
+/* The tags under the timeline fold away; collapsed by default */
+.tags-fold { margin-top: 8px; font-size: 13px; }
+.tags-fold summary { cursor: pointer; color: var(--accent); font-weight: 600; width: max-content; }
+.tags-fold summary:focus-visible { outline: 3px solid var(--rust); outline-offset: 2px; border-radius: 4px; }
 .mark { position: absolute; top: 0; font-family: var(--font-mono); font-size: 11px; font-weight: 700; white-space: nowrap; color: var(--rust); border-left: 2px solid var(--rust); padding-left: 4px; line-height: 20px; }
 /* an event near the end of the line hangs its label to the left of its tick, so it never runs off the strip */
 .mark.flip { border-left: 0; border-right: 2px solid var(--rust); padding: 0 4px 0 0; transform: translateX(-100%); }
@@ -242,7 +246,8 @@ button { font: inherit; cursor: pointer; }
           </div>
         </div>
         <audio id="audio" preload="auto"></audio>
-        <div class="strip-wrap"><div class="strip" id="strip"><div class="playhead" id="playhead"></div></div><div class="scale" id="scale"></div><div class="marks" id="marks"></div></div>
+        <div class="strip-wrap"><div class="strip" id="strip"><div class="playhead" id="playhead"></div></div><div class="scale" id="scale"></div>
+          <details class="tags-fold" id="tagsFold"><summary>Tags (<span id="tagCount">0</span>)</summary><div class="marks" id="marks"></div></details></div>
         <div class="row" style="margin-top:12px">
           <button class="btn" id="play">Play with sound</button>
           <label class="toggle"><input type="checkbox" id="slow"><span>Half speed</span></label>
@@ -628,6 +633,7 @@ button { font: inherit; cursor: pointer; }
     for (let k = 0; k <= Math.floor(DURATION); k += step) { const t = document.createElement('span'); t.textContent = k + 's'; $('scale').appendChild(t); }
     $('scale').lastChild.textContent = DURATION.toFixed(1) + 's';
     markEls = markers.map(markEl);
+    $('tagCount').textContent = markers.length;
     stackMarks();
   }
   function markEl(mk) {
@@ -644,6 +650,7 @@ button { font: inherit; cursor: pointer; }
   }
   // Each chip takes the first row where it doesn't overlap another, so nothing stacks on top of something else
   function stackMarks() {
+    if (!$('tagsFold').open) return;   // measured when the fold opens
     const rows = [];
     const span = el => { const r = el.getBoundingClientRect(); return [r.left, r.right]; };
     markEls.map(el => ({ el, s: span(el) })).sort((a, b) => a.s[0] - b.s[0]).forEach(({ el, s }) => {
@@ -655,6 +662,7 @@ button { font: inherit; cursor: pointer; }
     $('marks').style.height = `${Math.max(1, rows.length) * 22}px`;
   }
   window.addEventListener('resize', () => markEls.length && stackMarks());
+  $('tagsFold').addEventListener('toggle', stackMarks);
 
   // Audio files panel: pick a line to load it onto Nova
   function loadLine(id) {
