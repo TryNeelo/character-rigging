@@ -748,6 +748,13 @@
    "name": "highlight_home",
    "source": "script",
    "note": "Script cue: [Highlight the home]"
+  },
+  {
+   "time": 17.3,
+   "type": "event",
+   "name": "clear_spotlight",
+   "source": "script",
+   "note": "Script cue: [Stop spotlight]"
   }
  ]
 }
