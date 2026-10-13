@@ -291,15 +291,10 @@
  {
   "start": 15.56,
   "end": 17.48,
-  "text": "Want to choose a new look for your avatar?",
+  "text": "Wanna choose a new look for your avatar?",
   "words": [
    {
-    "w": "Want",
-    "s": 15.66,
-    "e": 15.82
-   },
-   {
-    "w": "to",
+    "w": "Wanna",
     "s": 15.66,
     "e": 15.82
    },
