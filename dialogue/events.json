@@ -4,14 +4,6 @@
     "does": "Sent automatically when a line finishes. Use it to move to the next step.",
     "builtIn": true
   },
-  "show_logo": {
-    "does": "Sample only: show the Neelo logo. Replaced when the real FTUX audio arrives.",
-    "sample": true
-  },
-  "show_path": {
-    "does": "Sample only: show the path forward. Replaced when the real FTUX audio arrives.",
-    "sample": true
-  },
   "highlight_shops": {
     "does": "Highlight the shops on the home map (\"See those shops?\").",
     "cues": [

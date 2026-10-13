@@ -5,7 +5,7 @@ import 'package:just_audio/just_audio.dart';
 
 import 'line.dart';
 
-/// An app event from a line's markers, such as "show_logo" when Nova says "Neelo".
+/// An app event from a line's markers, such as "highlight_shops" when Nova says "See those shops?".
 /// When a line finishes, an event named [NovaEvent.lineEnd] is sent.
 class NovaEvent {
   const NovaEvent(this.name, this.lineId, this.time);

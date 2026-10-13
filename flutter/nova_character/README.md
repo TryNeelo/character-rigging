@@ -43,13 +43,13 @@ NovaCharacter(
 // React to what he says. EVENTS.md lists every event and what it should do.
 nova.events.listen((event) {
   switch (event.name) {
-    case 'show_logo': showLogo();
+    case 'highlight_shops': highlightShops();
     case 'line_end': goToNextStep();
   }
 });
 
 // Make him talk.
-await nova.play('onboarding_nova_dialogue1');
+await nova.play('ftux_home');
 ```
 
 Dispose the controller with your screen (`nova.dispose()`).
@@ -86,9 +86,9 @@ The timing file holds the mouth shapes and the markers:
 
 ```json
 "markers": [
-  { "time": 0.56, "type": "event", "name": "show_logo" },
-  { "time": 2.28, "end": 3.70, "type": "look", "direction": "right" },
-  { "time": 2.28, "end": 3.70, "type": "arm", "side": "right", "degrees": 32 },
+  { "time": 5.65, "type": "event", "name": "highlight_shops" },
+  { "time": 5.65, "end": 11.32, "type": "look", "direction": "right" },
+  { "time": 5.65, "end": 11.32, "type": "arm", "side": "right", "degrees": 32 },
   { "time": 0.04, "end": 1.09, "type": "expression", "name": "happy" }
 ]
 ```

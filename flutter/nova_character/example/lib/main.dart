@@ -63,7 +63,7 @@ class _NovaDemoState extends State<NovaDemo> {
         FilledButton(
           onPressed: () => nova.isSpeaking
               ? nova.stop()
-              : nova.play('onboarding_nova_dialogue1', speed: halfSpeed ? 0.5 : 1),
+              : nova.play('ftux_home', speed: halfSpeed ? 0.5 : 1),
           child: Text(nova.isSpeaking ? 'Stop' : 'Play line'),
         ),
         const SizedBox(width: 12),

@@ -1,0 +1,605 @@
+{
+ "title": "FTUX: home",
+ "metadata": {
+  "soundFile": "/private/tmp/claude-501/-Users-manaf-alnakib-Library-CloudStorage-Dropbox-Projects-Business-Metstack-Coding-Neelo---Character-Rig/2443b1b7-656d-4687-8780-5f612d9821a7/scratchpad/ftux_home.wav",
+  "duration": 17.58
+ },
+ "mouthCues": [
+  {
+   "start": 0.0,
+   "end": 0.36,
+   "value": "X"
+  },
+  {
+   "start": 0.36,
+   "end": 0.51,
+   "value": "D"
+  },
+  {
+   "start": 0.51,
+   "end": 0.68,
+   "value": "B"
+  },
+  {
+   "start": 0.68,
+   "end": 0.85,
+   "value": "F"
+  },
+  {
+   "start": 0.85,
+   "end": 1.41,
+   "value": "B"
+  },
+  {
+   "start": 1.41,
+   "end": 1.71,
+   "value": "X"
+  },
+  {
+   "start": 1.71,
+   "end": 1.86,
+   "value": "B"
+  },
+  {
+   "start": 1.86,
+   "end": 1.93,
+   "value": "F"
+  },
+  {
+   "start": 1.93,
+   "end": 2.07,
+   "value": "C"
+  },
+  {
+   "start": 2.07,
+   "end": 2.35,
+   "value": "F"
+  },
+  {
+   "start": 2.35,
+   "end": 2.42,
+   "value": "B"
+  },
+  {
+   "start": 2.42,
+   "end": 2.49,
+   "value": "C"
+  },
+  {
+   "start": 2.49,
+   "end": 2.57,
+   "value": "A"
+  },
+  {
+   "start": 2.57,
+   "end": 2.71,
+   "value": "E"
+  },
+  {
+   "start": 2.71,
+   "end": 2.92,
+   "value": "F"
+  },
+  {
+   "start": 2.92,
+   "end": 2.99,
+   "value": "B"
+  },
+  {
+   "start": 2.99,
+   "end": 3.38,
+   "value": "X"
+  },
+  {
+   "start": 3.38,
+   "end": 3.56,
+   "value": "B"
+  },
+  {
+   "start": 3.56,
+   "end": 3.7,
+   "value": "H"
+  },
+  {
+   "start": 3.7,
+   "end": 3.77,
+   "value": "D"
+  },
+  {
+   "start": 3.77,
+   "end": 3.84,
+   "value": "B"
+  },
+  {
+   "start": 3.84,
+   "end": 4.12,
+   "value": "F"
+  },
+  {
+   "start": 4.12,
+   "end": 4.19,
+   "value": "B"
+  },
+  {
+   "start": 4.19,
+   "end": 4.27,
+   "value": "A"
+  },
+  {
+   "start": 4.27,
+   "end": 4.77,
+   "value": "E"
+  },
+  {
+   "start": 4.77,
+   "end": 5.71,
+   "value": "X"
+  },
+  {
+   "start": 5.71,
+   "end": 5.93,
+   "value": "B"
+  },
+  {
+   "start": 5.93,
+   "end": 6.0,
+   "value": "E"
+  },
+  {
+   "start": 6.0,
+   "end": 6.07,
+   "value": "F"
+  },
+  {
+   "start": 6.07,
+   "end": 6.21,
+   "value": "B"
+  },
+  {
+   "start": 6.21,
+   "end": 6.28,
+   "value": "D"
+  },
+  {
+   "start": 6.28,
+   "end": 6.43,
+   "value": "A"
+  },
+  {
+   "start": 6.43,
+   "end": 6.62,
+   "value": "B"
+  },
+  {
+   "start": 6.62,
+   "end": 7.04,
+   "value": "X"
+  },
+  {
+   "start": 7.04,
+   "end": 7.13,
+   "value": "C"
+  },
+  {
+   "start": 7.13,
+   "end": 7.34,
+   "value": "F"
+  },
+  {
+   "start": 7.34,
+   "end": 7.75,
+   "value": "E"
+  },
+  {
+   "start": 7.75,
+   "end": 8.1,
+   "value": "B"
+  },
+  {
+   "start": 8.1,
+   "end": 8.17,
+   "value": "F"
+  },
+  {
+   "start": 8.17,
+   "end": 8.25,
+   "value": "A"
+  },
+  {
+   "start": 8.25,
+   "end": 8.38,
+   "value": "B"
+  },
+  {
+   "start": 8.38,
+   "end": 8.47,
+   "value": "A"
+  },
+  {
+   "start": 8.47,
+   "end": 8.51,
+   "value": "B"
+  },
+  {
+   "start": 8.51,
+   "end": 8.59,
+   "value": "A"
+  },
+  {
+   "start": 8.59,
+   "end": 8.8,
+   "value": "C"
+  },
+  {
+   "start": 8.8,
+   "end": 8.86,
+   "value": "E"
+  },
+  {
+   "start": 8.86,
+   "end": 9.11,
+   "value": "F"
+  },
+  {
+   "start": 9.11,
+   "end": 9.25,
+   "value": "B"
+  },
+  {
+   "start": 9.25,
+   "end": 9.53,
+   "value": "E"
+  },
+  {
+   "start": 9.53,
+   "end": 9.67,
+   "value": "F"
+  },
+  {
+   "start": 9.67,
+   "end": 9.74,
+   "value": "B"
+  },
+  {
+   "start": 9.74,
+   "end": 10.02,
+   "value": "C"
+  },
+  {
+   "start": 10.02,
+   "end": 10.23,
+   "value": "B"
+  },
+  {
+   "start": 10.23,
+   "end": 10.3,
+   "value": "C"
+  },
+  {
+   "start": 10.3,
+   "end": 10.37,
+   "value": "B"
+  },
+  {
+   "start": 10.37,
+   "end": 10.51,
+   "value": "C"
+  },
+  {
+   "start": 10.51,
+   "end": 10.58,
+   "value": "B"
+  },
+  {
+   "start": 10.58,
+   "end": 10.72,
+   "value": "E"
+  },
+  {
+   "start": 10.72,
+   "end": 10.79,
+   "value": "G"
+  },
+  {
+   "start": 10.79,
+   "end": 10.93,
+   "value": "C"
+  },
+  {
+   "start": 10.93,
+   "end": 11.43,
+   "value": "B"
+  },
+  {
+   "start": 11.43,
+   "end": 11.73,
+   "value": "X"
+  },
+  {
+   "start": 11.73,
+   "end": 11.88,
+   "value": "A"
+  },
+  {
+   "start": 11.88,
+   "end": 12.02,
+   "value": "B"
+  },
+  {
+   "start": 12.02,
+   "end": 12.23,
+   "value": "E"
+  },
+  {
+   "start": 12.23,
+   "end": 12.42,
+   "value": "B"
+  },
+  {
+   "start": 12.42,
+   "end": 12.65,
+   "value": "X"
+  },
+  {
+   "start": 12.65,
+   "end": 12.71,
+   "value": "H"
+  },
+  {
+   "start": 12.71,
+   "end": 12.84,
+   "value": "B"
+  },
+  {
+   "start": 12.84,
+   "end": 12.91,
+   "value": "C"
+  },
+  {
+   "start": 12.91,
+   "end": 13.19,
+   "value": "B"
+  },
+  {
+   "start": 13.19,
+   "end": 13.26,
+   "value": "C"
+  },
+  {
+   "start": 13.26,
+   "end": 13.4,
+   "value": "F"
+  },
+  {
+   "start": 13.4,
+   "end": 13.61,
+   "value": "E"
+  },
+  {
+   "start": 13.61,
+   "end": 13.68,
+   "value": "F"
+  },
+  {
+   "start": 13.68,
+   "end": 13.78,
+   "value": "A"
+  },
+  {
+   "start": 13.78,
+   "end": 14.17,
+   "value": "X"
+  },
+  {
+   "start": 14.17,
+   "end": 14.37,
+   "value": "B"
+  },
+  {
+   "start": 14.37,
+   "end": 14.44,
+   "value": "E"
+  },
+  {
+   "start": 14.44,
+   "end": 14.58,
+   "value": "F"
+  },
+  {
+   "start": 14.58,
+   "end": 14.79,
+   "value": "E"
+  },
+  {
+   "start": 14.79,
+   "end": 14.86,
+   "value": "C"
+  },
+  {
+   "start": 14.86,
+   "end": 14.93,
+   "value": "E"
+  },
+  {
+   "start": 14.93,
+   "end": 15.0,
+   "value": "C"
+  },
+  {
+   "start": 15.0,
+   "end": 15.14,
+   "value": "B"
+  },
+  {
+   "start": 15.14,
+   "end": 15.26,
+   "value": "X"
+  },
+  {
+   "start": 15.26,
+   "end": 15.32,
+   "value": "B"
+  },
+  {
+   "start": 15.32,
+   "end": 15.51,
+   "value": "F"
+  },
+  {
+   "start": 15.51,
+   "end": 15.58,
+   "value": "B"
+  },
+  {
+   "start": 15.58,
+   "end": 15.66,
+   "value": "A"
+  },
+  {
+   "start": 15.66,
+   "end": 15.72,
+   "value": "C"
+  },
+  {
+   "start": 15.72,
+   "end": 15.85,
+   "value": "F"
+  },
+  {
+   "start": 15.85,
+   "end": 15.92,
+   "value": "B"
+  },
+  {
+   "start": 15.92,
+   "end": 16.13,
+   "value": "C"
+  },
+  {
+   "start": 16.13,
+   "end": 16.2,
+   "value": "B"
+  },
+  {
+   "start": 16.2,
+   "end": 16.39,
+   "value": "D"
+  },
+  {
+   "start": 16.39,
+   "end": 16.44,
+   "value": "E"
+  },
+  {
+   "start": 16.44,
+   "end": 16.62,
+   "value": "F"
+  },
+  {
+   "start": 16.62,
+   "end": 16.69,
+   "value": "B"
+  },
+  {
+   "start": 16.69,
+   "end": 16.76,
+   "value": "C"
+  },
+  {
+   "start": 16.76,
+   "end": 16.83,
+   "value": "F"
+  },
+  {
+   "start": 16.83,
+   "end": 16.9,
+   "value": "C"
+  },
+  {
+   "start": 16.9,
+   "end": 17.04,
+   "value": "F"
+  },
+  {
+   "start": 17.04,
+   "end": 17.25,
+   "value": "E"
+  },
+  {
+   "start": 17.25,
+   "end": 17.46,
+   "value": "B"
+  },
+  {
+   "start": 17.46,
+   "end": 17.58,
+   "value": "X"
+  }
+ ],
+ "markers": [
+  {
+   "time": 1.83,
+   "end": 4.58,
+   "type": "arm",
+   "side": "left",
+   "degrees": 32,
+   "source": "script",
+   "note": "Script cue: [arms up 32]"
+  },
+  {
+   "time": 1.83,
+   "end": 4.58,
+   "type": "arm",
+   "side": "right",
+   "degrees": 32,
+   "source": "script",
+   "note": "Script cue: [arms up 32]"
+  },
+  {
+   "time": 5.65,
+   "type": "event",
+   "name": "highlight_shops",
+   "source": "script",
+   "note": "Script cue: [Highlight the shops]"
+  },
+  {
+   "time": 5.65,
+   "end": 11.32,
+   "type": "look",
+   "direction": "right",
+   "source": "script",
+   "note": "Script cue: [look right]"
+  },
+  {
+   "time": 5.65,
+   "end": 11.32,
+   "type": "arm",
+   "side": "right",
+   "degrees": 32,
+   "source": "script",
+   "note": "Script cue: [right arm up 32]"
+  },
+  {
+   "time": 6.95,
+   "type": "event",
+   "name": "highlight_coins",
+   "source": "script",
+   "note": "Script cue: [Highlight the coins]"
+  },
+  {
+   "time": 11.83,
+   "end": 17.58,
+   "type": "look",
+   "direction": "up-right",
+   "source": "script",
+   "note": "Script cue: [look up-right]"
+  },
+  {
+   "time": 13.45,
+   "type": "event",
+   "name": "highlight_home",
+   "source": "script",
+   "note": "Script cue: [Highlight the home]"
+  }
+ ]
+}

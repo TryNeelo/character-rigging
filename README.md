@@ -104,7 +104,7 @@ Timing is 40 ms half, 80 ms closed, 50 ms half. Blinks happen at random every 2.
 ## Adding a new dialogue line
 
 1. Make a folder `dialogue/<line_name>/` and add the audio as `<line_name>.mp3`, plus `script.txt` with the exact words.
-2. Convert the audio to WAV: `ffmpeg -i <line_name>.mp3 -ar 16000 -ac 1 <line_name>.wav`
+2. Convert the audio to WAV: `afconvert -f WAVE -d LEI16@16000 -c 1 <line_name>.mp3 <line_name>.wav` (or `ffmpeg -i <line_name>.mp3 -ar 16000 -ac 1 <line_name>.wav`)
 3. Run Rhubarb Lip Sync (free, from github.com/DanielSWolf/rhubarb-lip-sync/releases; use the macOS build on a Mac):
    `rhubarb -f json --extendedShapes GHX --dialogFile script.txt -o cues-rhubarb-raw.json <line_name>.wav`
 4. Copy `cues-rhubarb-raw.json` to `cues.json`.
@@ -127,14 +127,17 @@ A line's `script.txt` is plain text:
 
 - **One caption per line**, broken wherever the caption should change. A script written as one paragraph is split by sentence.
 - **Exact words** as spoken, with punctuation.
-- **[Bracketed cues]** right before the word where something should happen, even mid-line: `There's lots to explore. [Highlight the shops] See those shops?` The cue is removed from the caption and becomes an event at that word. It must match an event in `dialogue/events.json` (its name, or one of its `cues`), or `build_captions.py` stops.
+- **[Bracketed cues]** right before the word where something should happen, even mid-line: `There's lots to explore. [Highlight the shops] See those shops?` The cue is removed from the caption and becomes an event at that word. It must match an event in `dialogue/events.json` (its name, or one of its `cues`), or one of Nova's moves below, or `build_captions.py` stops.
+- **Moves** are cued the same way and hold until the next cue of the same kind, or the end of the line. "Left" and "right" are the screen's sides.
+  - `[look right]`, `[look up-right]` and the other eight directions; `[look ahead]` looks straight again.
+  - `[arms up 32]`, `[right arm up 32]`, `[left arm up 32]` (degrees; `up` alone is 32), and `[arms down]`, `[right arm down]`.
 - Captions longer than `captions.maxChars` in `tools/rig_settings.json` (55, the length of "Each world is packed with stories and games to explore.", set by Manaf) are split at a sentence end, then a comma, then a space, and flagged to check.
 
 ## Line log
 
-**onboarding_nova_dialogue1** (3.8 s, 36 cues). Words (from an automatic transcript, to confirm, saved in script.txt): "Welcome to Neelo. I'm Nova. Let's get this journey started." Timed by Rhubarb from audio only, then hand-fixed against the audio (energy, frication and vowel formants per 10 ms). Shapes lead the sound by about 30 ms, as Rhubarb does. Sample markers for the developer handoff: event `show_logo` on "Neelo" (0.56 s), look right and raise the arm on the screen's right 32° through "Let's get this journey started" (2.28 to 3.70 s), event `show_path` on "journey" (2.88 s). Hand fixes: (1) "welcome": short B and C for "kuh" before A for M (0.30 to 0.45 s). (2) "to Neelo": B for T, F for OO, then B for N and EE, H for L, E closing to F for O (0.45 to 1.09 s). (3) Both pauses are true silence and now rest on X instead of holding B (1.09 to 1.33 s and 2.00 to 2.28 s). (4) "Nova": B for N, and G for V moved about 50 ms earlier (1.54 to 2.00 s). (5) "Let's": C opens on the E before B for TS (2.28 to 2.50 s). The earlier split of a long B over "get this" into B, C, B, C, B is kept. (6) "started": B for T, C for the "-te-" vowel, B for D, then X (3.44 to 3.76 s).
+**ftux_home** "FTUX: home" (17.6 s, 106 cues). The final recording, with Manaf's script and cues. It was about 10 dB quieter than the earlier sample lines, so it was raised to match (speech level within 1 dB, peaks kept at -1 dBFS). Timed by Rhubarb 1.14 with the script. Two pauses (after "things!" and "But first,") held B through silence and now rest on X. Moves from the script: both arms up 32° through "Welcome to your neighborhood. There's lots to explore."; look right and the right arm up 32° from "See those shops?" to the end of "things!"; look up-right from "But first" to the end. Events: `highlight_shops`, `highlight_coins`, `highlight_home` on "home".
 
-**voice_line_1** (5.0 s, 44 cues). "Hi, I'm Nova! Let's get your Neelo account set up. First, what's your child's name?" Words from an automatic transcript, to confirm. The source recording was about 23 dB quieter than the first line, so it was raised to match (speech level within 0.2 dB, peaks kept below -1 dBFS). Timed by Rhubarb 1.14 with the script, then hand-fixed against the audio: the three pauses (after "Nova!", "set up." and "First,") rest on X instead of holding B, C or A; "Hi" and "I'm" open; "Let's" gets H, C, B; "get your" gets C, B, E instead of one long F; "Neelo" gets H for the L; "First" opens with G for the F; "what's your" separates the TS; "child's" opens on its vowel with H for the L. No markers yet.
+The two earlier sample lines (onboarding_nova_dialogue1, voice_line_1) and their sample events (show_logo, show_path) were removed on 2026-10-13, when the final FTUX audio arrived. They're in git history.
 
 ## Decisions so far
 

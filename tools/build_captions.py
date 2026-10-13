@@ -7,6 +7,10 @@ Script format (dialogue/<line>/script.txt), plain text:
     Cues are removed from the caption text and become event markers at that word. A cue
     must match an event in dialogue/events.json (its name, or one of its "cues"), or the
     build stops so nothing slips through.
+  - Nova's moves can be cued the same way. They hold until the next cue of the same kind,
+    or the end of the line ("right" and "left" are the screen's sides):
+        [look right]  [look up-right]  [look ahead]          eight directions; ahead looks straight again
+        [arms up 32]  [right arm up 32]  [arms down]  [left arm down]    degrees; up alone is 32
   - Any caption longer than captions.maxChars (tools/rig_settings.json) is split at a
     sentence end, then a comma, then a space, and is flagged to check.
 
@@ -41,6 +45,34 @@ def event_for(cue):
                 return name
     slug = '_'.join(w for w in text.split() if w not in ('the', 'a', 'an'))
     return slug if slug in EVENTS else None
+
+DIRECTIONS = {'left', 'right', 'up', 'down', 'up-left', 'up-right', 'down-left', 'down-right'}
+ARM_UP = 32   # degrees when a cue says "up" without a number
+
+def action_for(cue):
+    """A move a bracketed cue means: ('look', direction or None for ahead) or ('arm', sides, degrees)."""
+    words = plain(cue.replace('°', ' ')).split()
+    if words[:1] == ['look']:
+        rest = ['up' if w == 'top' else 'down' if w == 'bottom' else w for w in words[1:]]
+        if rest in (['ahead'], ['straight'], ['forward'], ['center']):
+            return ('look', None)
+        if len(rest) == 2 and rest[0] in ('left', 'right'):
+            rest = rest[::-1]   # "right up" -> "up right"
+        d = '-'.join(rest)
+        return ('look', d) if d in DIRECTIONS else None
+    sides = ['left', 'right']
+    if words[:1] in (['left'], ['right']):
+        sides, words = [words[0]], words[1:]
+    if words[:1] in (['arm'], ['arms']):
+        rest = words[1:]
+        nums = [w for w in rest if w.isdigit()]
+        if rest == ['down'] or nums == ['0']:
+            return ('arm', sides, 0)
+        if nums:
+            return ('arm', sides, int(nums[0]))
+        if rest == ['up']:
+            return ('arm', sides, ARM_UP)
+    return None
 
 def split_long(caption):
     """Split a caption over MAX characters: at sentence ends, then commas, then spaces."""
@@ -114,16 +146,39 @@ for line in sorted(lines):
     captions[-1]['end'] = round(min(captions[-1]['end'], duration), 2)
     json.dump(captions, open(os.path.join(d, 'captions.json'), 'w'), indent=1)
 
-    # Cues become event markers at their word
+    # Cues become event markers at their word; moves hold until the next cue of their kind
     markers = [m for m in timing.get('markers', []) if m.get('source') != 'script']
+    moves = []
     for cue in cues:
         text, at = cue[0], cue[1]
+        t = times[at][1] if len(cue) > 2 else max(0.0, times[at][0] - CUE_LEAD)
+        action = action_for(text)
+        if action:
+            moves.append((round(t, 2), action, text))
+            continue
         name = event_for(text)
         if not name:
-            problems.append(f'{line}: cue [{text}] matches no event in dialogue/events.json')
+            problems.append(f'{line}: cue [{text}] matches no event in dialogue/events.json and no move')
             continue
-        t = times[at][1] if len(cue) > 2 else max(0.0, times[at][0] - CUE_LEAD)
         markers.append({'time': round(t, 2), 'type': 'event', 'name': name, 'source': 'script', 'note': f'Script cue: [{text}]'})
+    held = {}   # 'look' or the arm's side -> (start, marker fields, cue text)
+    def release(key, t):
+        if key in held:
+            start, fields, text = held.pop(key)
+            if t > start:
+                markers.append({'time': start, 'end': round(t, 2), **fields, 'source': 'script', 'note': f'Script cue: [{text}]'})
+    for t, action, text in sorted(moves, key=lambda m: m[0]):
+        if action[0] == 'look':
+            release('look', t)
+            if action[1]:
+                held['look'] = (t, {'type': 'look', 'direction': action[1]}, text)
+        else:
+            for side in action[1]:
+                release(side, t)
+                if action[2]:
+                    held[side] = (t, {'type': 'arm', 'side': side, 'degrees': action[2]}, text)
+    for key in list(held):
+        release(key, duration)
     timing['markers'] = sorted(markers, key=lambda m: m['time'])
     json.dump(timing, open(os.path.join(d, 'cues.json'), 'w'), indent=1)
     print(line, [(c['start'], c['end'], c['text']) for c in captions], 'cues:', [(c[0], round(times[c[1]][0], 2)) for c in cues])

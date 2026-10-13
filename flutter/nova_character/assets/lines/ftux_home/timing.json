@@ -1,0 +1,736 @@
+{
+ "id": "ftux_home",
+ "audio": "audio.mp3",
+ "duration": 17.58,
+ "cues": [
+  {
+   "start": 0.0,
+   "end": 0.36,
+   "shape": "X"
+  },
+  {
+   "start": 0.36,
+   "end": 0.51,
+   "shape": "D"
+  },
+  {
+   "start": 0.51,
+   "end": 0.68,
+   "shape": "B"
+  },
+  {
+   "start": 0.68,
+   "end": 0.85,
+   "shape": "F"
+  },
+  {
+   "start": 0.85,
+   "end": 1.41,
+   "shape": "B"
+  },
+  {
+   "start": 1.41,
+   "end": 1.71,
+   "shape": "X"
+  },
+  {
+   "start": 1.71,
+   "end": 1.86,
+   "shape": "B"
+  },
+  {
+   "start": 1.86,
+   "end": 1.93,
+   "shape": "F"
+  },
+  {
+   "start": 1.93,
+   "end": 2.07,
+   "shape": "C"
+  },
+  {
+   "start": 2.07,
+   "end": 2.35,
+   "shape": "F"
+  },
+  {
+   "start": 2.35,
+   "end": 2.42,
+   "shape": "B"
+  },
+  {
+   "start": 2.42,
+   "end": 2.49,
+   "shape": "C"
+  },
+  {
+   "start": 2.49,
+   "end": 2.57,
+   "shape": "A"
+  },
+  {
+   "start": 2.57,
+   "end": 2.71,
+   "shape": "E"
+  },
+  {
+   "start": 2.71,
+   "end": 2.92,
+   "shape": "F"
+  },
+  {
+   "start": 2.92,
+   "end": 2.99,
+   "shape": "B"
+  },
+  {
+   "start": 2.99,
+   "end": 3.38,
+   "shape": "X"
+  },
+  {
+   "start": 3.38,
+   "end": 3.56,
+   "shape": "B"
+  },
+  {
+   "start": 3.56,
+   "end": 3.7,
+   "shape": "H"
+  },
+  {
+   "start": 3.7,
+   "end": 3.77,
+   "shape": "D"
+  },
+  {
+   "start": 3.77,
+   "end": 3.84,
+   "shape": "B"
+  },
+  {
+   "start": 3.84,
+   "end": 4.12,
+   "shape": "F"
+  },
+  {
+   "start": 4.12,
+   "end": 4.19,
+   "shape": "B"
+  },
+  {
+   "start": 4.19,
+   "end": 4.27,
+   "shape": "A"
+  },
+  {
+   "start": 4.27,
+   "end": 4.77,
+   "shape": "E"
+  },
+  {
+   "start": 4.77,
+   "end": 5.71,
+   "shape": "X"
+  },
+  {
+   "start": 5.71,
+   "end": 5.93,
+   "shape": "B"
+  },
+  {
+   "start": 5.93,
+   "end": 6.0,
+   "shape": "E"
+  },
+  {
+   "start": 6.0,
+   "end": 6.07,
+   "shape": "F"
+  },
+  {
+   "start": 6.07,
+   "end": 6.21,
+   "shape": "B"
+  },
+  {
+   "start": 6.21,
+   "end": 6.28,
+   "shape": "D"
+  },
+  {
+   "start": 6.28,
+   "end": 6.43,
+   "shape": "A"
+  },
+  {
+   "start": 6.43,
+   "end": 6.62,
+   "shape": "B"
+  },
+  {
+   "start": 6.62,
+   "end": 7.04,
+   "shape": "X"
+  },
+  {
+   "start": 7.04,
+   "end": 7.13,
+   "shape": "C"
+  },
+  {
+   "start": 7.13,
+   "end": 7.34,
+   "shape": "F"
+  },
+  {
+   "start": 7.34,
+   "end": 7.75,
+   "shape": "E"
+  },
+  {
+   "start": 7.75,
+   "end": 8.1,
+   "shape": "B"
+  },
+  {
+   "start": 8.1,
+   "end": 8.17,
+   "shape": "F"
+  },
+  {
+   "start": 8.17,
+   "end": 8.25,
+   "shape": "A"
+  },
+  {
+   "start": 8.25,
+   "end": 8.38,
+   "shape": "B"
+  },
+  {
+   "start": 8.38,
+   "end": 8.47,
+   "shape": "A"
+  },
+  {
+   "start": 8.47,
+   "end": 8.51,
+   "shape": "B"
+  },
+  {
+   "start": 8.51,
+   "end": 8.59,
+   "shape": "A"
+  },
+  {
+   "start": 8.59,
+   "end": 8.8,
+   "shape": "C"
+  },
+  {
+   "start": 8.8,
+   "end": 8.86,
+   "shape": "E"
+  },
+  {
+   "start": 8.86,
+   "end": 9.11,
+   "shape": "F"
+  },
+  {
+   "start": 9.11,
+   "end": 9.25,
+   "shape": "B"
+  },
+  {
+   "start": 9.25,
+   "end": 9.53,
+   "shape": "E"
+  },
+  {
+   "start": 9.53,
+   "end": 9.67,
+   "shape": "F"
+  },
+  {
+   "start": 9.67,
+   "end": 9.74,
+   "shape": "B"
+  },
+  {
+   "start": 9.74,
+   "end": 10.02,
+   "shape": "C"
+  },
+  {
+   "start": 10.02,
+   "end": 10.23,
+   "shape": "B"
+  },
+  {
+   "start": 10.23,
+   "end": 10.3,
+   "shape": "C"
+  },
+  {
+   "start": 10.3,
+   "end": 10.37,
+   "shape": "B"
+  },
+  {
+   "start": 10.37,
+   "end": 10.51,
+   "shape": "C"
+  },
+  {
+   "start": 10.51,
+   "end": 10.58,
+   "shape": "B"
+  },
+  {
+   "start": 10.58,
+   "end": 10.72,
+   "shape": "E"
+  },
+  {
+   "start": 10.72,
+   "end": 10.79,
+   "shape": "G"
+  },
+  {
+   "start": 10.79,
+   "end": 10.93,
+   "shape": "C"
+  },
+  {
+   "start": 10.93,
+   "end": 11.43,
+   "shape": "B"
+  },
+  {
+   "start": 11.43,
+   "end": 11.73,
+   "shape": "X"
+  },
+  {
+   "start": 11.73,
+   "end": 11.88,
+   "shape": "A"
+  },
+  {
+   "start": 11.88,
+   "end": 12.02,
+   "shape": "B"
+  },
+  {
+   "start": 12.02,
+   "end": 12.23,
+   "shape": "E"
+  },
+  {
+   "start": 12.23,
+   "end": 12.42,
+   "shape": "B"
+  },
+  {
+   "start": 12.42,
+   "end": 12.65,
+   "shape": "X"
+  },
+  {
+   "start": 12.65,
+   "end": 12.71,
+   "shape": "H"
+  },
+  {
+   "start": 12.71,
+   "end": 12.84,
+   "shape": "B"
+  },
+  {
+   "start": 12.84,
+   "end": 12.91,
+   "shape": "C"
+  },
+  {
+   "start": 12.91,
+   "end": 13.19,
+   "shape": "B"
+  },
+  {
+   "start": 13.19,
+   "end": 13.26,
+   "shape": "C"
+  },
+  {
+   "start": 13.26,
+   "end": 13.4,
+   "shape": "F"
+  },
+  {
+   "start": 13.4,
+   "end": 13.61,
+   "shape": "E"
+  },
+  {
+   "start": 13.61,
+   "end": 13.68,
+   "shape": "F"
+  },
+  {
+   "start": 13.68,
+   "end": 13.78,
+   "shape": "A"
+  },
+  {
+   "start": 13.78,
+   "end": 14.17,
+   "shape": "X"
+  },
+  {
+   "start": 14.17,
+   "end": 14.37,
+   "shape": "B"
+  },
+  {
+   "start": 14.37,
+   "end": 14.44,
+   "shape": "E"
+  },
+  {
+   "start": 14.44,
+   "end": 14.58,
+   "shape": "F"
+  },
+  {
+   "start": 14.58,
+   "end": 14.79,
+   "shape": "E"
+  },
+  {
+   "start": 14.79,
+   "end": 14.86,
+   "shape": "C"
+  },
+  {
+   "start": 14.86,
+   "end": 14.93,
+   "shape": "E"
+  },
+  {
+   "start": 14.93,
+   "end": 15.0,
+   "shape": "C"
+  },
+  {
+   "start": 15.0,
+   "end": 15.14,
+   "shape": "B"
+  },
+  {
+   "start": 15.14,
+   "end": 15.26,
+   "shape": "X"
+  },
+  {
+   "start": 15.26,
+   "end": 15.32,
+   "shape": "B"
+  },
+  {
+   "start": 15.32,
+   "end": 15.51,
+   "shape": "F"
+  },
+  {
+   "start": 15.51,
+   "end": 15.58,
+   "shape": "B"
+  },
+  {
+   "start": 15.58,
+   "end": 15.66,
+   "shape": "A"
+  },
+  {
+   "start": 15.66,
+   "end": 15.72,
+   "shape": "C"
+  },
+  {
+   "start": 15.72,
+   "end": 15.85,
+   "shape": "F"
+  },
+  {
+   "start": 15.85,
+   "end": 15.92,
+   "shape": "B"
+  },
+  {
+   "start": 15.92,
+   "end": 16.13,
+   "shape": "C"
+  },
+  {
+   "start": 16.13,
+   "end": 16.2,
+   "shape": "B"
+  },
+  {
+   "start": 16.2,
+   "end": 16.39,
+   "shape": "D"
+  },
+  {
+   "start": 16.39,
+   "end": 16.44,
+   "shape": "E"
+  },
+  {
+   "start": 16.44,
+   "end": 16.62,
+   "shape": "F"
+  },
+  {
+   "start": 16.62,
+   "end": 16.69,
+   "shape": "B"
+  },
+  {
+   "start": 16.69,
+   "end": 16.76,
+   "shape": "C"
+  },
+  {
+   "start": 16.76,
+   "end": 16.83,
+   "shape": "F"
+  },
+  {
+   "start": 16.83,
+   "end": 16.9,
+   "shape": "C"
+  },
+  {
+   "start": 16.9,
+   "end": 17.04,
+   "shape": "F"
+  },
+  {
+   "start": 17.04,
+   "end": 17.25,
+   "shape": "E"
+  },
+  {
+   "start": 17.25,
+   "end": 17.46,
+   "shape": "B"
+  },
+  {
+   "start": 17.46,
+   "end": 17.58,
+   "shape": "X"
+  }
+ ],
+ "markers": [
+  {
+   "time": 1.83,
+   "end": 4.58,
+   "type": "arm",
+   "side": "left",
+   "degrees": 32,
+   "source": "script",
+   "note": "Script cue: [arms up 32]"
+  },
+  {
+   "time": 1.83,
+   "end": 4.58,
+   "type": "arm",
+   "side": "right",
+   "degrees": 32,
+   "source": "script",
+   "note": "Script cue: [arms up 32]"
+  },
+  {
+   "time": 5.65,
+   "type": "event",
+   "name": "highlight_shops",
+   "source": "script",
+   "note": "Script cue: [Highlight the shops]"
+  },
+  {
+   "time": 5.65,
+   "end": 11.32,
+   "type": "look",
+   "direction": "right",
+   "source": "script",
+   "note": "Script cue: [look right]"
+  },
+  {
+   "time": 5.65,
+   "end": 11.32,
+   "type": "arm",
+   "side": "right",
+   "degrees": 32,
+   "source": "script",
+   "note": "Script cue: [right arm up 32]"
+  },
+  {
+   "time": 6.95,
+   "type": "event",
+   "name": "highlight_coins",
+   "source": "script",
+   "note": "Script cue: [Highlight the coins]"
+  },
+  {
+   "time": 11.83,
+   "end": 17.58,
+   "type": "look",
+   "direction": "up-right",
+   "source": "script",
+   "note": "Script cue: [look up-right]"
+  },
+  {
+   "time": 13.45,
+   "type": "event",
+   "name": "highlight_home",
+   "source": "script",
+   "note": "Script cue: [Highlight the home]"
+  }
+ ],
+ "emphasis": [
+  {
+   "time": 0.25,
+   "strength": 0.64
+  },
+  {
+   "time": 0.98,
+   "strength": 0.57
+  },
+  {
+   "time": 1.86,
+   "strength": 0.38
+  },
+  {
+   "time": 4.08,
+   "strength": 0.47
+  },
+  {
+   "time": 4.52,
+   "strength": 0.6
+  },
+  {
+   "time": 5.93,
+   "strength": 0.78
+  },
+  {
+   "time": 7.34,
+   "strength": 0.56
+  },
+  {
+   "time": 8.66,
+   "strength": 0.65
+  },
+  {
+   "time": 9.03,
+   "strength": 0.59
+  },
+  {
+   "time": 9.43,
+   "strength": 0.83
+  },
+  {
+   "time": 10.01,
+   "strength": 0.55
+  },
+  {
+   "time": 10.59,
+   "strength": 0.99
+  },
+  {
+   "time": 11.03,
+   "strength": 0.58
+  },
+  {
+   "time": 12.11,
+   "strength": 0.81
+  },
+  {
+   "time": 12.91,
+   "strength": 0.88
+  },
+  {
+   "time": 13.39,
+   "strength": 0.53
+  },
+  {
+   "time": 14.22,
+   "strength": 0.9
+  },
+  {
+   "time": 15.66,
+   "strength": 0.76
+  },
+  {
+   "time": 16.31,
+   "strength": 0.89
+  },
+  {
+   "time": 16.8,
+   "strength": 1
+  },
+  {
+   "time": 17.17,
+   "strength": 0.91
+  }
+ ],
+ "captions": [
+  {
+   "start": 0.0,
+   "end": 1.66,
+   "text": "Hi, you're here!"
+  },
+  {
+   "start": 1.76,
+   "end": 3.14,
+   "text": "Welcome to your neighborhood."
+  },
+  {
+   "start": 3.3,
+   "end": 4.98,
+   "text": "There's lots to explore."
+  },
+  {
+   "start": 5.58,
+   "end": 6.78,
+   "text": "See those shops?"
+  },
+  {
+   "start": 6.88,
+   "end": 8.72,
+   "text": "As you earn coins, you'll be able to buy"
+  },
+  {
+   "start": 8.72,
+   "end": 11.72,
+   "text": "cool clothes, hats, and other fun things!"
+  },
+  {
+   "start": 11.76,
+   "end": 14.08,
+   "text": "But first, let's head inside your home."
+  },
+  {
+   "start": 14.08,
+   "end": 15.12,
+   "text": "I'll show you around,"
+  },
+  {
+   "start": 15.12,
+   "end": 17.58,
+   "text": "and you can make your avatar look the way you want."
+  }
+ ]
+}
