@@ -67,7 +67,7 @@
     "scene": "Any scene"
   },
   "clear_spotlight": {
-    "does": "End only the spotlight: the dim fades, the arrow stays and blinks until the child taps the item (or until a later [Stop highlight]).",
+    "does": "End only the spotlight: the spotlight fades, the arrow stays and blinks until the child taps the item (or until a later [Stop highlight]).",
     "cues": [
       "Stop spotlight",
       "Clear spotlight"
@@ -83,7 +83,7 @@
     "scene": "Any scene"
   },
   "_rules": [
-    "A highlight has two parts: the spotlight (the screen dims, with a cut-out around the item) and an arrow pointing at the item. They appear together.",
+    "A highlight has two parts: the spotlight (a dark overlay with a cut-out around the item) and an arrow pointing at the item. They appear together.",
     "A highlight stays until the script ends it, or until a new highlight replaces it. Finishing the line does not end it.",
     "[Stop highlight] (clear_highlight): the spotlight and the arrow fade out together.",
     "[Stop spotlight] (clear_spotlight): only the spotlight fades. The arrow stays and blinks until the child taps the item (or a later [Stop highlight])."
