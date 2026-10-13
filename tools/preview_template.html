@@ -131,14 +131,17 @@ button { font: inherit; cursor: pointer; }
 .line-item .t { font-weight: 700; font-size: 14px; }
 .line-item .m { font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .script-panel { width: min(560px, 100vw); }
-.events-panel { width: min(420px, 100vw); }
+.events-panel { width: min(520px, 100vw); }
 .events-list { overflow-y: auto; padding: 4px 16px 20px; }
-.events-list h3 { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 18px 0 8px; }
+.events-list h3 { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
+/* One block per scene: a rule and generous space between scenes, none between the events inside one */
+.event-group { padding: 26px 0 22px; }
+.event-group + .event-group { border-top: 1px solid var(--line); }
 .events-how { margin: 12px 0 0; font-size: 13px; color: var(--muted); }
 .events-how summary { cursor: pointer; color: var(--accent); font-weight: 600; width: max-content; }
 .events-how summary:focus-visible { outline: 3px solid var(--rust); outline-offset: 2px; border-radius: 4px; }
 .events-rules { margin: 8px 0 0; padding: 12px 14px 12px 30px; border-radius: 12px; background: var(--chip); line-height: 1.5; }
-.event-item { display: grid; gap: 4px; justify-items: start; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.event-item { display: grid; gap: 4px; justify-items: start; padding: 8px 0; }
 .event-item p { margin: 0; font-size: 13.5px; color: var(--fg); line-height: 1.45; }
 .event-item .tag { justify-self: start; }
 .panel-head .sub { font-size: 13px; color: var(--muted); margin: 2px 0 0; }
@@ -694,13 +697,14 @@ button { font: inherit; cursor: pointer; }
     how.appendChild(rules); list.appendChild(how);
     const scenes = [...new Set(EVENT_TAGS.events.map(ev => ev.scene))];
     for (const sc of scenes) {
-      const h = document.createElement('h3'); h.textContent = sc; list.appendChild(h);
+      const group = document.createElement('section'); group.className = 'event-group';
+      const h = document.createElement('h3'); h.textContent = sc; group.appendChild(h); list.appendChild(group);
       for (const ev of EVENT_TAGS.events.filter(x => x.scene === sc)) {
         const item = document.createElement('div'); item.className = 'event-item';
         const tag = document.createElement('button'); tag.type = 'button'; tag.className = 'tag'; tag.textContent = `[${ev.tag}]`;
         tag.title = `Copy. The app receives "${ev.name}".`;
         const does = document.createElement('p'); does.textContent = ev.does;
-        item.append(tag, does); list.appendChild(item);
+        item.append(tag, does); group.appendChild(item);
       }
     }
   })();

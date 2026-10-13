@@ -58,7 +58,7 @@
     "scene": "World select"
   },
   "start_world_rotation": {
-    "does": "Start rotating the worlds on the world selection screen: slide to the next world, pause briefly, and repeat, at a pace the app chooses, until stop_world_rotation.",
+    "does": "Start rotating the worlds on the world selection screen: slide to the next world, pause briefly, and repeat, at a pace the app chooses, until [Stop world rotation].",
     "cues": [
       "Start world rotation",
       "Rotate the worlds"

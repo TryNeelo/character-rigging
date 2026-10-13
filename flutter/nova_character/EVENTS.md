@@ -50,7 +50,7 @@ Line id: `ftux_world_select`
 
 | Time | Event | What the app should do |
 |---|---|---|
-| 2.95 s | `start_world_rotation` | Start rotating the worlds on the world selection screen: slide to the next world, pause briefly, and repeat, at a pace the app chooses, until stop_world_rotation. |
+| 2.95 s | `start_world_rotation` | Start rotating the worlds on the world selection screen: slide to the next world, pause briefly, and repeat, at a pace the app chooses, until [Stop world rotation]. |
 | 7.76 s | `stop_world_rotation` | Stop rotating the worlds: finish the slide in progress and stay on that world. |
 | 9.21 s | `highlight_next_world_arrow` | Highlight the arrow that rotates to the next world ("Tap the arrow to keep traveling through worlds"): spotlight it and point the arrow at it. |
 | 10.84 s | `clear_highlight` | End the highlight: the spotlight and the arrow fade out together. |
