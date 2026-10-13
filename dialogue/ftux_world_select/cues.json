@@ -541,6 +541,20 @@
    "note": "Script cue: [right arm up 32]"
   },
   {
+   "time": 2.95,
+   "type": "event",
+   "name": "start_world_rotation",
+   "source": "script",
+   "note": "Script cue: [Start world rotation]"
+  },
+  {
+   "time": 7.76,
+   "type": "event",
+   "name": "stop_world_rotation",
+   "source": "script",
+   "note": "Script cue: [Stop world rotation]"
+  },
+  {
    "time": 9.21,
    "type": "event",
    "name": "highlight_next_world_arrow",
