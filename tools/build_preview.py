@@ -35,13 +35,18 @@ def load(line):
     }
 
 EVENTS = {k: v for k, v in json.load(open(os.path.join(ROOT, 'dialogue', 'events.json'))).items() if not k.startswith('_')}
+# The Events panel: each event a writer can cue, by scene, with the [tag] to copy (its first cue wording)
+event_tags = {'rules': json.load(open(os.path.join(ROOT, 'dialogue', 'events.json'))).get('_rules', []),
+              'events': [{'name': k, 'tag': (v.get('cues') or [k])[0], 'does': v['does'], 'scene': v.get('scene', 'Other')}
+                         for k, v in EVENTS.items() if not v.get('builtIn') and not v.get('sample')]}
 lines = [load(os.path.basename(os.path.dirname(p))) for p in sorted(glob.glob(os.path.join(ROOT, 'dialogue', '*', 'cues.json')))]
 svg = open(os.path.join(ROOT, 'art', 'Nova-rigged.svg')).read().replace(
     '<svg id="nova" ', '<svg id="nova" role="img" aria-label="Nova, a bear, in his chosen outfit" ', 1)
 page = (open(os.path.join(ROOT, 'tools', 'preview_template.html')).read()
         .replace('%%SVG%%', svg)
         .replace('%%SETTINGS%%', json.dumps(json.load(open(os.path.join(ROOT, 'tools', 'rig_settings.json')))))
-        .replace('%%LINES%%', json.dumps(lines)))
+        .replace('%%LINES%%', json.dumps(lines))
+        .replace('%%EVENTS%%', json.dumps(event_tags)))
 os.makedirs(OUT, exist_ok=True)
 open(os.path.join(OUT, 'index.html'), 'w').write(page)
 for l in lines:

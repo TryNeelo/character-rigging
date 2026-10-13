@@ -2,6 +2,12 @@
 
 Events Nova sends to the app while he talks. Listen for them on `NovaController.events`; each `NovaEvent` has the `name` below and the time in the line. Generated from the Nova character repo, so this list always matches the lines in this package.
 
+## Highlights
+
+- A new highlight replaces the one before it.
+- Highlights clear when Nova finishes the line (line_end), unless the event says it stays until the child taps.
+- clear_highlight removes whatever is highlighted, for a highlight that should end mid-line.
+
 ## Every line
 
 | Event | What the app should do |
@@ -28,4 +34,5 @@ Names agreed for the FTUX flow. They appear in a line once its audio is timed.
 | `highlight_back_arrow` | Highlight the back arrow ("Tap the back arrow, and let's go!"). It stays until the child taps it. |
 | `highlight_next_world_arrow` | Highlight the arrow that rotates to the next world ("Tap the arrow to keep traveling through worlds"). |
 | `highlight_enter` | Highlight the Enter button on the world selection screen. |
+| `clear_highlight` | Remove whatever is highlighted right now. Use it when a highlight should end before the line does. |
 | `nova_exit` | Nova leaves the screen; the scene stays for the child to explore and choose. |

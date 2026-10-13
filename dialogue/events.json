@@ -1,5 +1,5 @@
 {
-  "_about": "Every app event Nova can send. Each event in a line's markers must be listed here. 'does' is what the app should do on screen. tools/build_events.py builds the developers' reference sheet (EVENTS.md) from this list and the lines that use each event. 'cues' lists how a writer may phrase it in a script's [brackets].",
+  "_about": "Every app event Nova can send. Each event in a line's markers must be listed here. 'does' is what the app should do on screen. tools/build_events.py builds the developers' reference sheet (EVENTS.md) from this list and the lines that use each event. 'cues' lists how a writer may phrase it in a script's [brackets]; the first is the one the preview's Events panel copies. 'scene' groups it in that panel.",
   "line_end": {
     "does": "Sent automatically when a line finishes. Use it to move to the next step.",
     "builtIn": true
@@ -9,52 +9,74 @@
     "cues": [
       "Highlight the shops",
       "Highlight the stores"
-    ]
+    ],
+    "scene": "Home"
   },
   "highlight_home": {
     "does": "Highlight the home on the map with the arrow (\"let's head inside your home\"). It stays until the child taps the home.",
     "cues": [
-      "Highlight home",
-      "Highlight the home"
-    ]
+      "Highlight the home",
+      "Highlight home"
+    ],
+    "scene": "Home"
   },
   "highlight_sticker_book": {
     "does": "Highlight the sticker book in the room.",
     "cues": [
       "Highlight the sticker book"
-    ]
+    ],
+    "scene": "Room"
   },
   "highlight_closet": {
     "does": "Highlight the closet with the arrow. It stays until the child taps the closet.",
     "cues": [
       "Highlight the closet"
-    ]
+    ],
+    "scene": "Room"
   },
   "highlight_back_arrow": {
     "does": "Highlight the back arrow (\"Tap the back arrow, and let's go!\"). It stays until the child taps it.",
     "cues": [
       "Highlight the back arrow",
       "Highlight the back button"
-    ]
+    ],
+    "scene": "Room"
   },
   "highlight_next_world_arrow": {
     "does": "Highlight the arrow that rotates to the next world (\"Tap the arrow to keep traveling through worlds\").",
     "cues": [
       "Highlight the right button",
       "Highlight the right arrow"
-    ]
+    ],
+    "scene": "World select"
   },
   "highlight_enter": {
     "does": "Highlight the Enter button on the world selection screen.",
     "cues": [
       "Highlight the enter button"
-    ]
+    ],
+    "scene": "World select"
+  },
+  "clear_highlight": {
+    "does": "Remove whatever is highlighted right now. Use it when a highlight should end before the line does.",
+    "cues": [
+      "Stop highlight",
+      "Stop highlighting",
+      "Clear highlight"
+    ],
+    "scene": "Any scene"
   },
   "nova_exit": {
     "does": "Nova leaves the screen; the scene stays for the child to explore and choose.",
     "cues": [
       "Nova leaves the screen",
       "Nova leaves"
-    ]
-  }
+    ],
+    "scene": "Any scene"
+  },
+  "_rules": [
+    "A new highlight replaces the one before it.",
+    "Highlights clear when Nova finishes the line (line_end), unless the event says it stays until the child taps.",
+    "clear_highlight removes whatever is highlighted, for a highlight that should end mid-line."
+  ]
 }

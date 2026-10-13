@@ -9,7 +9,8 @@ Usage: python3 tools/build_events.py
 """
 import glob, json, os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-catalog = {k: v for k, v in json.load(open(os.path.join(ROOT, 'dialogue', 'events.json'))).items() if not k.startswith('_')}
+raw = json.load(open(os.path.join(ROOT, 'dialogue', 'events.json')))
+catalog = {k: v for k, v in raw.items() if not k.startswith('_')}
 
 lines, used, unknown = [], set(), []
 for p in sorted(glob.glob(os.path.join(ROOT, 'dialogue', '*', 'cues.json'))):
@@ -27,6 +28,7 @@ md = ['# Nova app events', '',
       'Events Nova sends to the app while he talks. Listen for them on `NovaController.events`; '
       'each `NovaEvent` has the `name` below and the time in the line. Generated from the Nova '
       'character repo, so this list always matches the lines in this package.', '',
+      '## Highlights', ''] + [f'- {r}' for r in raw.get('_rules', [])] + ['',
       '## Every line', '', '| Event | What the app should do |', '|---|---|']
 md += [f"| `{n}` | {v['does']} |" for n, v in catalog.items() if v.get('builtIn')]
 for line, title, events in lines:

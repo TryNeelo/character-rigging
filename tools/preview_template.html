@@ -126,6 +126,13 @@ button { font: inherit; cursor: pointer; }
 .line-item .t { font-weight: 700; font-size: 14px; }
 .line-item .m { font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .script-panel { width: min(560px, 100vw); }
+.events-panel { width: min(420px, 100vw); }
+.events-list { overflow-y: auto; padding: 4px 16px 20px; }
+.events-list h3 { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 18px 0 8px; }
+.events-rules { margin: 12px 0 0; padding: 12px 14px 12px 30px; border-radius: 12px; background: var(--chip); font-size: 13px; color: var(--muted); line-height: 1.5; }
+.event-item { display: grid; gap: 4px; justify-items: start; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.event-item p { margin: 0; font-size: 13.5px; color: var(--fg); line-height: 1.45; }
+.event-item .tag { justify-self: start; }
 .panel-head .sub { font-size: 13px; color: var(--muted); margin: 2px 0 0; }
 .script-legend { display: flex; gap: 12px; flex-wrap: wrap; padding: 10px 16px; font-size: 12.5px; color: var(--muted); border-bottom: 1px solid var(--line); }
 .script-rows { overflow-y: auto; }
@@ -195,6 +202,7 @@ button { font: inherit; cursor: pointer; }
           <h2 id="lineTitle"></h2>
           <div class="row">
             <button class="btn ghost small" id="scriptBtn" aria-expanded="false" aria-controls="scriptPanel">Script</button>
+            <button class="btn ghost small" id="eventsBtn" aria-expanded="false" aria-controls="eventsPanel">Events</button>
             <button class="btn ghost small" id="linesBtn" aria-expanded="false" aria-controls="linesPanel">Audio files (<span id="lineCount"></span>)</button>
           </div>
         </div>
@@ -253,6 +261,10 @@ button { font: inherit; cursor: pointer; }
   <div class="script-legend"><span><span class="cue event">event</span>the app reacts</span><span><span class="cue action">action</span>Nova moves</span><span>Tap a line to play from there.</span></div>
   <div class="script-rows" id="scriptRows"></div>
 </aside>
+<aside class="lines-panel events-panel" id="eventsPanel" aria-label="Events">
+  <div class="panel-head"><div><h2>Events</h2><p class="sub">What the app does when Nova reaches a tag. Click a tag to copy it.</p></div><button class="btn ghost small" id="eventsClose">Close</button></div>
+  <div class="events-list" id="eventsList"></div>
+</aside>
 <aside class="lines-panel" id="linesPanel" aria-label="Audio files">
   <div class="panel-head"><h2>Audio files</h2><button class="btn ghost small" id="linesClose">Close</button></div>
   <div class="lines-list" id="linesList"></div>
@@ -275,6 +287,7 @@ button { font: inherit; cursor: pointer; }
   // Every dialogue line: {id, title, words, audio, cues, markers, emphasis}. One is loaded at a time.
   // Cues come from Rhubarb Lip Sync: {start, end, value}.
   const LINES = %%LINES%%;
+  const EVENT_TAGS = %%EVENTS%%;   // the Events panel: highlight rules and every event a script can cue
   let line = LINES.find(l => `#${l.id}` === location.hash) || LINES[0];
   let cues = line.cues, markers = line.markers, emphasis = line.emphasis, captions = line.captions, DURATION = cues[cues.length - 1].end;
   // Shared with the Flutter component: tools/rig_settings.json
@@ -415,7 +428,9 @@ button { font: inherit; cursor: pointer; }
     input.addEventListener('input', () => { pose[k] = +input.value; out.textContent = sliderLabel[k](input.value); });
   });
   // Click a tag to copy it for a script
-  document.querySelectorAll('.tag').forEach(tag => tag.addEventListener('click', async e => {
+  document.addEventListener('click', async e => {
+    const tag = e.target.closest('.tag');
+    if (!tag) return;
     e.preventDefault();
     const text = tag.textContent;
     if (tag.classList.contains('copied')) return;
@@ -428,7 +443,7 @@ button { font: inherit; cursor: pointer; }
     }
     tag.classList.add('copied'); tag.textContent = 'Copied';
     setTimeout(() => { tag.classList.remove('copied'); tag.textContent = text; }, 900);
-  }));
+  });
   // Brow test control: Auto follows the line; the others hold an expression
   const browBtns = ['auto', ...Object.keys(B.expressions)].map(name => {
     const b = document.createElement('button');
@@ -618,7 +633,7 @@ button { font: inherit; cursor: pointer; }
   });
   $('lineCount').textContent = LINES.length;
   // Drawers: Audio files and Script. One open at a time; a click outside or Esc closes it.
-  const DRAWERS = { lines: ['linesPanel', 'linesBtn'], script: ['scriptPanel', 'scriptBtn'] };
+  const DRAWERS = { lines: ['linesPanel', 'linesBtn'], script: ['scriptPanel', 'scriptBtn'], events: ['eventsPanel', 'eventsBtn'] };
   const isOpen = k => $(DRAWERS[k][0]).classList.contains('open');
   function togglePanel(key, open, returnFocus = true) {
     for (const k of Object.keys(DRAWERS)) if (k !== key && open && isOpen(k)) togglePanel(k, false, false);
@@ -626,7 +641,8 @@ button { font: inherit; cursor: pointer; }
     $(panel).classList.toggle('open', open);
     $(btn).setAttribute('aria-expanded', open);
     if (open) {
-      const first = key === 'lines' ? (lineBtns.find(b => b.dataset.id === line.id) || lineBtns[0]) : $('scriptRows').querySelector('.script-row');
+      const first = key === 'lines' ? (lineBtns.find(b => b.dataset.id === line.id) || lineBtns[0])
+        : key === 'events' ? $('eventsList').querySelector('.tag') : $('scriptRows').querySelector('.script-row');
       if (first) first.focus();
     } else if (returnFocus) $(btn).focus();
   }
@@ -640,6 +656,26 @@ button { font: inherit; cursor: pointer; }
   $('linesClose').addEventListener('click', () => togglePanel('lines', false));
   $('scriptBtn').addEventListener('click', () => togglePanel('script', !isOpen('script')));
   $('scriptClose').addEventListener('click', () => togglePanel('script', false));
+  $('eventsBtn').addEventListener('click', () => togglePanel('events', !isOpen('events')));
+  $('eventsClose').addEventListener('click', () => togglePanel('events', false));
+  // Events panel: the house rules for highlights, then every event by scene with its [tag]
+  (() => {
+    const list = $('eventsList');
+    const rules = document.createElement('ul'); rules.className = 'events-rules';
+    EVENT_TAGS.rules.forEach(r => { const li = document.createElement('li'); li.textContent = r; rules.appendChild(li); });
+    list.appendChild(rules);
+    const scenes = [...new Set(EVENT_TAGS.events.map(ev => ev.scene))];
+    for (const sc of scenes) {
+      const h = document.createElement('h3'); h.textContent = sc; list.appendChild(h);
+      for (const ev of EVENT_TAGS.events.filter(x => x.scene === sc)) {
+        const item = document.createElement('div'); item.className = 'event-item';
+        const tag = document.createElement('button'); tag.type = 'button'; tag.className = 'tag'; tag.textContent = `[${ev.tag}]`;
+        tag.title = `Copy. The app receives "${ev.name}".`;
+        const does = document.createElement('p'); does.textContent = ev.does;
+        item.append(tag, does); list.appendChild(item);
+      }
+    }
+  })();
   document.addEventListener('keydown', e => { if (e.key === 'Escape') for (const k of Object.keys(DRAWERS)) if (isOpen(k)) togglePanel(k, false); });
 
   // Script view: each caption with its time; cues sit before the word they happen on
