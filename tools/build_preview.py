@@ -49,7 +49,10 @@ def merged(base, change):
         out[k] = merged(base[k], v) if isinstance(v, dict) and isinstance(base.get(k), dict) and k != 'framing' else v
     return out
 # Nova is on the page at load; every other character comes with his rigged SVG, swapped in by the character picker
-characters = {'nova': {'label': 'Nova', 'settings': SETTINGS}}
+# The preview's close-up is for checking lip-sync, so Nova's frames his face like the others' (cap to collar);
+# the app keeps his close-up from rig_settings.json
+NOVA_PREVIEW = dict(SETTINGS, framing=dict(SETTINGS['framing'], close=dict(SETTINGS["framing"]["close"], top=92, bottom=432, width=340)))
+characters = {'nova': {'label': 'Nova', 'settings': NOVA_PREVIEW}}
 for path in sorted(glob.glob(os.path.join(ROOT, 'tools', 'characters', '*.json'))):
     name = os.path.splitext(os.path.basename(path))[0]
     if name == 'nova': continue

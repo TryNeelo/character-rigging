@@ -35,25 +35,26 @@
 }
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5; margin: 0; }
-.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 48px; display: grid; gap: 24px; }
+.wrap { margin: 0 auto; padding-inline: 16px; padding-block: 28px 48px; display: grid; gap: 24px; }
 header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
 header h1 { font-family: var(--font-display); font-weight: 700; font-size: 2rem; line-height: 1.1; margin: 0; text-wrap: balance; }
 header p { margin: 6px 0 0; color: var(--muted); max-width: 62ch; }
-.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 24px; align-items: start; }
+/* The scene takes whatever width is left beside the controls */
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 560px); gap: 24px; align-items: start; }
 @media (max-width: 760px) { .grid { grid-template-columns: minmax(0, 1fr); } }
 
 .stage { background: var(--stage); border-radius: 20px; padding: 16px; display: grid; gap: 12px; justify-items: center; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); }
 @media (max-width: 760px) { .stage { position: static; } }
-.frame { aspect-ratio: var(--ar, 0.46); width: min(100%, calc(64vh * var(--ar, 0.46))); background: var(--scene); border-radius: 12px; overflow: hidden; position: relative; }
+/* A square scene, as big as the column allows while the whole stage (caption and readout too) stays on screen */
+.frame { aspect-ratio: 1; width: min(100%, calc(100svh - 190px)); min-width: min(100%, 280px); background: var(--scene); border-radius: 12px; overflow: hidden; position: relative; }
 .frame svg { width: 100%; height: 100%; display: block; }
-.frame .size { position: absolute; right: 8px; top: 6px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .caption { justify-self: stretch; min-height: 2.6em; display: grid; place-items: center; text-align: center; font-weight: 700; font-size: 15px; color: var(--fg); background: var(--surface); border-radius: 12px; padding: 8px 14px; }
 .caption:empty { visibility: hidden; }
 .caption[hidden] { display: none; }
 .readout { justify-self: stretch; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
 .readout .now { font-family: var(--font-mono); font-weight: 700; color: var(--fg); background: var(--surface); border-radius: 8px; padding: 2px 10px; font-variant-numeric: tabular-nums; }
 
-.panel { display: grid; gap: 40px; min-width: 0; }
+.panel { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; min-width: 0; }
 .panel > section + section { padding-top: 32px; border-top: 1px solid var(--line); margin-top: -8px; }
 section h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; margin: 0 0 12px; }
 section > p { margin: 0 0 12px; color: var(--muted); font-size: 14px; max-width: 60ch; }
@@ -191,7 +192,7 @@ button { font: inherit; cursor: pointer; }
 
   <div class="grid">
     <div class="stage">
-      <div class="frame" id="frame"><span class="size" id="frameSize"></span><div class="toast" id="toast" hidden></div>%%SVG%%</div>
+      <div class="frame" id="frame"><div class="toast" id="toast" hidden></div>%%SVG%%</div>
       <div class="caption" id="caption" aria-live="polite"></div>
       <div class="readout"><span>Mouth now: <span class="now" id="now">smile</span></span><span id="status">Idle, blinking</span></div>
     </div>
@@ -204,12 +205,8 @@ button { font: inherit; cursor: pointer; }
             <div class="seg-ctl" role="group" aria-label="Character" id="characterCtl"></div></div>
           <div class="field" id="outfitField"><span>Outfit</span>
             <div class="seg-ctl" role="group" aria-label="Outfit" id="outfitCtl"></div></div>
-          <div class="field"><span>Frame</span>
-            <div class="seg-ctl" role="group" aria-label="Frame size" id="frameCtl"></div></div>
           <div class="field"><span>Framing</span>
             <div class="seg-ctl" role="group" aria-label="Framing" id="framingCtl"></div></div>
-          <div class="field"><span>Position</span>
-            <div class="seg-ctl" role="group" aria-label="Position" id="alignCtl"></div></div>
           <div class="row"><label class="toggle"><input type="checkbox" id="outlineOn" checked><span>White outline</span></label>
             <label class="toggle"><input type="checkbox" id="captionsOn" checked><span>Captions (the app draws its own subtitle)</span></label></div>
         </div>
@@ -338,16 +335,17 @@ button { font: inherit; cursor: pointer; }
   svg.removeAttribute('width'); svg.removeAttribute('height');
   CHARACTERS[who].svg = svg.outerHTML;
 
-  // ---- Scene: frame size, framing preset, position ----
+  // ---- Scene: a square frame and a framing preset ----
   // Framing presets are ranges in character units (Nova: artboard 556 x 837, feet at y 837, centre x 278).
-  // Each character has his own, all at the same scale as Nova.
+  // Each character has his own. The preview offers full body, and a close-up for checking lip-sync;
+  // the app has all four (rig_settings.json).
   let ANCHOR_X = 278;
-  const FRAMES = { phone: ['Phone', 390, 844], square: ['Square', 600, 600], wide: ['Landscape', 960, 540], avatar: ['Avatar', 160, 160] };
-  let FRAMING = Object.fromEntries(Object.entries(S.framing).map(([k, f]) => [k, [f.label, f]]));
-  const ALIGN = { left: 'Left', center: 'Center', right: 'Right' };
+  const PREVIEW_FRAMINGS = ['full', 'close'];
+  const framings = () => Object.fromEntries(Object.entries(S.framing).filter(([k]) => PREVIEW_FRAMINGS.includes(k)).map(([k, f]) => [k, [f.label, f]]));
+  let FRAMING = framings();
   // Outfits come from the rig: every part that changes with the outfit has one group per outfit
   let OUTFITS = {};
-  const scene = { character: who, frame: 'phone', framing: 'full', align: 'center', outfit: null };
+  const scene = { character: who, framing: 'full', outfit: null };
 
   function setOutfit() {
     svg.querySelectorAll('.outfit').forEach(g => { g.style.display = g.dataset.outfit === scene.outfit ? '' : 'none'; });
@@ -358,19 +356,11 @@ button { font: inherit; cursor: pointer; }
   }
   function layout() {
     if (dots) setOutfit();
-    const [, fw, fh] = FRAMES[scene.frame];
+    // Square frame: the framing's height or width, whichever is bigger, fills it; the character is centred
+    // and the crop line sits at the bottom
     const f = FRAMING[scene.framing][1];
-    const s = Math.min(fh / (f.bottom - f.top), fw / f.width);
-    const vw = fw / s, vh = fh / s;
-    let vx = ANCHOR_X - vw / 2;
-    if (scene.align === 'left') vx = Math.max(vx, ANCHOR_X - f.width / 2);
-    if (scene.align === 'right') vx = Math.min(vx, ANCHOR_X + f.width / 2 - vw);
-    svg.setAttribute('viewBox', `${vx.toFixed(1)} ${(f.bottom - vh).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`);
-    $('frame').style.setProperty('--ar', fw / fh);
-    // Position only matters when the frame is wider than the framing needs
-    const noRoom = vw - f.width < 20;
-    $('alignCtl').querySelectorAll('button').forEach(b => { b.disabled = noRoom; });
-    $('frameSize').textContent = `${fw} × ${fh}`;
+    const size = Math.max(f.bottom - f.top, f.width);
+    svg.setAttribute('viewBox', `${(ANCHOR_X - size / 2).toFixed(1)} ${(f.bottom - size).toFixed(1)} ${size.toFixed(1)} ${size.toFixed(1)}`);
   }
   function segControl(el, options, key) {
     const btns = Object.entries(options).map(([k, v]) => {
@@ -382,9 +372,7 @@ button { font: inherit; cursor: pointer; }
     });
   }
   segControl($('characterCtl'), Object.fromEntries(Object.entries(CHARACTERS).map(([k, c]) => [k, c.label])), 'character');
-  segControl($('frameCtl'), FRAMES, 'frame');
   segControl($('framingCtl'), FRAMING, 'framing');
-  segControl($('alignCtl'), ALIGN, 'align');
   let dots = null;
   // The outline is drawn into the art as a white layer behind Nova; the toggle shows or hides it
   $('captionsOn').addEventListener('change', e => { $('caption').hidden = !e.target.checked; });
@@ -400,7 +388,7 @@ button { font: inherit; cursor: pointer; }
   const NS = 'http://www.w3.org/2000/svg';
   function bindRig() {
     ({ look: LOOK, brows: B, talk: TK, idle: I } = S);
-    FRAMING = Object.fromEntries(Object.entries(S.framing).map(([k, f]) => [k, [f.label, f]]));
+    FRAMING = framings();
     ANCHOR_X = svg.dataset.anchorX ? +svg.dataset.anchorX : 278;
     upper = $('upper'); head = $('head'); armL = $('arm-left'); armR = $('arm-right');
     HP = pivot(head); LP = pivot(armL); RP = pivot(armR);

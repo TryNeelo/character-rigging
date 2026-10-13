@@ -59,7 +59,7 @@
     "_mouthDropY": "The talking shapes sit this much lower than his drawn smile, so the mustache doesn't hide the closed and narrow ones.",
     "mouthDropY": 3
   },
-  "_settings": "Changes to tools/rig_settings.json for him only. Pupil reach is scaled to his eyes (a bigger pupil in a slightly smaller eye). Framing is only set for full body so far; the rest are Nova's sizes from the top of the hat.",
+  "_settings": "Changes to tools/rig_settings.json for him only. Pupil reach is scaled to his eyes (a bigger pupil in a slightly smaller eye). Full body and close-up are set (the close-up frames his face, from the hat brim to the beard, for checking lip-sync); knees and waist are Nova's sizes from the top of the hat.",
   "settings": {
     "look": {"pupilReach": 7.5, "pupilReachY": 6.2},
     "_brows": "Surprised lifts a little less than Nova's, so his brows stay clear of the hat brim.",
@@ -68,7 +68,7 @@
       "full": {"label": "Full body", "top": -14, "bottom": 887, "width": 400},
       "knees": {"label": "Knees up", "top": -14, "bottom": 696, "width": 370},
       "waist": {"label": "Waist up", "top": -14, "bottom": 566, "width": 370},
-      "close": {"label": "Close-up", "top": -14, "bottom": 396, "width": 345}
+      "close": {"label": "Close-up", "top": 170, "bottom": 470, "width": 300}
     }
   }
 }

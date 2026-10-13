@@ -121,9 +121,9 @@
    },
    "close": {
     "label": "Close-up",
-    "top": -14,
-    "bottom": 396,
-    "width": 345
+    "top": 40,
+    "bottom": 340,
+    "width": 300
    }
   }
  }

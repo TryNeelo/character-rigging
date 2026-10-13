@@ -53,14 +53,14 @@
     "minStroke": 2.5,
     "mouthDropY": 0
   },
-  "_settings": "Changes to tools/rig_settings.json for her only. Pupil reach is scaled to her eyes (a bigger pupil than Nova's). Framing is only set for full body so far; the rest are Nova's sizes from the top of her hair.",
+  "_settings": "Changes to tools/rig_settings.json for her only. Pupil reach is scaled to her eyes (a bigger pupil than Nova's). Full body and close-up are set (the close-up frames her face, from her bun to her scarf, for checking lip-sync); knees and waist are Nova's sizes from the top of her hair.",
   "settings": {
     "look": {"pupilReach": 8.8, "pupilReachY": 6.8},
     "framing": {
       "full": {"label": "Full body", "top": -14, "bottom": 832, "width": 400},
       "knees": {"label": "Knees up", "top": -14, "bottom": 696, "width": 370},
       "waist": {"label": "Waist up", "top": -14, "bottom": 566, "width": 370},
-      "close": {"label": "Close-up", "top": -14, "bottom": 396, "width": 345}
+      "close": {"label": "Close-up", "top": 40, "bottom": 340, "width": 300}
     }
   }
 }

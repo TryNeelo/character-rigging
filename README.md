@@ -108,7 +108,7 @@ Timing is 40 ms half, 80 ms closed, 50 ms half. Blinks happen at random every 2.
 
 **Frame rate (app).** The Flutter widget draws Nova on his own clock, not every screen refresh: 30 fps while he talks, 15 fps for idle motion (`frameRate` in `tools/rig_settings.json`). Each part is drawn once and reused, so moving it just shifts the finished picture. With movement off (`idle: false`) he doesn't redraw at all between blinks. Measured in Chrome on a Mac (2026-10-06), all Chrome processes: quiet with movement 56% → 30% of one core, talking 60% → 50%, movement off about 17% (Chrome's own baseline). To be confirmed on tablets.
 
-**Scenes.** The preview places Nova in a frame by setting the SVG's `viewBox`. Framing presets are vertical ranges in artboard units (full body, knees up, waist up, close-up); the crop is aligned to the bottom of the frame, and Nova can stand left, centre or right.
+**Scenes.** The preview places the character in a square frame, as big as the screen allows, by setting the SVG's `viewBox`. It offers two framing presets: full body, and a close-up for checking lip-sync. Presets are vertical ranges in artboard units; the crop is aligned to the bottom of the frame and the character stands in the centre. The app has all four presets (full body, knees up, waist up, close-up) and places characters left, centre or right.
 
 **Markers.** `cues.json` can carry a `markers` list next to the mouth cues. `{"time", "type": "event", "name"}` sends an event to the app at that moment, for example to highlight the shops. `{"time", "end", "type": "look", "direction"}` turns Nova's eyes and head toward one of eight directions on screen (left, right, up, down, up-left, up-right, down-left, down-right; diagonals are scaled to 75% so the pupils stay in the eyes; looking up also lifts the brows 2 px), and `{"time", "end", "type": "arm", "side": "left" | "right", "degrees"}` raises the arm on that side of the screen and lowers it at `end`; each pupil moves from its resting spot to the same spot in its own eye (so the far pupil travels further), and the head turns 2.5°. The preview shows markers under the timeline and pops up each event as it fires.
 
@@ -126,7 +126,7 @@ Every character does everything Nova does: lip-sync, blinks, looking in 8 direct
 - Mouth: Nova's exact shapes, scaled 0.575 and centred on Skyrian's drawn mouth, behind the mustache. His drawn mouth is his idle smile. The talking shapes sit 3 units lower than the smile, so the mustache doesn't hide the closed and narrow ones. The rest and closed lines are at least 3 units thick. The round mouth's ring matches his beard.
 - Eyes: lids in his skin colours (light on the screen-left half, darker on the right), sized to his eyes (radius 22.2). Pupil reach is scaled to his eyes (7.5 across, 6.2 up and down).
 - Brows: his "surprised" lift is 7 instead of 9, so his brows stay clear of the hat brim.
-- Framing: full body is -14 to 887 (hat tip to below his shoes). He's taller than Nova with his hat, so in the same frame he shows a little smaller than Nova. The other presets are Nova's sizes, measured from the top of the hat, and aren't tuned yet (waiting on the developers).
+- Framing: full body is -14 to 887 (hat tip to below his shoes). He's taller than Nova with his hat, so in the same frame he shows a little smaller than Nova. Close-up is 170 to 470, his face from the hat brim to the beard, for checking lip-sync. Knees up and waist up are Nova's sizes, measured from the top of the hat, and aren't tuned yet (waiting on the developers).
 - His export has no layer names, so parts are listed by position, like Nova's. `shapeCount` stops the build if the export changes.
 
 **Obselda** (`art/obselda/`, `tools/characters/obselda.json`) is the explorer of world 2. One look ("explorer"), on a 374 × 814 canvas, standing at x = 184.4 with her soles on the bottom edge.
@@ -137,7 +137,7 @@ Every character does everything Nova does: lip-sync, blinks, looking in 8 direct
 - Mouth: Nova's shapes scaled 0.425 onto her drawn mouth, with lines at least 2.5 units thick. Nothing covers it, so it isn't lowered. The round mouth's ring matches her face.
 - Eyes: lids in her two face colours, sized to her eyes (radius 25.5). Pupil reach 8.8 across, 6.8 up and down.
 - She has no hat; the app skips hat files for her.
-- Framing: full body is -14 to 832. The other presets aren't tuned yet.
+- Framing: full body is -14 to 832. Close-up is 40 to 340, her face from the bun to the scarf, for checking lip-sync. Knees up and waist up aren't tuned yet.
 
 ## Adding a character
 
