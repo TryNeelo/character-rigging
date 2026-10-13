@@ -147,7 +147,7 @@ Nova's output must not change when a character is added: compare `art/Nova-rigge
 4. Copy `cues-rhubarb-raw.json` to `cues.json`.
 5. Write `script.txt` (see Script format). Add any new event names to `dialogue/events.json`, then time the captions and cues: `~/whisper-venv/bin/python tools/build_captions.py <line_name>`.
 6. Find the stressed words: `python3 tools/build_emphasis.py <line_name>`, and add a `"title"` to `cues.json`: the line's name in the Audio files panel.
-7. If someone other than Nova speaks the line, add `"character": "<name>"` (for example `"skyrian"`) to `cues.json`. Build the preview: `python3 tools/build_preview.py` and open `preview/index.html`. The new line is in the Audio files panel, and choosing it puts its speaker on stage.
+7. If someone other than Nova speaks the line, add `"character": "<name>"` (for example `"skyrian"`) to `cues.json`. Build the preview: `python3 tools/build_preview.py` and open `preview/index.html`. The new line is in its speaker's Audio files panel: the panel and the Script drawer only show the lines of the character on stage, and switching characters loads his first line.
 8. Review at half speed. Fix any mouth holds that look wrong by editing `cues.json` (each cue is `{"start", "end", "value"}` in seconds), then rebuild the preview.
 
 Giving Rhubarb the script text (step 3) usually improves accuracy a lot. The first line was timed from audio alone because no script was available.
