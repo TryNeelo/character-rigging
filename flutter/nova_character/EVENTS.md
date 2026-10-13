@@ -44,6 +44,12 @@ Line id: `ftux_room`
 | 13.57 s | `highlight_closet` | Highlight the closet: spotlight it and point the arrow at it. |
 | 18.38 s | `clear_spotlight` | End only the spotlight: the spotlight fades, the arrow stays and blinks until the child taps the item (or until a later [Stop highlight]). |
 
+## FTUX: world 1
+
+Line id: `ftux_w1`
+
+No events in this line.
+
 ## FTUX: world select
 
 Line id: `ftux_world_select`

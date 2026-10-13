@@ -1,0 +1,62 @@
+[
+ {
+  "time": 0.16,
+  "strength": 1
+ },
+ {
+  "time": 0.9,
+  "strength": 0.74
+ },
+ {
+  "time": 1.5,
+  "strength": 0.84
+ },
+ {
+  "time": 2.54,
+  "strength": 0.98
+ },
+ {
+  "time": 2.95,
+  "strength": 0.88
+ },
+ {
+  "time": 3.32,
+  "strength": 0.54
+ },
+ {
+  "time": 4.34,
+  "strength": 0.83
+ },
+ {
+  "time": 4.75,
+  "strength": 0.46
+ },
+ {
+  "time": 5.95,
+  "strength": 0.79
+ },
+ {
+  "time": 6.34,
+  "strength": 0.83
+ },
+ {
+  "time": 6.69,
+  "strength": 0.59
+ },
+ {
+  "time": 7.04,
+  "strength": 0.79
+ },
+ {
+  "time": 7.9,
+  "strength": 0.75
+ },
+ {
+  "time": 8.3,
+  "strength": 0.52
+ },
+ {
+  "time": 8.8,
+  "strength": 0.3
+ }
+]

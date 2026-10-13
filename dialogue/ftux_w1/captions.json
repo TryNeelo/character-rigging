@@ -1,0 +1,149 @@
+[
+ {
+  "start": 0.0,
+  "end": 2.3,
+  "text": "Hello! I'm Skyrian.",
+  "words": [
+   {
+    "w": "Hello!",
+    "s": 0.0,
+    "e": 0.38
+   },
+   {
+    "w": "I'm",
+    "s": 0.78,
+    "e": 1.22
+   },
+   {
+    "w": "Skyrian.",
+    "s": 1.22,
+    "e": 1.92
+   }
+  ],
+  "split": false
+ },
+ {
+  "start": 2.3,
+  "end": 5.76,
+  "text": "Welcome to Aetheris, where we look out for one another.",
+  "words": [
+   {
+    "w": "Welcome",
+    "s": 2.4,
+    "e": 2.72
+   },
+   {
+    "w": "to",
+    "s": 2.72,
+    "e": 3.02
+   },
+   {
+    "w": "Aetheris,",
+    "s": 3.02,
+    "e": 3.2
+   },
+   {
+    "w": "where",
+    "s": 3.74,
+    "e": 4.14
+   },
+   {
+    "w": "we",
+    "s": 4.14,
+    "e": 4.3
+   },
+   {
+    "w": "look",
+    "s": 4.3,
+    "e": 4.44
+   },
+   {
+    "w": "out",
+    "s": 4.44,
+    "e": 4.66
+   },
+   {
+    "w": "for",
+    "s": 4.66,
+    "e": 4.86
+   },
+   {
+    "w": "one",
+    "s": 4.86,
+    "e": 5.0
+   },
+   {
+    "w": "another.",
+    "s": 5.0,
+    "e": 5.36
+   }
+  ],
+  "split": false
+ },
+ {
+  "start": 5.84,
+  "end": 7.62,
+  "text": "There's lots to discover!",
+  "words": [
+   {
+    "w": "There's",
+    "s": 5.94,
+    "e": 6.2
+   },
+   {
+    "w": "lots",
+    "s": 6.2,
+    "e": 6.48
+   },
+   {
+    "w": "to",
+    "s": 6.48,
+    "e": 6.78
+   },
+   {
+    "w": "discover!",
+    "s": 6.78,
+    "e": 7.22
+   }
+  ],
+  "split": false
+ },
+ {
+  "start": 7.88,
+  "end": 9.66,
+  "text": "Tap a flag to get started.",
+  "words": [
+   {
+    "w": "Tap",
+    "s": 7.98,
+    "e": 8.02
+   },
+   {
+    "w": "a",
+    "s": 8.02,
+    "e": 8.22
+   },
+   {
+    "w": "flag",
+    "s": 8.22,
+    "e": 8.5
+   },
+   {
+    "w": "to",
+    "s": 8.5,
+    "e": 8.76
+   },
+   {
+    "w": "get",
+    "s": 8.76,
+    "e": 8.92
+   },
+   {
+    "w": "started.",
+    "s": 8.92,
+    "e": 9.32
+   }
+  ],
+  "split": false
+ }
+]
