@@ -9,7 +9,7 @@ pubspec.yaml.
 
 Usage: python3 tools/build_flutter.py
 """
-import glob, json, os, re, shutil
+import copy, glob, json, os, re, shutil
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PKG = os.path.join(ROOT, 'flutter', 'nova_character')
 ASSETS = os.path.join(PKG, 'assets')
@@ -45,6 +45,21 @@ rig = {
     **settings,
 }
 rig['brows']['pivots'] = {side: pivot(f'brow-{side}') for side in ('left', 'right')}
+# Nova's head can be drawn smaller than the art (headScale in nova.json): his part files have it baked in,
+# so the head numbers the app uses (eye centres and size, pupil and brow moves, brow pivots) shrink to match
+hs = json.load(open(os.path.join(ROOT, 'tools', 'characters', 'nova.json'))).get('headScale')
+if hs:
+    k, (ax, ay) = hs['scale'], hs['anchor']
+    rig = copy.deepcopy(rig)   # (the settings are shared with the other characters)
+    at = lambda p: [round(ax + k * (p[0] - ax), 3), round(ay + k * (p[1] - ay), 3)]
+    sz = lambda v: round(v * k, 3)
+    e = rig['eyes']
+    e['centers'] = [at(c) for c in e['centers']]
+    e['radius'], e['pupilRest'], e['pupilRestY'] = sz(e['radius']), [sz(v) for v in e['pupilRest']], sz(e['pupilRestY'])
+    rig['brows']['pivots'] = {side: at(p) for side, p in rig['brows']['pivots'].items()}
+    for key in ('pupilReach', 'pupilReachY', 'browLiftUp'): rig['look'][key] = sz(rig['look'][key])
+    rig['brows']['autoLiftPx'] = sz(rig['brows']['autoLiftPx'])
+    for x in rig['brows']['expressions'].values(): x['liftPx'] = sz(x['liftPx'])
 json.dump(rig, open(os.path.join(ASSETS, 'rig.json'), 'w'), indent=1)
 
 def merged(base, change):

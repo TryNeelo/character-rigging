@@ -12,7 +12,7 @@ Usage: python3 tools/build_rig.py
 """
 import glob, json, math, os, re, shutil
 from face_rig import (ROOT, centre, clips_used, lid, lid_parts, mouth_group, mouth_shapes, part_writer,
-                      shapes_of, whiten)
+                      shapes_of, whiten, OUTLINE_PX)
 import build_character
 
 C = json.load(open(os.path.join(ROOT, 'tools', 'characters', 'nova.json')))
@@ -38,6 +38,12 @@ E = C['eyes']
 PUPIL_REST = tuple(E['pupilRest'])
 PUPIL_REST_Y = E['pupilRestY']  # both pupils also sit a little below their eye's centre
 HD = C['head']
+# The head (with the hat) can be drawn smaller than the art, shrinking toward an anchor at the bottom of the face.
+# Every head part, its outline and the face rig sit inside this transform, so they move together.
+HS = C.get('headScale', {'scale': 1, 'anchor': [0, 0]})
+_k, (_ax, _ay) = HS['scale'], HS['anchor']
+HEAD_T = f'matrix({_k:g} 0 0 {_k:g} {round(_ax * (1 - _k), 3):g} {round(_ay * (1 - _k), 3):g})'
+scaled = lambda body: body if _k == 1 else f'<g transform="{HEAD_T}">{body}</g>'
 # Brows by screen side
 BROWS = {side: els[HD['brows'][side]] for side in ('left', 'right')}
 
@@ -101,7 +107,8 @@ def per_outfit(key, pivot=None):
 # White outline, drawn into the art (face_rig.whiten): every outer part again in white, a little bigger.
 for o in OUTFITS.values():
     for k in ('legs', 'arm_left', 'arm_right', 'body', 'hat', 'hat_back'):
-        o[f'{k}_ol_svg'] = whiten(o[f'{k}_svg'])
+        # (the hat is drawn at the head's size, so its outline is grown to match once scaled)
+        o[f'{k}_ol_svg'] = whiten(o[f'{k}_svg'], OUTLINE_PX / (_k if k.startswith('hat') else 1))
 
 hat = '<g id="hat">' + per_outfit('hat_svg') + '</g>'
 hat_back = '<g id="hat-back">' + per_outfit('hat_back_svg') + '</g>'
@@ -117,7 +124,7 @@ EAR_ROOTS = ''.join(els[i] for i in HD['earRoots'])                       # behi
 FUR = ''.join(els[i] for i in HD['fur'])                                  # head fur
 EYES = J(*HD['eyes'])                                                     # eye patches, eye whites
 EARS = J(*HD['ears'])
-head = (f'<g id="head" class="part" data-pivot="{HEAD_PIVOT[0]} {HEAD_PIVOT[1]}">'
+head = (f'<g id="head" class="part" data-pivot="{HEAD_PIVOT[0]} {HEAD_PIVOT[1]}">' + (f'<g transform="{HEAD_T}">' if _k != 1 else '')
         + hat_back                                              # any part of the hat behind the head
         + els[HD['earRoots'][0]] + els[HD['earRoots'][1]]       # ear roots, behind the head
         + FUR
@@ -132,16 +139,17 @@ head = (f'<g id="head" class="part" data-pivot="{HEAD_PIVOT[0]} {HEAD_PIVOT[1]}"
         + els[HD['muzzle']]                                     # muzzle
         + mouth                                                 # replaces the drawn smile
         + ''.join(els[i] for i in HD['nose'])                   # nose
-        + hat + '</g>')
+        + hat + ('</g>' if _k != 1 else '') + '</g>')
 
 # The outline layer mirrors the moving groups (-ol ids); the preview copies their transforms.
-HEAD_OL = whiten(EAR_ROOTS + FUR + EARS)   # ear roots, head fur, ears
+HEAD_OL = whiten(EAR_ROOTS + FUR + EARS, OUTLINE_PX / _k)   # ear roots, head fur, ears (outline as wide as the body's once scaled)
 outline = ('<g id="outline">'
            + '<g id="legs-ol">' + per_outfit('legs_ol_svg') + '</g><g id="upper-ol">'
            + ''.join(f'<g id="arm-{side}-ol">' + per_outfit(f'arm_{side}_ol_svg') + '</g>' for side in ('left', 'right'))
            + '<g id="body-ol">' + per_outfit('body_ol_svg') + '</g>'
-           + '<g id="head-ol"><g id="hat-back-ol">' + per_outfit('hat_back_ol_svg') + '</g>' + HEAD_OL
-           + '<g id="hat-ol">' + per_outfit('hat_ol_svg') + '</g></g></g></g>')
+           + '<g id="head-ol">' + (f'<g transform="{HEAD_T}">' if _k != 1 else '')
+           + '<g id="hat-back-ol">' + per_outfit('hat_back_ol_svg') + '</g>' + HEAD_OL
+           + '<g id="hat-ol">' + per_outfit('hat_ol_svg') + '</g>' + ('</g>' if _k != 1 else '') + '</g></g></g>')
 LID_CLIPS = ''.join(f'<clipPath id="clip-eye-{side}"><ellipse cx="{cx}" cy="{cy}" rx="{round(R_EYE + 0.75, 1)}" ry="{round(R_EYE + 0.75, 1)}"/></clipPath>'
                     for side, cx, cy, fur in LIDS)
 clips = ('<clipPath id="clip-eyes">' + ''.join(f'<ellipse cx="{x}" cy="{y}" rx="{R_EYE}" ry="{E["radiusY"]}"/>' for x, y in E['whites']) + '</clipPath>'
@@ -162,7 +170,10 @@ print('wrote', OUT, len(svg), 'bytes; arm pivots', {n: (o['pivot_left'], o['pivo
 # A new outfit only adds a folder; base/ never changes.
 PARTS_DIR = os.path.join(ROOT, 'art', 'parts')
 shutil.rmtree(PARTS_DIR, ignore_errors=True)
-part = part_writer(PARTS_DIR, W, H)
+_part = part_writer(PARTS_DIR, W, H)
+def part(name, body, defs=''):
+    # Head parts (base/ and the hats) get the head's size change baked in
+    _part(name, scaled(body) if name.startswith('base/') or '/hat' in name else body, defs)
 lids = lambda state: f'<g transform="{OFF}">' + lid_parts([(side, cx, cy, R_EYE, fur) for side, cx, cy, fur in LIDS], state, 15) + '</g>'
 for name, o in OUTFITS.items():
     for k in ('legs', 'arm_left', 'arm_right', 'body', 'hat', 'hat_back'):

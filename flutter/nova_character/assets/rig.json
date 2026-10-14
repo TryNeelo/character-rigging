@@ -61,20 +61,20 @@
  "eyes": {
   "centers": [
    [
-    232.875,
-    269.183
+    237.457,
+    280.865
    ],
    [
-    324.259,
-    269.183
+    319.703,
+    280.865
    ]
   ],
-  "radius": 24.654,
+  "radius": 22.189,
   "pupilRest": [
-   8.2,
-   -7.8
+   7.38,
+   -7.02
   ],
-  "pupilRestY": 5.9
+  "pupilRestY": 5.31
  },
  "framing": {
   "full": {
@@ -110,13 +110,13 @@
   "armSwingDegrees": 1.2
  },
  "look": {
-  "pupilReach": 11,
+  "pupilReach": 9.9,
   "headDegrees": 2.5,
   "headPx": 2,
   "smoothing": 0.12,
-  "pupilReachY": 9,
+  "pupilReachY": 8.1,
   "headPxY": 2,
-  "browLiftUp": 2,
+  "browLiftUp": 1.8,
   "diagonal": 0.75,
   "directions": {
    "left": [
@@ -169,33 +169,33 @@
   "widthPx": 8
  },
  "brows": {
-  "autoLiftPx": 3.5,
+  "autoLiftPx": 3.15,
   "autoRiseSeconds": 0.08,
   "autoHoldSeconds": 0.1,
   "autoFallSeconds": 0.3,
   "smoothing": 0.12,
   "expressions": {
    "surprised": {
-    "liftPx": 9,
+    "liftPx": 8.1,
     "tiltDegrees": 2
    },
    "happy": {
-    "liftPx": 5,
+    "liftPx": 4.5,
     "tiltDegrees": -6
    },
    "concerned": {
-    "liftPx": 2,
+    "liftPx": 1.8,
     "tiltDegrees": 6
    }
   },
   "pivots": {
    "left": [
-    230.4,
-    229.2
+    235.23,
+    244.88
    ],
    "right": [
-    327.8,
-    229.0
+    322.89,
+    244.7
    ]
   }
  },

@@ -12,6 +12,8 @@
   "_faceOffset": "The head in the full-body art is the original head moved by this much, at the same scale, so the hat, eyelids and mouth shapes keep the original coordinates inside a translate.",
   "faceOffset": [54, -168.129],
   "headPivot": [278.7, 392],
+  "_headScale": "Manaf (2026-10-14): the head, with the hat, drawn at 90% of the art's size, shrinking toward the bottom centre of the face (where the head fur ends above the collar), so the join with the neck stays put. The face rig scales with it.",
+  "headScale": {"scale": 0.9, "anchor": [278.7, 386]},
   "head": {
     "earRoots": [0, 42],
     "fur": [43, 44],

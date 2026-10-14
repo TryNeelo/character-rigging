@@ -90,16 +90,18 @@ def mouth_group(m_id, body, vis=False):
     hid = '' if vis else ' style="display:none"'
     return f'<g id="mouth-{m_id}" class="mouth"{hid}>{body}</g>'
 
-def whiten(fragment):
+def whiten(fragment, px=OUTLINE_PX):
     """White outline, drawn into the art: every shape again in white, its edge grown by
-    OUTLINE_PX with a round stroke. The app draws these first, then the coloured parts on top."""
+    OUTLINE_PX with a round stroke. The app draws these first, then the coloured parts on top.
+    px: the growth in the fragment's own units (larger for a part that is drawn scaled down, so it
+    comes out as wide as everyone else's)."""
     def white(m):
         tag = m.group(0)
         attr = lambda name: (re.search(rf'\s{name}="([^"]*)"', tag) or [None, None])[1]
         fill, stroke_w = attr('fill'), float(attr('stroke-width') or 0) if attr('stroke') not in (None, 'none') else 0
         tag = re.sub(r'\s(?:fill|fill-opacity|fill-rule|clip-rule|stroke|stroke-width|stroke-linecap|stroke-linejoin|class|style)="[^"]*"', '', tag)
         return (tag[:-2] + f' fill="{"none" if fill == "none" else "#FFFFFF"}" stroke="#FFFFFF"'
-                f' stroke-width="{2 * OUTLINE_PX + stroke_w:g}" stroke-linejoin="round" stroke-linecap="round"/>')
+                f' stroke-width="{2 * px + stroke_w:g}" stroke-linejoin="round" stroke-linecap="round"/>')
     return re.sub(SHAPE, white, fragment)
 
 def part_writer(parts_dir, width, height):
