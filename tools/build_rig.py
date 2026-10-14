@@ -111,6 +111,8 @@ for name, o in OUTFITS.items():
         # (drawn with the head already at its size: undo the head's size change, which the hat gets too)
         o['hat_svg'] = f'<g transform="{HEAD_T_INV}">{o["hat_svg"]}</g>'
     o['hat_back_svg'] = pick(R(o.get('hat_back', [])))
+    if o.get('hatAtHeadSize') and o['hat_back_svg']:
+        o['hat_back_svg'] = f'<g transform="{HEAD_T_INV}">{o["hat_back_svg"]}</g>'
     if 'armUp' in o:
         # The shoulder is the point the arm turns about between this drawing and the same Nova with that arm raised
         up = shapes_of(os.path.join(ROOT, 'art', o['armUp']['file']), o['count'])
@@ -149,8 +151,10 @@ def per_outfit(key, pivot=None):
 for o in OUTFITS.values():
     for k in ('legs', 'body_back', 'arm_left', 'arm_right', 'body', 'hat', 'hat_back'):
         if k == 'body' and 'body_ol_svg' in o: continue
-        # (the hat is drawn at the head's size, so its outline is grown to match once scaled)
-        o[f'{k}_ol_svg'] = whiten(o[f'{k}_svg'], OUTLINE_PX / (_k if k.startswith('hat') else 1))
+        # (a hat from the art's full-size head shrinks with the head, so its outline is grown to match;
+        # a hat drawn at the head's size already comes out at full size)
+        shrinks = k.startswith('hat') and not o.get('hatAtHeadSize')
+        o[f'{k}_ol_svg'] = whiten(o[f'{k}_svg'], OUTLINE_PX / (_k if shrinks else 1))
     if o.get('hatOutline', True) is False: o['hat_ol_svg'] = ''
 
 hat = '<g id="hat">' + per_outfit('hat_svg') + '</g>'

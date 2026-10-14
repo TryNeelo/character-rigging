@@ -8,7 +8,7 @@ This folder is the single source for Neelo's character rigs (Nova, Skyrian the w
 art/
   Nova-outfit_1.svg             Full-body Figma export, outfit 1 (Hoodie). Never edited. The two magenta dots mark the shoulder pivots.
   Nova-outfit_2.svg             Full-body Figma export, outfit 2 (Aviator). Never edited. Same head, pivot dots and canvas.
-  Nova-outfit_3.svg             Full-body Figma export, outfit 3 (Construction). Never edited. Its hard hat has a back piece behind the head.
+  Nova-outfit_3.svg             Full-body Figma export, outfit 3 (Construction), re-exported with a neck scarf and the head at 90%. Never edited. Its hard hat has a back piece behind the head.
   Nova-outfit_4.svg             Full-body Figma export, outfit 4 (Diver), drawn with the head at 90%. Never edited. Glass helmet, air hoses behind the arms.
   Nova-outfit_4-right-arm-up.svg  The same diver with his right arm raised (76.3°). Never edited. Sets the diver's shoulder pivots.
   Nova-rigged.svg               Current rig, built from Nova-outfit_1.svg: grouped parts, hat, eyelids and mouth shapes.
