@@ -64,6 +64,8 @@ def build(config_path):
 
     # ---- Mouth: Nova's shapes, scaled to his drawn mouth and centred on it; his own mouth is the smile ----
     smile = pick(F.get('smile', []))
+    # (a colour in the drawn mouth can be swapped, so the idle mouth matches the talking ones)
+    for a, b in F.get('smileRecolor', {}).items(): smile = smile.replace(f'fill="{a}"', f'fill="{b}"')
     old = shapes_of(os.path.join(ROOT, 'art', NOVA_SMILE['original']), NOVA_SMILE['originalShapeCount'])
     box = lambda tags: [f(v) for f, v in zip((min, min, max, max), zip(*[path_box(t) for t in tags]))]
     nx0, ny0, nx1, ny1 = box([old[i] for i in NOVA_SMILE['originalSmile']])
