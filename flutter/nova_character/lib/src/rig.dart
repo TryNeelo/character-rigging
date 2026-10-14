@@ -56,7 +56,7 @@ class NovaOutfitSpec {
   final (double, double)? armRestLeft, armRestRight;
 
   /// For arms with elbows, the shoulder's angle out from vertical when the arm hangs straight
-  /// down as drawn. An arm marker of 0 degrees means this pose.
+  /// down as drawn. Arm markers count their degrees up from this pose (0 is arms down).
   final double armDownLeft, armDownRight;
 
   bool get hasElbows => elbowLeftPivot != null;

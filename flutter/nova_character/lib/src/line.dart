@@ -18,7 +18,7 @@ class NovaCue {
 /// "right", "up", "down", "up-left", "up-right", "down-left", "down-right"), `type: "arm"` raising the arm on the screen's [side] by [degrees], or
 /// `type: "expression"` setting his brows to [name] ("happy", "surprised", "concerned").
 /// Characters with elbows (Skyrian) also have `type: "elbow"`, bending the elbow on [side] by
-/// [degrees]; for them an "arm" marker holds a straight arm at [degrees] out from straight down.
+/// [degrees]; for them an "arm" marker holds a straight arm raised [degrees] from hanging down.
 class NovaMarker {
   const NovaMarker(
       {required this.time, required this.type, this.end, this.name, this.direction, this.side, this.degrees});

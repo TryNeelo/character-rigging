@@ -148,7 +148,7 @@ other than Nova speaks it:
   `time` and `end`: `left`, `right`, `up`, `down`, `up-left`, `up-right`, `down-left`,
   `down-right`. `arm` markers raise the arm on that side of the screen, then lower it
   at `end`. For characters with elbows (Skyrian), an `arm` marker holds a straight arm
-  `degrees` out from straight down (0 is straight down) and `elbow` markers bend the elbow
+  raised `degrees` from hanging down (0 is arms down) and `elbow` markers bend the elbow
   (`{ "type": "elbow", "side": "right", "degrees": 90 }`: positive bends it in toward the
   body, negative bends it out); with neither, his arms rest behind his back. `expression` markers set his brows: `happy`, `surprised` or `concerned`. You
   don't need to do anything with these; the widget handles them.

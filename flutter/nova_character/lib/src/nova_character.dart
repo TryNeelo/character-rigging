@@ -163,11 +163,11 @@ class _NovaCharacterState extends State<NovaCharacter> {
     final spec = rig.outfits[rig.outfits.containsKey(widget.outfit) ? widget.outfit! : rig.defaultOutfit]!;
     if (spec.hasElbows) {
       // Arms rest as drawn; an arm marker holds a straight arm, an elbow marker bends the elbow
-      // (0 degrees is the arm straight down as drawn, a few degrees out from vertical)
+      // (degrees count up from the arm hanging down as drawn, like Nova's)
       (double, double) target(String side, (double, double) rest, double down) {
         final arm = c.line?.armAt(c.time, side);
         final elbow = c.line?.elbowAt(c.time, side) ?? (arm != null ? 0.0 : rest.$2);
-        final shoulder = arm == null ? rest.$1 : (arm == 0 ? down : arm);
+        final shoulder = arm == null ? rest.$1 : down + arm;
         return (shoulder - rest.$1, elbow - rest.$2);
       }
       (armLeft, bendLeft) = target('left', spec.armRestLeft!, spec.armDownLeft);
