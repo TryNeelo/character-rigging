@@ -45,8 +45,9 @@ header p { margin: 6px 0 0; color: var(--muted); max-width: 62ch; }
 
 .stage { background: var(--stage); border-radius: 20px; padding: 16px; display: grid; gap: 12px; justify-items: center; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); }
 @media (max-width: 760px) { .stage { position: static; } }
-/* A square scene, as big as the column allows while the whole stage (caption and readout too) stays on screen */
-.frame { aspect-ratio: 1; width: min(100%, calc(100svh - 190px)); min-width: min(100%, 280px); background: var(--scene); border-radius: 12px; overflow: hidden; position: relative; }
+/* A square scene, as big as the column allows while the whole stage (caption and readout too) stays on screen.
+   --fit is the room left above the bottom of the window, measured by fitFrame() below */
+.frame { aspect-ratio: 1; width: min(100%, var(--fit, calc(100svh - 190px))); min-width: min(100%, 280px); background: var(--scene); border-radius: 12px; overflow: hidden; position: relative; }
 .frame svg { width: 100%; height: 100%; display: block; }
 .caption { justify-self: stretch; min-height: 2.6em; display: grid; place-items: center; text-align: center; font-weight: 700; font-size: 15px; color: var(--fg); background: var(--surface); border-radius: 12px; padding: 8px 14px; }
 .caption:empty { visibility: hidden; }
@@ -775,6 +776,21 @@ button { font: inherit; cursor: pointer; }
     $('marks').style.height = `${Math.max(1, rows.length) * 22}px`;
   }
   window.addEventListener('resize', () => markEls.length && stackMarks());
+
+  // The scene grows with the column but stops where the stage would run past the bottom of the window:
+  // the room from the stage's place on the unscrolled page (below the title) to the bottom, less the
+  // caption, the readout and the stage's padding. Refits when the window, caption or readout changes size.
+  const frameEl = document.getElementById('frame'), stageEl = frameEl.parentElement;
+  function fitFrame() {
+    const st = stageEl.getBoundingClientRect(), fr = frameEl.getBoundingClientRect();
+    const top = stageEl.parentElement.getBoundingClientRect().top + window.scrollY + (fr.top - st.top);
+    const below = st.bottom - fr.bottom;
+    frameEl.style.setProperty('--fit', Math.max(280, Math.floor(window.innerHeight - top - below - 16)) + 'px');
+  }
+  window.addEventListener('resize', fitFrame);
+  new ResizeObserver(fitFrame).observe(document.getElementById('caption'));
+  new ResizeObserver(fitFrame).observe(document.querySelector('.readout'));
+  fitFrame();
   $('tagsFold').addEventListener('toggle', stackMarks);
 
   // Audio files panel: pick a line to load it onto Nova
