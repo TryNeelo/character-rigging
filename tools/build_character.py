@@ -14,7 +14,7 @@ Usage: python3 tools/build_character.py tools/characters/<name>.json   (build_ri
 """
 import json, os, re, shutil, sys
 import math
-from face_rig import (ROOT, arm_from_three, mirrored, arm_from_placements, arm_from_poses, arm_joints, straight_like, compose, inverse, placement, turn, clips_used, lid, lid_parts, mouth_group, mouth_shapes, part_writer, path_box,
+from face_rig import (ROOT, outline_points, path_d, arm_from_three, mirrored, arm_from_placements, arm_from_poses, arm_joints, straight_like, compose, inverse, placement, turn, clips_used, lid, lid_parts, mouth_group, mouth_shapes, part_writer, path_box,
                       rect_centre, round_rect_centre, capsule_top, shapes_of, whiten, LID_R)
 
 NOVA_SMILE = json.load(open(os.path.join(ROOT, 'tools', 'characters', 'nova.json')))
@@ -29,7 +29,9 @@ def build(config_path):
     F = C['face']
 
     # ---- Eyes: whites (the pupils stay inside them), pupils at rest, lids in his skin colours ----
-    eyes = {side: round_rect_centre(els[F['whites'][side]]) for side in ('left', 'right')}
+    # The eye circle: the eye white, or (when the white isn't round, like Voltis's half-covered eyes) the
+    # round eye shape around it (eyeCircles), which the lids close over
+    eyes = {side: round_rect_centre(els[F.get('eyeCircles', F['whites'])[side]]) for side in ('left', 'right')}
     r = round(sum(e[2] for e in eyes.values()) / 2, 3)
     k = r / LID_R
     open_y, half_y = round(2 * r + 2 * k, 1), round(15 * k, 1)   # how far the lid sits up: open, half closed
@@ -45,6 +47,13 @@ def build(config_path):
                         for side, cx, cy, rr, fur in lid_eyes)
     eye_clip = ('<clipPath id="clip-eyes">' + ''.join(f'<ellipse cx="{round(e[0], 3)}" cy="{round(e[1], 3)}" rx="{round(e[2], 3)}" ry="{round(e[3], 3)}"/>'
                                                      for e in eyes.values()) + '</clipPath>')
+    clip_polygons = None
+    if F.get('pupilClip') == 'whites':
+        # Pupils stay inside the eye whites themselves (not a circle): the white shapes are the clip,
+        # and the app gets them as outlines
+        whites = [els[F['whites'][side]] for side in ('left', 'right')]
+        eye_clip = '<clipPath id="clip-eyes">' + ''.join('<path d="%s"/>' % path_d(w) for w in whites) + '</clipPath>'
+        clip_polygons = [outline_points(w) for w in whites]
     pupils = ('<g id="pupils" clip-path="url(#clip-eyes)">' + ''.join(
         f'<g id="pupil-{side}" data-rest="{rest[side][0]:g}" data-rest-y="{rest_y:g}">{els[F["pupils"][side]]}</g>' for side in ('left', 'right')) + '</g>')
 
@@ -123,6 +132,10 @@ def build(config_path):
                 # Two-piece arm: the forearm (and hand) bends at the elbow. The art's pose is his rest pose.
                 o[f'pivot_{side}'], o[f'elbow_{side}'], shoulder, bend = arm_joints(els[a['capsule']], els[a['forearmCapsule']], side)
                 o[f'rest_{side}'] = (shoulder, bend)
+            elif 'pivotDot' in a:
+                # One-piece arm (like Nova's) turning at the shoulder dot in the art; the dot isn't drawn
+                cx, cy, _, _ = round_rect_centre(els[a['pivotDot']])
+                o[f'pivot_{side}'] = (round(cx, 2), round(cy, 2))
             else:
                 o[f'pivot_{side}'] = tuple(a['pivot']) if 'pivot' in a else capsule_top(els[a['capsule']])
         for check in o.get('poseChecks', []):
@@ -234,7 +247,9 @@ def build(config_path):
                     for oname, o in outfits.items()},
         'defaultOutfit': default,
         'eyes': {'centers': [[round(e[0], 3), round(e[1], 3)] for e in eyes.values()], 'radius': r,
-                 'pupilRest': [rest['left'][0], rest['right'][0]], 'pupilRestY': rest_y},
+                 'pupilRest': [rest['left'][0], rest['right'][0]], 'pupilRestY': rest_y,
+                 # the pupils' clip when the eye whites aren't round: each white's outline, as points
+                 **({'clipPolygons': clip_polygons} if clip_polygons else {})},
         'browPivots': {side: list(p) for side, p in brow_pivot.items()},
         # The head's layers, back to front: part files in base/, or the face rig (pupils, lids, brows, mouth, hat)
         'headLayers': [l[0] for l in C['head']],

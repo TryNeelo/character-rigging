@@ -98,6 +98,9 @@ class NovaRig {
                 forearmBehind: e.value['forearmBehind'] as bool? ?? false)
         },
         eyeCenters = [for (final c in _j['eyes']['centers'] as List) _offset(c)],
+        eyeClipPolygons = [
+          for (final p in (_j['eyes']['clipPolygons'] as List?) ?? const []) [for (final c in p as List) _offset(c)]
+        ],
         eyeRadius = _num(_j['eyes']['radius']),
         pupilRest = [for (final v in _j['eyes']['pupilRest'] as List) _num(v)],
         pupilRestY = _num(_j['eyes']['pupilRestY']),
@@ -129,6 +132,10 @@ class NovaRig {
   final Map<String, NovaOutfitSpec> outfits;
   final String defaultOutfit;
   final List<Offset> eyeCenters;
+
+  /// When a character's eye whites aren't round (Voltis), their outlines: the pupils stay inside
+  /// these instead of circles.
+  final List<List<Offset>> eyeClipPolygons;
 
   /// How far each pupil (left, right) sits from its eye's centre at rest, in canvas units.
   final List<double> pupilRest;

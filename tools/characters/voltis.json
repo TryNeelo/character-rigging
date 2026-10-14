@@ -1,0 +1,71 @@
+{
+  "_about": "Voltis's rig settings, read by tools/build_character.py. Parts are listed by position in the flat Figma export art/voltis/Voltis.svg (0-based, [from, to) ranges). The export has no layer names; shapeCount stops the build if it changes.",
+  "label": "Voltis",
+  "source": "voltis/Voltis.svg",
+  "shapeCount": 71,
+  "canvas": [380, 856],
+  "_anchor": "Where he stands: the centre line of his face and coat, and his soles.",
+  "anchor": [189.6, 855.4],
+  "_headPivot": "At the chin, inside the beard: the head nods and sways about this point, and the beard, ears, hair and glasses move with it.",
+  "headPivot": [189.6, 240],
+  "outfits": {
+    "inventor": {
+      "label": "Inventor",
+      "_legs": "Trousers, boots and the boot details.",
+      "legs": [[18, 26], [50, 52]],
+      "_arms": "By screen side. One piece each, like Nova's: the hand, then the sleeve over it. Each turns at the shoulder dot in the art (3 and 10, not drawn; the other dots 1, 2, 8 and 9 aren't used). No elbow. His arms hang down as drawn: that is his resting pose.",
+      "arm_left": {"shapes": [[7, 8], [11, 14]], "pivotDot": 10},
+      "arm_right": {"shapes": [[0, 1], [4, 7]], "pivotDot": 3},
+      "_body": "Vest, coat and the coat's button.",
+      "body": [[26, 33], [48, 50]]
+    }
+  },
+  "defaultOutfit": "inventor",
+  "_head": "The head's layers, back to front, as in Figma. Named layers are part files; pupils, lids, brows and mouth are the shared face rig. His eyes are half covered by a heavy lid (the orange eye shape); the lids close over that whole shape, under his glasses.",
+  "head": [
+    ["ears", [[14, 18]]],
+    ["beard", [[33, 35]]],
+    ["face", [[35, 38]]],
+    ["hair", [[38, 40]]],
+    ["mouth"],
+    ["mustache", [[42, 46]]],
+    ["hair_spikes", [[46, 48]]],
+    ["brows"],
+    ["eyes", [[54, 56], [57, 59]]],
+    ["pupils"],
+    ["lids"],
+    ["lashes", [[60, 66]]],
+    ["glasses", [[66, 71]]]
+  ],
+  "_headOutline": "Ears, beard, face and hair get the white outline.",
+  "headOutline": [[14, 18], [33, 35], [35, 37], [38, 40], [46, 48]],
+  "face": {
+    "_smile": "His drawn mouth (the Mouth frame). It is his idle smile, and the shared mouth shapes are scaled and centred onto it.",
+    "smile": [[40, 42]],
+    "_eyes": "Each eye: the round orange eye shape (eyeCircles; the lids close over it) and the white half below it, which the pupils stay inside (pupilClip).",
+    "eyeCircles": {"left": 54, "right": 57},
+    "whites": {"left": 55, "right": 58},
+    "pupilClip": "whites",
+    "pupils": {"left": 56, "right": 59},
+    "brows": {"left": 53, "right": 52},
+    "_lidColors": "The orange of his eye shapes.",
+    "lidColors": {"left": "#E78C31", "right": "#E78C31"},
+    "_mouthColor": "Inside of the talking mouths: the colour of his drawn mouth (near black).",
+    "mouthColor": "#1C1E1E",
+    "_lipColor": "Ring around the round mouth (F): it matches his face.",
+    "lipColor": "#DC7D4D",
+    "_minStroke": "Thinnest line for the rest and closed mouths (X, A) at his size, in canvas units.",
+    "minStroke": 2.5,
+    "mouthDropY": 0
+  },
+  "_settings": "Changes to tools/rig_settings.json for him only. Pupil reach is small: his eye whites are half covered. Full body and close-up are set (the close-up frames his face, from his hair to his beard, for checking lip-sync); knees and waist aren't tuned yet.",
+  "settings": {
+    "look": {"pupilReach": 8, "pupilReachY": 5},
+    "framing": {
+      "full": {"label": "Full body", "top": -14, "bottom": 874, "width": 400},
+      "knees": {"label": "Knees up", "top": -14, "bottom": 700, "width": 370},
+      "waist": {"label": "Waist up", "top": -14, "bottom": 560, "width": 370},
+      "close": {"label": "Close-up", "top": 20, "bottom": 340, "width": 320}
+    }
+  }
+}

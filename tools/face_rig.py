@@ -294,6 +294,29 @@ def arm_from_three(rest, raised, bent, upper, forearm, side):
 def mirrored(p, axis):
     return (round(2 * axis - p[0], 2), p[1])
 
+def outline_points(tag, steps=12):
+    """A closed path's outline as a list of points (curves sampled), for clipping in the app."""
+    pts, cur, start = [], (0.0, 0.0), (0.0, 0.0)
+    for cmd, args in re.findall(r'([MLHVCZ])([^MLHVCZ]*)', re.search(r'd="([^"]*)"', tag).group(1)):
+        n = [float(v) for v in re.findall(r'-?\d*\.?\d+(?:e-?\d+)?', args)]
+        if cmd == 'M': cur = start = (n[0], n[1]); pts.append(cur)
+        elif cmd == 'L':
+            for i in range(0, len(n), 2): cur = (n[i], n[i + 1]); pts.append(cur)
+        elif cmd == 'H': cur = (n[-1], cur[1]); pts.append(cur)
+        elif cmd == 'V': cur = (cur[0], n[-1]); pts.append(cur)
+        elif cmd == 'C':
+            for i in range(0, len(n), 6):
+                p0, p1, p2, p3 = cur, (n[i], n[i + 1]), (n[i + 2], n[i + 3]), (n[i + 4], n[i + 5])
+                for k in range(1, steps + 1):
+                    t = k / steps; u = 1 - t
+                    pts.append(tuple(u**3 * a + 3 * u * u * t * b + 3 * u * t * t * c + t**3 * d for a, b, c, d in zip(p0, p1, p2, p3)))
+                cur = p3
+        elif cmd == 'Z': cur = start
+    return [(round(x, 2), round(y, 2)) for x, y in pts]
+
+def path_d(tag):
+    return re.search(r'd="([^"]*)"', tag).group(1)
+
 def path_box(tag):
     """Bounding box of a path with absolute commands (from its points and control points,
     which is close enough for the simple shapes in a face)."""

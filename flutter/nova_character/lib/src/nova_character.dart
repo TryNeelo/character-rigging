@@ -461,6 +461,12 @@ class _EyesClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
+    if (rig.eyeClipPolygons.isNotEmpty) {
+      for (final outline in rig.eyeClipPolygons) {
+        path.addPolygon([for (final p in outline) p * s], true);
+      }
+      return path;
+    }
     for (final c in rig.eyeCenters) {
       path.addOval(Rect.fromCircle(center: c * s, radius: rig.eyeRadius * s));
     }

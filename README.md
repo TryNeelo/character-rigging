@@ -1,6 +1,6 @@
 # Neelo | Character Rig
 
-This folder is the single source for Neelo's character rigs (Nova, Skyrian the world 1 wizard, Obselda the world 2 explorer and Tydras of world 3): the artwork, the lip-sync rig, the dialogue audio and the timing for each line. Prototyping lives in a separate project and reads files from here without changing them.
+This folder is the single source for Neelo's character rigs (Nova, Skyrian the world 1 wizard, Obselda the world 2 explorer, Tydras of world 3 and Voltis the world 4 inventor): the artwork, the lip-sync rig, the dialogue audio and the timing for each line. Prototyping lives in a separate project and reads files from here without changing them.
 
 ## Folder layout
 
@@ -26,6 +26,7 @@ art/
   obselda/                      Obselda, the explorer: Obselda.svg (Figma export, never edited), Obselda-rigged.svg, parts/, rig.json.
   tydras/                       Tydras: Tydras.svg (arms down, Figma export, never edited), poses/ (right arm raised, and raised
                                 with the elbow bent out; never edited), Tydras-rigged.svg, parts/, rig.json.
+  voltis/                       Voltis, the inventor: Voltis.svg (Figma export, never edited), Voltis-rigged.svg, parts/, rig.json.
 dialogue/
   events.json                   Every app event name and what the app should do. Lines may only use events listed here.
   <line_name>/
@@ -153,6 +154,14 @@ Every character does everything Nova does: lip-sync, blinks, looking in 8 direct
 - Eyes: lids in her two face colours (radius 26). Pupil reach 9.25 across, 7.6 up and down.
 - Framing: full body is -14 to 750 (640 wide); close-up 10 to 330. Knees up and waist up aren't tuned yet.
 
+**Voltis** (`art/voltis/`, `tools/characters/voltis.json`) is the inventor of world 4. One look ("inventor"), on a 380 × 856 canvas, standing at x = 189.6 with his soles on the bottom edge.
+
+- Parts, back to front: trousers and boots; then (moving with the breath) his arms, and the vest and coat; then the head: ears, beard, face, hair, mouth, mustache, hair spikes, brows, eyes, pupils, lids, eyelashes and glasses.
+- Arms: one piece each, like Nova's (no elbow). Each turns at the shoulder dot in the art, (94.47, 385.46) and (284.69, 385.46); the sleeve's top stays hidden under the coat. His arms hang down as drawn, and `[arms up 45]` raises them from there.
+- Eyes: his eye whites are half circles under a heavy orange lid. The lids close over the whole round eye shape, under his glasses, and his pupils stay inside the white half (`pupilClip`), so they slip under the lid when he looks up. Pupil reach is small (8 across, 5 up and down).
+- Mouth: Nova's shapes scaled 0.425 onto his drawn mouth, in its near-black. As in Figma, the mouth sits behind his mustache, so the bottom of the open shapes is hidden.
+- Framing: full body is -14 to 874; close-up 20 to 340. Knees up and waist up aren't tuned yet.
+
 ## Adding a character
 
 1. Export the assembled character from Figma as one SVG, sized relative to Nova, and save it as `art/<name>/<Name>.svg`. Never edit it. Ticking "Include 'id' attribute" makes the layers easier to read, but isn't required.
@@ -212,6 +221,8 @@ A line's `script.txt` is plain text:
 **ftux_w2** "FTUX: world 2" (10.8 s, 76 cues). Spoken by **Obselda** (`"character": "obselda"`). Final recording, with Manaf's script; no tags yet. Raised 3.9 dB to match ftux_home (peaks at -1 dBFS). Mouth track hand-timed the same way (closures on "I'm", the B in "Obselda", "welcome", the P in "Cragspire" and "explore", "Tap"; G on "flag"; X in every pause; nothing under 40 ms). "Welcome to Cragspire and our steady, rocky ground." is 50 characters, so it stays one caption.
 
 **ftux_w3** "FTUX: world 3" (10.9 s, 82 cues). Spoken by **Tydras** (`"character": "tydras"`). Final recording, with Manaf's script; no tags yet. Already at the other lines' level (raised 0.3 dB). Mouth track hand-timed the same way (closures on "I'm", "welcome", the M in "Omiri", "Tap", the B in "begin"; G on "find", "flag"; X in every pause; nothing under 40 ms). "Welcome to Omiri, where the waters are always ready to listen." is 62 characters, so it splits at the comma.
+
+**ftux_w4** "FTUX: world 4" (11.3 s, 73 cues). Spoken by **Voltis** (`"character": "voltis"`). Final recording, with Manaf's script; no tags yet. Raised 1.9 dB to match. Mouth track hand-timed the same way (closures on "welcome", "I'm", the M in "Lumina", the B in "bright", "Tap", "jump"; G on "Voltis", "of", "adventure", "flag"; X in every pause; nothing under 40 ms). All captions fit in 55 characters.
 
 The two earlier sample lines (onboarding_nova_dialogue1, voice_line_1) and their sample events (show_logo, show_path) were removed on 2026-10-13, when the final FTUX audio arrived. They're in git history.
 

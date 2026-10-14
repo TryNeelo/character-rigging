@@ -35,11 +35,15 @@ flutter:
     - assets/characters/tydras/
     - assets/characters/tydras/parts/base/
     - assets/characters/tydras/parts/outfits/sea/
+    - assets/characters/voltis/
+    - assets/characters/voltis/parts/base/
+    - assets/characters/voltis/parts/outfits/inventor/
     - assets/lines/ftux_home/
     - assets/lines/ftux_home_return/
     - assets/lines/ftux_room/
     - assets/lines/ftux_w1/
     - assets/lines/ftux_w2/
     - assets/lines/ftux_w3/
+    - assets/lines/ftux_w4/
     - assets/lines/ftux_world_select/
     # END GENERATED ASSETS
