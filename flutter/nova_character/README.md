@@ -12,6 +12,16 @@ The other characters come in the same package and work the same way. Today that'
 pass `character: 'skyrian'`, `'obselda'`, `'tydras'`, `'voltis'` or `'tremu'` (see "Other characters").
 Nothing changes for code that only shows Nova.
 
+## What's new in 0.4.0
+
+Nothing to change in code written for 0.3.0.
+
+- Five world characters: Skyrian, Obselda, Tydras, Voltis and Tremu, each with a welcome line (`ftux_w1` to `ftux_w5`).
+  Pick one with `NovaCharacter(character: ...)`; a line's `character` tells you who speaks it.
+- Elbows: Skyrian's, Obselda's, Tydras's and Tremu's arms bend, and their lines can hold arms down, raised or bent.
+- Nova's head (and hat) is 10% smaller. Only his art and `assets/rig.json` changed.
+- Tremu's mouth is a stand-in for now; his drawn mouth will come in a later version, as an art update only.
+
 ## Try it
 
 ```bash
