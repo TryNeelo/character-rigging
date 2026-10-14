@@ -1,0 +1,75 @@
+{
+  "_about": "Tremu's rig settings, read by tools/build_character.py. Parts are listed by position in the flat Figma export art/tremu/Tremu.svg (0-based, [from, to) ranges). The export has no layer names; shapeCount stops the build if it changes.",
+  "label": "Tremu",
+  "source": "tremu/Tremu.svg",
+  "shapeCount": 80,
+  "canvas": [428, 898],
+  "_anchor": "Where he stands: the centre line of his face and robe, and his soles.",
+  "anchor": [212.6, 897.7],
+  "_headPivot": "Under the mustache: the head nods and sways about this point, and his beard, leafy hair, headband and glasses move with it.",
+  "headPivot": [212.6, 288],
+  "outfits": {
+    "elder": {
+      "label": "Elder",
+      "_legs": "Sandals, socks and trousers.",
+      "legs": [[15, 45]],
+      "_arms": "By screen side. Each arm: the upper arm, the forearm (with the hand, drawn behind the sleeve) and the wide sleeve, which moves with the upper arm. The magenta pivot dots (2, 6, 9, 13) aren't drawn. As drawn, his hands are behind his back: that is his resting pose.",
+      "arm_left": {"shapes": [[0, 2], [3, 6]], "capsule": 0, "forearm": [[1, 2]], "forearmCapsule": 1, "forearmBehind": true},
+      "arm_right": {"shapes": [[7, 9], [10, 13]], "capsule": 7, "forearm": [[8, 9]], "forearmCapsule": 8, "forearmBehind": true},
+      "_armsDown": "The same Tremu with both arms straight down (Figma). The shoulder and elbow pivots are the points his arms turn about between the two drawings (they land on Manaf's magenta dots), and this is his [arms down] pose.",
+      "armsDown": "tremu/poses/arms-down.svg",
+      "_poseChecks": "Figma pose the build must reproduce exactly: the right arm raised straight out (75.7 degrees from vertical, 60.2 up from arms down).",
+      "poseChecks": [
+        {"file": "tremu/poses/right-arm-up.svg", "side": "right", "shoulder": 75.6925}
+      ],
+      "_body": "Robe, sash, skirt, its swirls, the apron and its diamond, belt and buckle.",
+      "body": [[45, 56], [73, 76]]
+    }
+  },
+  "defaultOutfit": "elder",
+  "_headBehind": "His big leafy hair: drawn behind his body and arms, it turns with his head.",
+  "headBehind": [["hair", [[14, 15]]]],
+  "_head": "The head's layers, back to front. Named layers are part files; pupils, lids, brows and mouth are the shared face rig. He has no drawn mouth: it sits under his mustache. His brows sit in front of his headband (in Figma they're behind it, out of sight), so his brow expressions show.",
+  "head": [
+    ["ears", [[56, 60]]],
+    ["beard", [[60, 61]]],
+    ["mouth"],
+    ["mustache", [[61, 62]]],
+    ["beard_top", [[62, 63]]],
+    ["face", [[63, 64]]],
+    ["eyes", [[64, 66], [67, 69]]],
+    ["pupils"],
+    ["lids"],
+    ["headband", [[72, 73]]],
+    ["brows"],
+    ["glasses", [[76, 79]]],
+    ["leaf", [[79, 80]]]
+  ],
+  "_headOutline": "Hair, ears, beard, face, headband and the leaf get the white outline.",
+  "headOutline": [[14, 15], [56, 61], [62, 64], [72, 73], [79, 80]],
+  "face": {
+    "_mouthAt": "He has no drawn mouth. The shared mouth shapes are placed here instead (where Nova's smile box goes: its centre and width), with their top edge tucked under his mustache.",
+    "mouthAt": {"centre": [212.6, 284], "width": 52},
+    "_hiddenShapes": "The idle smile, the rest line and the closed lips stay hidden under his mustache, as in Figma: his mouth only shows when it opens.",
+    "hiddenShapes": ["smile", "X", "A"],
+    "_eyes": "Each eye: a dark ring with the white inside it. The lids close over the white, inside the ring.",
+    "whites": {"left": 68, "right": 65},
+    "pupils": {"left": 69, "right": 66},
+    "brows": {"left": 71, "right": 70},
+    "_lidColors": "His face's orange.",
+    "lidColors": {"left": "#D3663F", "right": "#D3663F"},
+    "_lipColor": "Ring around the round mouth (F): it matches his beard.",
+    "lipColor": "#9EDC9F",
+    "mouthDropY": 0
+  },
+  "_settings": "Changes to tools/rig_settings.json for him only. Full body and close-up are set (the close-up frames his face, from his headband to his beard, for checking lip-sync); knees and waist aren't tuned yet.",
+  "settings": {
+    "look": {"pupilReach": 8, "pupilReachY": 6},
+    "framing": {
+      "full": {"label": "Full body", "top": -14, "bottom": 916, "width": 440},
+      "knees": {"label": "Knees up", "top": -14, "bottom": 760, "width": 440},
+      "waist": {"label": "Waist up", "top": -14, "bottom": 560, "width": 440},
+      "close": {"label": "Close-up", "top": 110, "bottom": 430, "width": 320}
+    }
+  }
+}

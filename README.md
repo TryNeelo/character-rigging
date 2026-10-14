@@ -1,6 +1,6 @@
 # Neelo | Character Rig
 
-This folder is the single source for Neelo's character rigs (Nova, Skyrian the world 1 wizard, Obselda the world 2 explorer, Tydras of world 3 and Voltis the world 4 inventor): the artwork, the lip-sync rig, the dialogue audio and the timing for each line. Prototyping lives in a separate project and reads files from here without changing them.
+This folder is the single source for Neelo's character rigs (Nova, Skyrian the world 1 wizard, Obselda the world 2 explorer, Tydras of world 3, Voltis the world 4 inventor and Tremu the world 5 elder): the artwork, the lip-sync rig, the dialogue audio and the timing for each line. Prototyping lives in a separate project and reads files from here without changing them.
 
 ## Folder layout
 
@@ -27,6 +27,8 @@ art/
   tydras/                       Tydras: Tydras.svg (arms down, Figma export, never edited), poses/ (right arm raised, and raised
                                 with the elbow bent out; never edited), Tydras-rigged.svg, parts/, rig.json.
   voltis/                       Voltis, the inventor: Voltis.svg (Figma export, never edited), Voltis-rigged.svg, parts/, rig.json.
+  tremu/                        Tremu: Tremu.svg (hands behind back, Figma export, never edited), poses/ (arms-down.svg and
+                                right-arm-up.svg; never edited), Tremu-rigged.svg, parts/, rig.json.
 dialogue/
   events.json                   Every app event name and what the app should do. Lines may only use events listed here.
   <line_name>/
@@ -162,10 +164,20 @@ Every character does everything Nova does: lip-sync, blinks, looking in 8 direct
 - Mouth: Nova's shapes scaled 0.425 onto his drawn mouth, in its near-black. As in Figma, the mouth sits behind his mustache, so the bottom of the open shapes is hidden.
 - Framing: full body is -14 to 874; close-up 20 to 340. Knees up and waist up aren't tuned yet.
 
+**Tremu** (`art/tremu/`, `tools/characters/tremu.json`) is the elder of world 5. One look ("elder"), on a 428 × 898 canvas, standing at x = 212.6 with his soles on the bottom edge.
+
+- Parts, back to front: sandals, socks and trousers; then (moving with the breath) his big leafy hair, arms, and the robe with its sash, apron, belt and buckle; then the head.
+- His leafy hair is drawn behind his body and arms but turns with his head (`headBehind`), like Tydras's.
+- Head: ears, beard, mouth, mustache, the top of the beard, face, eyes, pupils, lids, headband, brows, glasses and the leaf over the headband. The head turns about (212.6, 288), under the mustache. His brows sit in front of his headband (in Figma they're behind it, out of sight), so his brow expressions show.
+- Arms: like Skyrian's, they bend at the elbow, with a wide sleeve that moves with the upper arm and covers the elbow (the forearm is drawn behind it). As drawn, his hands are behind his back: that's his resting pose. The pivots come from Manaf's pose exports (`art/tremu/poses/`, which are wider, so the build shifts them back onto his canvas): the points his arms turn about between the hands-behind-back and arms-down drawings, (127.87, 362.51) and (300.21, 362.55) for the shoulders, (68.72, 525.97) and (359.2, 525.97) for the elbows. They land within half a unit of Manaf's magenta pivot dots (not drawn). `[arms down]` is the arms-down drawing (16.4° out from vertical on the left, 15.5° on the right), and his raised-arm drawing is `[right arm up 60]`; the build checks itself against it.
+- Mouth: he has no drawn mouth. Nova's shapes (scaled 0.93) are placed under his mustache (`mouthAt` instead of a drawn smile), with their top edge tucked under its arch. The idle smile, the rest line and the closed lips are left empty (`hiddenShapes`), so his mouth only shows while it's open, as if his mustache covers it. The round mouth's ring matches his beard.
+- Eyes: a dark ring around each white. The lids close over the white, inside the ring, in his face's orange (radius 25.4). Pupil reach 8 across, 6 up and down.
+- Framing: full body is -14 to 916; close-up 110 to 430, his face from the headband to the beard, for checking lip-sync. Knees up and waist up aren't tuned yet.
+
 ## Adding a character
 
 1. Export the assembled character from Figma as one SVG, sized relative to Nova, and save it as `art/<name>/<Name>.svg`. Never edit it. Ticking "Include 'id' attribute" makes the layers easier to read, but isn't required.
-2. Copy `tools/characters/skyrian.json` to `tools/characters/<name>.json`. List his parts by position in the export (legs, body behind the arms, arms with their upper-arm capsule or a `pivot`, body, hat, the head's layers), his head pivot and anchor, his drawn mouth, eye whites, pupils, brows and lid colours.
+2. Copy `tools/characters/skyrian.json` to `tools/characters/<name>.json`. List his parts by position in the export (legs, body behind the arms, arms with their upper-arm capsule or a `pivot`, body, hat, the head's layers), his head pivot and anchor, his drawn mouth (or, with none, where the mouth goes: `mouthAt`), eye whites, pupils, brows and lid colours.
 3. Run `python3 tools/build_rig.py`, then `python3 tools/build_preview.py`. He appears in the preview's Character picker.
 4. Check his mouth shapes, blinks, looks, brows and arms in the preview, and tune his settings file (mouth drop, minimum stroke, pupil reach, brow lifts, framing).
 5. Give his lines `"character": "<name>"` in cues.json, and run `python3 tools/build_flutter.py` to package him.
@@ -223,6 +235,8 @@ A line's `script.txt` is plain text:
 **ftux_w3** "FTUX: world 3" (10.9 s, 82 cues). Spoken by **Tydras** (`"character": "tydras"`). Final recording, with Manaf's script; no tags yet. Already at the other lines' level (raised 0.3 dB). Mouth track hand-timed the same way (closures on "I'm", "welcome", the M in "Omiri", "Tap", the B in "begin"; G on "find", "flag"; X in every pause; nothing under 40 ms). "Welcome to Omiri, where the waters are always ready to listen." is 62 characters, so it splits at the comma.
 
 **ftux_w4** "FTUX: world 4" (11.3 s, 73 cues). Spoken by **Voltis** (`"character": "voltis"`). Final recording, with Manaf's script; no tags yet. Raised 1.9 dB to match. Mouth track hand-timed the same way (closures on "welcome", "I'm", the M in "Lumina", the B in "bright", "Tap", "jump"; G on "Voltis", "of", "adventure", "flag"; X in every pause; nothing under 40 ms). All captions fit in 55 characters.
+
+**ftux_w5** "FTUX: world 5" (11.2 s, 88 cues). Spoken by **Tremu** (`"character": "tremu"`). Final recording, with Manaf's script; no tags yet. Lowered 0.8 dB to match. Mouth track hand-timed the same way (closures on "I'm", "Tremu", "welcome", "come", "explore", "me", "tap"; G on "friend", "Everglen", "every", "voice", "flag"; X in every pause; nothing under 40 ms). The second caption (61 characters) is split at the comma: "Welcome to Everglen," / "where every voice gets a chance to grow."
 
 The two earlier sample lines (onboarding_nova_dialogue1, voice_line_1) and their sample events (show_logo, show_path) were removed on 2026-10-13, when the final FTUX audio arrived. They're in git history.
 

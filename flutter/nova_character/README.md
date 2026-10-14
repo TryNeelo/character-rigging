@@ -8,8 +8,8 @@ Everything Nova needs (art, audio, timing) is bundled in the package. You don't
 assemble anything: add the widget, play a line, and listen for events.
 
 The other characters come in the same package and work the same way. Today that's
-**Skyrian** (world 1), **Obselda** (world 2), **Tydras** (world 3) and **Voltis** (world 4):
-pass `character: 'skyrian'`, `'obselda'`, `'tydras'` or `'voltis'` (see "Other characters").
+**Skyrian** (world 1), **Obselda** (world 2), **Tydras** (world 3), **Voltis** (world 4) and **Tremu** (world 5):
+pass `character: 'skyrian'`, `'obselda'`, `'tydras'`, `'voltis'` or `'tremu'` (see "Other characters").
 Nothing changes for code that only shows Nova.
 
 ## Try it
@@ -19,7 +19,7 @@ cd example
 flutter run -d chrome     # or any device
 ```
 
-The demo screen has a Play button, a character picker (Nova, Skyrian, Obselda, Tydras or Voltis, each with a
+The demo screen has a Play button, a character picker (Nova, Skyrian, Obselda, Tydras, Voltis or Tremu, each with a
 sample line), framing and position controls, and a log of the events he sends.
 
 ## Add it to your app
@@ -67,21 +67,21 @@ existing code doesn't change. The controller is the same for every character.
 ```dart
 NovaCharacter(
   controller: nova,
-  character: 'skyrian',           // 'nova' (default), 'skyrian', 'obselda', 'tydras' or 'voltis'
+  character: 'skyrian',           // 'nova' (default), 'skyrian', 'obselda', 'tydras', 'voltis' or 'tremu'
   framing: NovaFraming.full,
 )
 
-await nova.play('ftux_w1');       // a Skyrian line ('ftux_w2' Obselda's, 'ftux_w3' Tydras's, 'ftux_w4' Voltis's)
+await nova.play('ftux_w1');       // a Skyrian line ('ftux_w2' Obselda's, 'ftux_w3' Tydras's, 'ftux_w4' Voltis's, 'ftux_w5' Tremu's)
 ```
 
 Each line knows who speaks it: `NovaLine.character` (`nova.line?.character` while it
-plays) is the speaker's id (`'nova'`, `'skyrian'`, `'obselda'`, `'tydras'` or `'voltis'`), so you can pass it straight to the widget. Every
+plays) is the speaker's id (`'nova'`, `'skyrian'`, `'obselda'`, `'tydras'`, `'voltis'` or `'tremu'`), so you can pass it straight to the widget. Every
 character lip-syncs, blinks, looks, raises his arms, sets his brows and sends events
 the same way. The world characters have one look each, so `outfit` doesn't apply to them.
 
-Skyrian's, Obselda's and Tydras's arms bend at the elbow. Skyrian and Obselda rest with
+Skyrian's, Obselda's, Tydras's and Tremu's arms bend at the elbow. Skyrian, Obselda and Tremu rest with
 their hands behind their back; Tydras rests with her arms down. Voltis's arms are one piece,
-like Nova's. Their lines can hold the
+like Nova's. Tremu has no drawn mouth: his mouth shows under his mustache only while it's open. Their lines can hold the
 arms straight down, raise them straight, and bend either elbow.
 The widget handles all of it from the line's markers (below). All characters
 are drawn at the same scale as Nova; Skyrian is a little taller with his hat, so his
@@ -109,7 +109,7 @@ full-body framing is a little taller too.
 | `idle` | `true` | Movement switch. Nova draws at 15 fps for idle motion, 30 while talking and 60 during arm and look moves (they last a moment). On: breathing and slight sway between lines, nods and brow lifts while talking. Off: he only blinks and lip-syncs, and doesn't redraw between blinks. |
 | `blink` | `true` | Random blinks every 2.5 to 5.5 s. |
 | `outfit` | `'hoodie'` | Which outfit Nova wears: `'hoodie'`, `'aviator'` or `'construction'`. Change it any time; his face, lip-sync and motion carry over. |
-| `character` | `'nova'` | Which character to draw: `'nova'`, `'skyrian'`, `'obselda'`, `'tydras'` or `'voltis'`. Unknown ids fall back to Nova. Change it any time. |
+| `character` | `'nova'` | Which character to draw: `'nova'`, `'skyrian'`, `'obselda'`, `'tydras'`, `'voltis'` or `'tremu'`. Unknown ids fall back to Nova. Change it any time. |
 
 If the widget's height is unbounded, it sizes itself to the framing's proportions.
 
@@ -127,6 +127,7 @@ This version has the four Nova FTUX lines and Skyrian's world 1 line, all with t
 | `ftux_w2` | Obselda | World 2: Obselda's welcome (no events yet) |
 | `ftux_w3` | Tydras | World 3: Tydras's welcome (no events yet) |
 | `ftux_w4` | Voltis | World 4: Voltis's welcome to Lumina (no events yet) |
+| `ftux_w5` | Tremu | World 5: Tremu's welcome to Everglen (no events yet) |
 
 Each line is a folder in `assets/lines/<line_id>/` with `audio.mp3` and `timing.json`.
 The timing file holds the mouth shapes and the markers, plus `"character"` when someone

@@ -1,0 +1,167 @@
+[
+ {
+  "start": 0.0,
+  "end": 2.6,
+  "text": "Hello, friend. I'm Tremu.",
+  "words": [
+   {
+    "w": "Hello,",
+    "s": 0.0,
+    "e": 0.44
+   },
+   {
+    "w": "friend.",
+    "s": 0.64,
+    "e": 0.84
+   },
+   {
+    "w": "I'm",
+    "s": 1.36,
+    "e": 1.66
+   },
+   {
+    "w": "Tremu.",
+    "s": 1.66,
+    "e": 2.2
+   }
+  ],
+  "split": false
+ },
+ {
+  "start": 2.88,
+  "end": 4.56,
+  "text": "Welcome to Everglen,",
+  "words": [
+   {
+    "w": "Welcome",
+    "s": 2.98,
+    "e": 3.32
+   },
+   {
+    "w": "to",
+    "s": 3.32,
+    "e": 3.64
+   },
+   {
+    "w": "Everglen,",
+    "s": 3.64,
+    "e": 4.34
+   }
+  ],
+  "split": true
+ },
+ {
+  "start": 4.56,
+  "end": 7.4,
+  "text": "where every voice gets a chance to grow.",
+  "words": [
+   {
+    "w": "where",
+    "s": 4.66,
+    "e": 4.74
+   },
+   {
+    "w": "every",
+    "s": 4.74,
+    "e": 5.26
+   },
+   {
+    "w": "voice",
+    "s": 5.26,
+    "e": 5.68
+   },
+   {
+    "w": "gets",
+    "s": 5.68,
+    "e": 5.92
+   },
+   {
+    "w": "a",
+    "s": 5.92,
+    "e": 6.12
+   },
+   {
+    "w": "chance",
+    "s": 6.12,
+    "e": 6.36
+   },
+   {
+    "w": "to",
+    "s": 6.36,
+    "e": 6.68
+   },
+   {
+    "w": "grow.",
+    "s": 6.68,
+    "e": 7.0
+   }
+  ],
+  "split": true
+ },
+ {
+  "start": 7.44,
+  "end": 9.22,
+  "text": "Come explore with me!",
+  "words": [
+   {
+    "w": "Come",
+    "s": 7.54,
+    "e": 7.7
+   },
+   {
+    "w": "explore",
+    "s": 7.7,
+    "e": 8.2
+   },
+   {
+    "w": "with",
+    "s": 8.2,
+    "e": 8.5
+   },
+   {
+    "w": "me!",
+    "s": 8.5,
+    "e": 8.86
+   }
+  ],
+  "split": false
+ },
+ {
+  "start": 9.22,
+  "end": 11.18,
+  "text": "Tap a flag to get going.",
+  "words": [
+   {
+    "w": "Tap",
+    "s": 9.32,
+    "e": 9.54
+   },
+   {
+    "w": "a",
+    "s": 9.54,
+    "e": 9.74
+   },
+   {
+    "w": "flag",
+    "s": 9.74,
+    "e": 10.04
+   },
+   {
+    "w": "to",
+    "s": 10.04,
+    "e": 10.28
+   },
+   {
+    "w": "get",
+    "s": 10.28,
+    "e": 10.42
+   },
+   {
+    "w": "going.",
+    "s": 10.42,
+    "e": 10.84
+   }
+  ],
+  "split": false
+ }
+]

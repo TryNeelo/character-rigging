@@ -1,0 +1,137 @@
+{
+ "label": "Tremu",
+ "canvas": {
+  "width": 428,
+  "height": 898
+ },
+ "anchor": {
+  "x": 212.6,
+  "y": 897.7
+ },
+ "pivots": {
+  "head": [
+   212.6,
+   288
+  ]
+ },
+ "outfits": {
+  "elder": {
+   "label": "Elder",
+   "hat": false,
+   "forearmBehind": true,
+   "hatBack": false,
+   "bodyBack": false,
+   "pivots": {
+    "armLeft": [
+     127.87,
+     362.51
+    ],
+    "armRight": [
+     300.21,
+     362.55
+    ],
+    "elbowLeft": [
+     68.72,
+     525.97
+    ],
+    "elbowRight": [
+     359.2,
+     525.97
+    ]
+   },
+   "armRest": {
+    "left": [
+     23.87,
+     83.83
+    ],
+    "right": [
+     23.87,
+     84.13
+    ]
+   },
+   "armDown": {
+    "left": 16.41,
+    "right": 15.54
+   }
+  }
+ },
+ "defaultOutfit": "elder",
+ "eyes": {
+  "centers": [
+   [
+    172.981,
+    216.405
+   ],
+   [
+    252.253,
+    216.405
+   ]
+  ],
+  "radius": 25.437,
+  "pupilRest": [
+   5.96,
+   -5.96
+  ],
+  "pupilRestY": 3.4
+ },
+ "browPivots": {
+  "left": [
+   179.0,
+   164.3
+  ],
+  "right": [
+   246.3,
+   164.3
+  ]
+ },
+ "headLayers": [
+  "ears",
+  "beard",
+  "mouth",
+  "mustache",
+  "beard_top",
+  "face",
+  "eyes",
+  "pupils",
+  "lids",
+  "headband",
+  "brows",
+  "glasses",
+  "leaf"
+ ],
+ "headBehindLayers": [
+  "hair"
+ ],
+ "settings": {
+  "look": {
+   "pupilReach": 8,
+   "pupilReachY": 6
+  },
+  "framing": {
+   "full": {
+    "label": "Full body",
+    "top": -14,
+    "bottom": 916,
+    "width": 440
+   },
+   "knees": {
+    "label": "Knees up",
+    "top": -14,
+    "bottom": 760,
+    "width": 440
+   },
+   "waist": {
+    "label": "Waist up",
+    "top": -14,
+    "bottom": 560,
+    "width": 440
+   },
+   "close": {
+    "label": "Close-up",
+    "top": 110,
+    "bottom": 430,
+    "width": 320
+   }
+  }
+ }
+}

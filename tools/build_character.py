@@ -63,11 +63,17 @@ def build(config_path):
     brows = '<g id="brows">' + ''.join(f'<g id="brow-{side}" data-pivot="{p[0]:g} {p[1]:g}">{brow[side]}</g>' for side, p in brow_pivot.items()) + '</g>'
 
     # ---- Mouth: Nova's shapes, scaled to his drawn mouth and centred on it; his own mouth is the smile ----
-    smile = pick(F['smile'])
+    smile = pick(F.get('smile', []))
     old = shapes_of(os.path.join(ROOT, 'art', NOVA_SMILE['original']), NOVA_SMILE['originalShapeCount'])
     box = lambda tags: [f(v) for f, v in zip((min, min, max, max), zip(*[path_box(t) for t in tags]))]
     nx0, ny0, nx1, ny1 = box([old[i] for i in NOVA_SMILE['originalSmile']])
-    sx0, sy0, sx1, sy1 = box([els[i] for i in R(F['smile'])])
+    if 'smile' in F:
+        sx0, sy0, sx1, sy1 = box([els[i] for i in R(F['smile'])])
+    else:
+        # No drawn mouth (Tremu's is under his mustache): mouthAt says where Nova's smile box goes
+        (cx, cy), w = F['mouthAt']['centre'], F['mouthAt']['width']
+        h = w * (ny1 - ny0) / (nx1 - nx0)
+        sx0, sy0, sx1, sy1 = cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2
     s = (sx1 - sx0) / (nx1 - nx0)
     # (the talking shapes can sit a little lower than the drawn mouth, so a mustache doesn't hide them)
     tx, ty = (sx0 + sx1) / 2 - s * (nx0 + nx1) / 2, (sy0 + sy1) / 2 - s * (ny0 + ny1) / 2 + F.get('mouthDropY', 0)
@@ -78,6 +84,8 @@ def build(config_path):
         lo = F.get('minStroke', 0) / s
         return re.sub(r'stroke-width="([\d.]+)"', lambda m: f'stroke-width="{max(float(m.group(1)), lo):.3g}"', b) if lo else b
     shapes = [(m, smile if m == 'smile' else f'<g transform="{place}">{thicken(b)}</g>') for m, b in shapes]
+    # (shapes a mustache would cover completely are left empty, so nothing peeks out)
+    shapes = [(m, '' if m in F.get('hiddenShapes', []) else b) for m, b in shapes]
     mouth = '<g id="mouth">' + ''.join(mouth_group(m, b, vis=(m == 'smile')) for m, b in shapes) + '</g>'
 
     # ---- Outfits: legs, the body behind the arms, arms, body and hat ----
@@ -88,6 +96,14 @@ def build(config_path):
         o['body_svg'] = pick(o['body'])
         o['hat_svg'] = pick(o.get('hat', []))
         o['hat_back_svg'] = pick(o.get('hat_back', []))
+        arm_idx = {i for sd in ('left', 'right') for i in R(o[f'arm_{sd}']['shapes'])}
+        ref = next(i for i, e in enumerate(els) if i not in arm_idx and e.startswith('<path'))
+        def back_from(other):
+            # Another export of him may be wider, with everything shifted: the move that carries it back
+            # onto this canvas (measured on the first path that isn't part of an arm)
+            x0, y0 = (float(v) for v in re.search(r'd="M(-?[\d.]+) (-?[\d.]+)', other[ref]).groups())
+            x1, y1 = (float(v) for v in re.search(r'd="M(-?[\d.]+) (-?[\d.]+)', els[ref]).groups())
+            return (1, 0, 0, 1, x1 - x0, y1 - y0)
         if 'armPoses' in o:
             # One arm drawn three ways (resting, raised straight, raised with the elbow bent): its shoulder and
             # elbow are the points the art turns about between the drawings. The other arm is its mirror image.
@@ -107,9 +123,11 @@ def build(config_path):
                 # Two-piece arm, with the same arms drawn straight down in another export: the pivots are the
                 # points the art turns about between the two drawings, so both poses come out exactly
                 down = shapes_of(os.path.join(ROOT, 'art', o['armsDown']), C['shapeCount'])
+                back = back_from(down)
                 (o[f'pivot_{side}'], o[f'elbow_{side}'], shoulder, bend,
-                 o[f'down_{side}']) = arm_from_poses(els[a['capsule']], els[a['forearmCapsule']],
-                                                     down[a['capsule']], down[a['forearmCapsule']], side)
+                 o[f'down_{side}']) = arm_from_placements(placement(els[a['capsule']]), placement(els[a['forearmCapsule']]),
+                                                          compose(back, placement(down[a['capsule']])),
+                                                          compose(back, placement(down[a['forearmCapsule']])), side)
                 o[f'rest_{side}'] = (shoulder, bend)
             elif fore and 'armPoses' in o:
                 f = arm_fits[side]
@@ -141,9 +159,7 @@ def build(config_path):
         for check in o.get('poseChecks', []):
             # Another export with one arm raised: the rig must reproduce its upper arm and forearm
             other = shapes_of(os.path.join(ROOT, 'art', check['file']), C['shapeCount'])
-            x0, y0 = (float(v) for v in re.search(r'd="M(-?[\d.]+) (-?[\d.]+)', other[0]).groups())
-            x1, y1 = (float(v) for v in re.search(r'd="M(-?[\d.]+) (-?[\d.]+)', els[0]).groups())
-            back = (1, 0, 0, 1, x1 - x0, y1 - y0)   # the export may be wider, with everything shifted
+            back = back_from(other)
             side, a = check['side'], o[f'arm_{check["side"]}']
             out = 1 if side == 'right' else -1
             def about(p, deg):   # turn by deg clockwise on screen about p
