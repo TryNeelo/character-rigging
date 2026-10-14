@@ -157,7 +157,7 @@ Every character does everything Nova does: lip-sync, blinks, looking in 8 direct
 **Voltis** (`art/voltis/`, `tools/characters/voltis.json`) is the inventor of world 4. One look ("inventor"), on a 380 × 856 canvas, standing at x = 189.6 with his soles on the bottom edge.
 
 - Parts, back to front: trousers and boots; then (moving with the breath) his arms, and the vest and coat; then the head: ears, beard, face, hair, mouth, mustache, hair spikes, brows, eyes, pupils, lids, eyelashes and glasses.
-- Arms: one piece each, like Nova's (no elbow). Each turns at the shoulder dot in the art, (94.47, 385.46) and (284.69, 385.46); the sleeve's top stays hidden under the coat. His arms hang down as drawn, and `[arms up 45]` raises them from there.
+- Arms: one piece each, like Nova's (no elbow). Each turns at its shoulder, (107.3, 337.1) and (271.9, 337.1): 50 units up the arm from the dots in the art (which sit halfway down the sleeve), where the sleeve comes out from under the coat, as Manaf asked. The sleeve's top stays hidden under the coat. His arms hang down as drawn, and `[arms up 45]` raises them from there.
 - Eyes: his eye whites are half circles under a heavy orange lid. The lids close over the whole round eye shape, under his glasses, and his pupils stay inside the white half (`pupilClip`), so they slip under the lid when he looks up. Pupil reach is small (8 across, 5 up and down).
 - Mouth: Nova's shapes scaled 0.425 onto his drawn mouth, in its near-black. As in Figma, the mouth sits behind his mustache, so the bottom of the open shapes is hidden.
 - Framing: full body is -14 to 874; close-up 20 to 340. Knees up and waist up aren't tuned yet.

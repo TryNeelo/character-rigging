@@ -14,8 +14,9 @@
       "_legs": "Trousers, boots and the boot details.",
       "legs": [[18, 26], [50, 52]],
       "_arms": "By screen side. One piece each, like Nova's: the hand, then the sleeve over it. Each turns at the shoulder dot in the art (3 and 10, not drawn; the other dots 1, 2, 8 and 9 aren't used). No elbow. His arms hang down as drawn: that is his resting pose.",
-      "arm_left": {"shapes": [[7, 8], [11, 14]], "pivotDot": 10},
-      "arm_right": {"shapes": [[0, 1], [4, 7]], "pivotDot": 3},
+      "_pivot": "Manaf asked for the shoulders a little higher than the dots in the art (which sit halfway down the sleeve): each pivot is 50 units up the arm from its dot, where the sleeve comes out from under the coat.",
+      "arm_left": {"shapes": [[7, 8], [11, 14]], "pivot": [107.3, 337.1]},
+      "arm_right": {"shapes": [[0, 1], [4, 7]], "pivot": [271.9, 337.1]},
       "_body": "Vest, coat and the coat's button.",
       "body": [[26, 33], [48, 50]]
     }
