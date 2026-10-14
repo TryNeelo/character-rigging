@@ -20,7 +20,7 @@ class _NovaDemoState extends State<NovaDemo> {
   String outfit = 'hoodie';
   String character = 'nova';
   // Each character's sample line
-  static const lines = {'nova': 'ftux_home', 'skyrian': 'ftux_w1', 'obselda': 'ftux_w2'};
+  static const lines = {'nova': 'ftux_home', 'skyrian': 'ftux_w1', 'obselda': 'ftux_w2', 'tydras': 'ftux_w3'};
 
   @override
   void initState() {
@@ -78,6 +78,7 @@ class _NovaDemoState extends State<NovaDemo> {
           ButtonSegment(value: 'nova', label: Text('Nova')),
           ButtonSegment(value: 'skyrian', label: Text('Skyrian')),
           ButtonSegment(value: 'obselda', label: Text('Obselda')),
+          ButtonSegment(value: 'tydras', label: Text('Tydras')),
         ],
         selected: {character},
         onSelectionChanged: (v) => setState(() {

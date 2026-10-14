@@ -1,6 +1,6 @@
 # Neelo | Character Rig
 
-This folder is the single source for Neelo's character rigs (Nova, Skyrian the world 1 wizard and Obselda the world 2 explorer): the artwork, the lip-sync rig, the dialogue audio and the timing for each line. Prototyping lives in a separate project and reads files from here without changing them.
+This folder is the single source for Neelo's character rigs (Nova, Skyrian the world 1 wizard, Obselda the world 2 explorer and Tydras of world 3): the artwork, the lip-sync rig, the dialogue audio and the timing for each line. Prototyping lives in a separate project and reads files from here without changing them.
 
 ## Folder layout
 
@@ -24,6 +24,8 @@ art/
     parts/                      His part files for the Flutter component: base/ and outfits/wizard/.
     rig.json                    Canvas, pivots, eyes, head layers and setting changes, for the Flutter packaging.
   obselda/                      Obselda, the explorer: Obselda.svg (Figma export, never edited), Obselda-rigged.svg, parts/, rig.json.
+  tydras/                       Tydras: Tydras.svg (arms down, Figma export, never edited), poses/ (right arm raised, and raised
+                                with the elbow bent out; never edited), Tydras-rigged.svg, parts/, rig.json.
 dialogue/
   events.json                   Every app event name and what the app should do. Lines may only use events listed here.
   <line_name>/
@@ -45,6 +47,8 @@ tools/
   face_rig.py                   The shared face rig (mouth shapes, eyelids) and the white outline, used for every character.
   build_rig.py                  Rebuilds art/Nova-rigged.svg and art/parts/ from Nova's exports, then every other character.
   build_character.py            Builds one character other than Nova into art/<name>/ (build_rig.py runs it for each).
+  raise_audio.py                Brings a new recording to the same loudness as the other lines (peaks at -1 dBFS).
+  sound_map.py                  Prints a line's letter order, sound segments and 10 ms loudness/brightness, for timing mouths by hand.
   build_preview.py              Builds preview/index.html with every line in dialogue/.
   build_emphasis.py             Finds each line's stressed moments for the brow lifts and head nods.
   build_captions.py             Times each sentence of a line's script for captions (needs faster-whisper; see the file).
@@ -139,6 +143,16 @@ Every character does everything Nova does: lip-sync, blinks, looking in 8 direct
 - She has no hat; the app skips hat files for her.
 - Framing: full body is -14 to 832. Close-up is 40 to 340, her face from the bun to the scarf, for checking lip-sync. Knees up and waist up aren't tuned yet.
 
+**Tydras** (`art/tydras/`, `tools/characters/tydras.json`) is the character of world 3. One look ("sea"), on a 606 × 732 canvas (her tentacles spread wide), standing at x = 302.2 with the hem of her dress on the bottom edge.
+
+- Parts, back to front: tentacles, under-dress, legs and shoe straps; then (moving with the breath) her big curly hair, arms, and the dress with its sash; then the head.
+- Her hair is drawn behind her body and arms but turns with her head (`headBehind`): the preview and the app draw it in its own layer with the head's movement.
+- Head: face, hair curls, headdress, ears, eyes, pupils, lids, locks, earrings, crown, brows and mouth. Her brows sit in front of her crown (in Figma they're behind), so they stay visible when they lift.
+- Arms: a forearm (with the hand), drawn behind the upper arm and its sleeve; the sleeve moves with the upper arm. Her arms hang down as drawn: that's her resting pose and her `[arms down]` (21.5° out from vertical). The shoulder and elbow come from Manaf's two pose drawings of her right arm (`art/tydras/poses/`): raised straight 60° from vertical, and raised with the elbow bent 60° out. They are the points her arm turns about between the drawings, (343.95, 320.01) and (388.06, 430.72); the left arm is the mirror image. `[right arm up 60]` and `[right arm up 60] [right elbow out 60]` match the two drawings exactly.
+- Mouth: Nova's shapes scaled 0.425 onto her drawn mouth, in her drawn mouth's near-black (`mouthColor`; Obselda's talking shapes also use her drawn mouth's deep red-brown now).
+- Eyes: lids in her two face colours (radius 26). Pupil reach 9.25 across, 7.6 up and down.
+- Framing: full body is -14 to 750 (640 wide); close-up 10 to 330. Knees up and waist up aren't tuned yet.
+
 ## Adding a character
 
 1. Export the assembled character from Figma as one SVG, sized relative to Nova, and save it as `art/<name>/<Name>.svg`. Never edit it. Ticking "Include 'id' attribute" makes the layers easier to read, but isn't required.
@@ -152,14 +166,14 @@ Nova's output must not change when a character is added: compare `art/Nova-rigge
 ## Adding a new dialogue line
 
 1. Make a folder `dialogue/<line_name>/` and add the audio as `<line_name>.mp3`, plus `script.txt` with the exact words.
-2. Convert the audio to WAV: `afconvert -f WAVE -d LEI16@16000 -c 1 <line_name>.mp3 <line_name>.wav` (or `ffmpeg -i <line_name>.mp3 -ar 16000 -ac 1 <line_name>.wav`)
+2. Bring the recording to the other lines' loudness, then make a 16 kHz WAV for timing: `afconvert -f WAVE -d LEI16 source.mp3 source.wav`, `~/whisper-venv/bin/python tools/raise_audio.py source.wav dialogue/<line_name>/<line_name>.mp3`, then `afconvert -f WAVE -d LEI16@16000 -c 1 dialogue/<line_name>/<line_name>.mp3 <line_name>.wav`.
 3. Run Rhubarb Lip Sync (free, from github.com/DanielSWolf/rhubarb-lip-sync/releases; use the macOS build on a Mac):
    `rhubarb -f json --extendedShapes GHX --dialogFile script.txt -o cues-rhubarb-raw.json <line_name>.wav`
 4. Copy `cues-rhubarb-raw.json` to `cues.json`.
 5. Write `script.txt` (see Script format). Add any new event names to `dialogue/events.json`, then time the captions and cues: `~/whisper-venv/bin/python tools/build_captions.py <line_name>`.
 6. Find the stressed words: `python3 tools/build_emphasis.py <line_name>`, and add a `"title"` to `cues.json`: the line's name in the Audio files panel.
 7. If someone other than Nova speaks the line, add `"character": "<name>"` (for example `"skyrian"`) to `cues.json`. Build the preview: `python3 tools/build_preview.py` and open `preview/index.html`. The new line is in its speaker's Audio files panel: the panel and the Script drawer only show the lines of the character on stage, and switching characters loads his first line.
-8. Review at half speed. Fix any mouth holds that look wrong by editing `cues.json` (each cue is `{"start", "end", "value"}` in seconds), then rebuild the preview.
+8. Time the mouth by hand: Rhubarb's raw timing is too loose for the final lines. `~/whisper-venv/bin/python tools/sound_map.py <line_name>.wav dialogue/<line_name>/script.txt` prints the order of sounds and the 10 ms loudness and brightness to place each shape against (see the file for the rules). Write the shapes into `cues.json` (each cue is `{"start", "end", "value"}` in seconds), rebuild the preview and review at half speed.
 
 Giving Rhubarb the script text (step 3) usually improves accuracy a lot. The first line was timed from audio alone because no script was available.
 
@@ -196,6 +210,8 @@ A line's `script.txt` is plain text:
 **ftux_w1** "FTUX: world 1" (9.7 s, 82 cues). Spoken by **Skyrian**, the world 1 wizard (`"character": "skyrian"` in cues.json). Final recording, with Manaf's script; no tags yet. Raised 10.1 dB to match ftux_home (peaks at -1 dBFS). Mouth track hand-timed the same way (closures on "I'm", "welcome", "Tap"; G on "for", "discover", "flag"; X in every pause; nothing under 40 ms). "Welcome to Aetheris, where we look out for one another." is exactly 55 characters, so it stays one caption. The preview plays it on Skyrian.
 
 **ftux_w2** "FTUX: world 2" (10.8 s, 76 cues). Spoken by **Obselda** (`"character": "obselda"`). Final recording, with Manaf's script; no tags yet. Raised 3.9 dB to match ftux_home (peaks at -1 dBFS). Mouth track hand-timed the same way (closures on "I'm", the B in "Obselda", "welcome", the P in "Cragspire" and "explore", "Tap"; G on "flag"; X in every pause; nothing under 40 ms). "Welcome to Cragspire and our steady, rocky ground." is 50 characters, so it stays one caption.
+
+**ftux_w3** "FTUX: world 3" (10.9 s, 82 cues). Spoken by **Tydras** (`"character": "tydras"`). Final recording, with Manaf's script; no tags yet. Already at the other lines' level (raised 0.3 dB). Mouth track hand-timed the same way (closures on "I'm", "welcome", the M in "Omiri", "Tap", the B in "begin"; G on "find", "flag"; X in every pause; nothing under 40 ms). "Welcome to Omiri, where the waters are always ready to listen." is 62 characters, so it splits at the comma.
 
 The two earlier sample lines (onboarding_nova_dialogue1, voice_line_1) and their sample events (show_logo, show_path) were removed on 2026-10-13, when the final FTUX audio arrived. They're in git history.
 

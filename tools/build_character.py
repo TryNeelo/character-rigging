@@ -14,7 +14,7 @@ Usage: python3 tools/build_character.py tools/characters/<name>.json   (build_ri
 """
 import json, os, re, shutil, sys
 import math
-from face_rig import (ROOT, arm_from_placements, arm_from_poses, arm_joints, straight_like, compose, inverse, placement, turn, clips_used, lid, lid_parts, mouth_group, mouth_shapes, part_writer, path_box,
+from face_rig import (ROOT, arm_from_three, mirrored, arm_from_placements, arm_from_poses, arm_joints, straight_like, compose, inverse, placement, turn, clips_used, lid, lid_parts, mouth_group, mouth_shapes, part_writer, path_box,
                       rect_centre, round_rect_centre, capsule_top, shapes_of, whiten, LID_R)
 
 NOVA_SMILE = json.load(open(os.path.join(ROOT, 'tools', 'characters', 'nova.json')))
@@ -63,7 +63,7 @@ def build(config_path):
     # (the talking shapes can sit a little lower than the drawn mouth, so a mustache doesn't hide them)
     tx, ty = (sx0 + sx1) / 2 - s * (nx0 + nx1) / 2, (sy0 + sy1) / 2 - s * (ny0 + ny1) / 2 + F.get('mouthDropY', 0)
     place = f'translate({tx:.3f} {ty:.3f}) scale({s:.4f})'
-    shapes, clips = mouth_shapes('', F.get('lipColor', '#C8985A'))
+    shapes, clips = mouth_shapes('', F.get('lipColor', '#C8985A'), F.get('mouthColor', '#3D200A'))
     def thicken(b):
         # Thin lines (rest and closed mouths) get at least minStroke canvas units once scaled
         lo = F.get('minStroke', 0) / s
@@ -79,6 +79,16 @@ def build(config_path):
         o['body_svg'] = pick(o['body'])
         o['hat_svg'] = pick(o.get('hat', []))
         o['hat_back_svg'] = pick(o.get('hat_back', []))
+        if 'armPoses' in o:
+            # One arm drawn three ways (resting, raised straight, raised with the elbow bent): its shoulder and
+            # elbow are the points the art turns about between the drawings. The other arm is its mirror image.
+            P = o['armPoses']; ps = P['side']; pa = o[f'arm_{ps}']
+            load = lambda f: shapes_of(os.path.join(ROOT, 'art', f), C['shapeCount'])
+            fit = arm_from_three(els, load(P['raised']), load(P['bent']), R(pa['shapes']), R(pa['forearm']), ps)
+            assert abs(fit['raised'] - P['raisedDegrees']) < 0.1 and abs(fit['bent'] + P['bentOutDegrees']) < 0.1, fit
+            axis = (placement(els[o['arm_left']['capsule']])[4] + placement(els[o['arm_right']['capsule']])[4]) / 2
+            arm_fits = {ps: fit, ('left' if ps == 'right' else 'right'): dict(fit, pivot=mirrored(fit['pivot'], axis),
+                                                                                elbow=mirrored(fit['elbow'], axis))}
         for side in ('left', 'right'):
             a = o[f'arm_{side}']
             fore = set(R(a.get('forearm', [])))
@@ -92,6 +102,10 @@ def build(config_path):
                  o[f'down_{side}']) = arm_from_poses(els[a['capsule']], els[a['forearmCapsule']],
                                                      down[a['capsule']], down[a['forearmCapsule']], side)
                 o[f'rest_{side}'] = (shoulder, bend)
+            elif fore and 'armPoses' in o:
+                f = arm_fits[side]
+                o[f'pivot_{side}'], o[f'elbow_{side}'], o[f'rest_{side}'] = f['pivot'], f['elbow'], f['rest']
+                o[f'down_{side}'] = f['rest'][0]   # the drawn arms hang down: [arms down] is the resting pose
             elif fore and 'armsLike' in o:
                 # Arms drawn like another character's (the same capsules, scaled): his straight pose carries over
                 like = json.load(open(os.path.join(ROOT, 'tools', 'characters', o['armsLike'] + '.json')))
@@ -134,7 +148,10 @@ def build(config_path):
             for ol in ('', '_ol'):
                 if o[f'forearm_{side}_svg']:
                     e = o[f'elbow_{side}']
-                    o[f'arm_{side}{ol}_rig'] = o[f'arm_{side}{ol}_svg'] + f'<g class="forearm" data-pivot="{e[0]:g} {e[1]:g}">{o[f"forearm_{side}{ol}_svg"]}</g>'
+                    fore_g = f'<g class="forearm" data-pivot="{e[0]:g} {e[1]:g}">{o[f"forearm_{side}{ol}_svg"]}</g>'
+                    # (a forearm can sit behind the upper arm and its sleeve, as drawn)
+                    o[f'arm_{side}{ol}_rig'] = (fore_g + o[f'arm_{side}{ol}_svg'] if o[f'arm_{side}'].get('forearmBehind')
+                                                else o[f'arm_{side}{ol}_svg'] + fore_g)
                 else:
                     o[f'arm_{side}{ol}_rig'] = o[f'arm_{side}{ol}_svg']
     default = C['defaultOutfit']
@@ -153,6 +170,9 @@ def build(config_path):
     head = (f'<g id="head" class="part" data-pivot="{hp[0]:g} {hp[1]:g}">'
             + ''.join(rig_layers[l[0]] if len(l) == 1 else pick(l[1]) for l in C['head']) + '</g>')
     head_ol = whiten(pick(C['headOutline']))
+    # Head parts drawn behind the body and arms (like hair hanging down the back) still turn with the head
+    head_behind = ''.join(pick(l[1]) for l in C.get('headBehind', []))
+    head_behind_g = (f'<g id="head-behind" class="part" data-pivot="{hp[0]:g} {hp[1]:g}">{head_behind}</g>\n' if head_behind else '')
     d = outfits[default]
     # data-rest: the arm's resting pose as drawn (shoulder out from straight down, elbow bend), when it has an elbow
     rest_attr = lambda side: ((f' data-rest="{d["rest_" + side][0]:g} {d["rest_" + side][1]:g}"' if ('rest_' + side) in d else '')
@@ -171,7 +191,7 @@ def build(config_path):
            f'<defs>{eye_clip}{lid_clips}{"".join(clips)}</defs>\n'
            '<g id="character">\n'
            f'{outline}\n<g id="legs">{per_outfit("legs_svg")}</g>\n<g id="upper">\n'
-           f'<g id="body-back">{per_outfit("body_back_svg")}</g>\n{arms}\n<g id="body">{per_outfit("body_svg")}</g>\n{head}\n</g>\n'
+           f'{head_behind_g}<g id="body-back">{per_outfit("body_back_svg")}</g>\n{arms}\n<g id="body">{per_outfit("body_svg")}</g>\n{head}\n</g>\n'
            '</g>\n</svg>\n')
     out_dir = os.path.join(ROOT, 'art', name)
     out = os.path.join(out_dir, f'{C["label"]}-rigged.svg')
@@ -187,7 +207,7 @@ def build(config_path):
                 part(f'outfits/{oname}/{kk}', o[f'{kk}_svg'])
                 part(f'outfits/{oname}/{kk}_outline', o[f'{kk}_ol_svg'])
     part('base/head_outline', head_ol)
-    for l in C['head']:
+    for l in C['head'] + C.get('headBehind', []):
         if len(l) == 2: part(f'base/{l[0]}', pick(l[1]))
     for side in ('left', 'right'):
         part(f'base/pupil_{side}', els[F['pupils'][side]])
@@ -203,7 +223,8 @@ def build(config_path):
         'canvas': {'width': W, 'height': H},
         'anchor': {'x': ax, 'y': ay},
         'pivots': {'head': hp},
-        'outfits': {oname: {'label': o['label'], 'hat': bool(o['hat_svg']), 'hatBack': bool(o['hat_back_svg']), 'bodyBack': bool(o['body_back_svg']),
+        'outfits': {oname: {'label': o['label'], 'hat': bool(o['hat_svg']),
+                            **({'forearmBehind': True} if o['arm_left'].get('forearmBehind') else {}), 'hatBack': bool(o['hat_back_svg']), 'bodyBack': bool(o['body_back_svg']),
                             'pivots': {'armLeft': list(o['pivot_left']), 'armRight': list(o['pivot_right']),
                                        **({'elbowLeft': list(o['elbow_left']), 'elbowRight': list(o['elbow_right'])} if 'elbow_left' in o else {})},
                             # Resting pose of each arm as drawn: (shoulder out from straight down, elbow bend), in degrees
@@ -217,6 +238,8 @@ def build(config_path):
         'browPivots': {side: list(p) for side, p in brow_pivot.items()},
         # The head's layers, back to front: part files in base/, or the face rig (pupils, lids, brows, mouth, hat)
         'headLayers': [l[0] for l in C['head']],
+        # Head parts drawn behind the body and arms, turning with the head (part files in base/)
+        **({'headBehindLayers': [l[0] for l in C['headBehind']]} if C.get('headBehind') else {}),
         'settings': C.get('settings', {}),
     }
     json.dump(rig, open(os.path.join(out_dir, 'rig.json'), 'w'), indent=1)

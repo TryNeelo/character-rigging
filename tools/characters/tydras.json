@@ -1,0 +1,72 @@
+{
+  "_about": "Tydras's rig settings, read by tools/build_character.py. Parts are listed by position in the flat Figma export art/tydras/Tydras.svg (0-based, [from, to) ranges). The export has no layer names; shapeCount stops the build if it changes.",
+  "label": "Tydras",
+  "source": "tydras/Tydras.svg",
+  "shapeCount": 72,
+  "canvas": [606, 732],
+  "_anchor": "Where she stands: the centre line of her face and dress, and the hem of her dress.",
+  "anchor": [302.2, 732],
+  "_headPivot": "Under the chin: the head nods and sways about this point, and her hair, crown and earrings move with it.",
+  "headPivot": [302.2, 262],
+  "outfits": {
+    "sea": {
+      "label": "Sea",
+      "_legs": "Tentacles, under-dress, legs and shoe straps.",
+      "legs": [[0, 16], [65, 66], [67, 68]],
+      "_arms": "By screen side. Each arm: the forearm (with the hand, drawn behind), then the upper arm and its sleeve, which move together. The magenta pivot dots (47, 60) aren't drawn. As drawn, her arms hang down: that is her resting pose and her [arms down].",
+      "arm_left": {"shapes": [[48, 52]], "capsule": 48, "forearm": [[46, 47]], "forearmBehind": true},
+      "arm_right": {"shapes": [[61, 65]], "capsule": 61, "forearm": [[59, 60]], "forearmBehind": true},
+      "_armPoses": "Her right arm drawn raised straight (60 degrees from vertical) and raised with the elbow bent out 60 degrees (Figma). The shoulder and elbow are the points her arm turns about between the drawings; the left arm is the mirror image.",
+      "armPoses": {"side": "right", "raised": "tydras/poses/right-arm-up.svg", "bent": "tydras/poses/right-arm-wave.svg",
+                   "raisedDegrees": 60, "bentOutDegrees": 60},
+      "_body": "Neck, skirt, bodice, sash.",
+      "body": [[20, 21], [52, 54], [66, 67], [68, 70]]
+    }
+  },
+  "defaultOutfit": "sea",
+  "_headBehind": "Her big curly hair: drawn behind her body and arms, it turns with her head.",
+  "headBehind": [["hair_back", [[16, 20]]]],
+  "_head": "The head's layers, back to front. Named layers are part files; pupils, lids, brows and mouth are the shared face rig. Her brows sit in front of her crown (in Figma they're behind), so they stay visible when they lift.",
+  "head": [
+    ["face", [[21, 23]]],
+    ["hair_front", [[23, 28]]],
+    ["headdress", [[28, 30]]],
+    ["ears", [[30, 34]]],
+    ["eyes", [[36, 38], [39, 41]]],
+    ["pupils"],
+    ["lids"],
+    ["locks", [[42, 44]]],
+    ["earrings", [[44, 46]]],
+    ["crown", [[54, 59]]],
+    ["brows"],
+    ["mouth"]
+  ],
+  "_headOutline": "Hair, face, headdress, ears, earrings and crown get the white outline.",
+  "headOutline": [[16, 20], [21, 23], [23, 28], [28, 30], [30, 34], [44, 46], [54, 59]],
+  "face": {
+    "_smile": "Her drawn mouth (the Mouth frame). It is her idle smile, and the shared mouth shapes are scaled and centred onto it.",
+    "smile": [[70, 72]],
+    "whites": {"left": 37, "right": 40},
+    "pupils": {"left": 38, "right": 41},
+    "brows": {"left": 35, "right": 34},
+    "_lidColors": "Skin around each eye: her face is lighter on the screen-left half and darker on the right.",
+    "lidColors": {"left": "#A95BA6", "right": "#975394"},
+    "_mouthColor": "Inside of the talking mouths: the colour of her drawn mouth (near black).",
+    "mouthColor": "#1C1E1E",
+    "_lipColor": "Ring around the round mouth (F): it matches her face.",
+    "lipColor": "#A95BA6",
+    "_minStroke": "Thinnest line for the rest and closed mouths (X, A) at her size, in canvas units.",
+    "minStroke": 2.5,
+    "mouthDropY": 0
+  },
+  "_settings": "Changes to tools/rig_settings.json for her only. Pupil reach is scaled to her eyes. Full body and close-up are set (the close-up frames her face and crown, for checking lip-sync); knees and waist aren't tuned yet.",
+  "settings": {
+    "look": {"pupilReach": 9.25, "pupilReachY": 7.6},
+    "framing": {
+      "full": {"label": "Full body", "top": -14, "bottom": 750, "width": 640},
+      "knees": {"label": "Knees up", "top": -14, "bottom": 650, "width": 400},
+      "waist": {"label": "Waist up", "top": -14, "bottom": 500, "width": 400},
+      "close": {"label": "Close-up", "top": 10, "bottom": 330, "width": 320}
+    }
+  }
+}

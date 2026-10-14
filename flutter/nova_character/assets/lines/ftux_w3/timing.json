@@ -1,0 +1,496 @@
+{
+ "id": "ftux_w3",
+ "character": "tydras",
+ "audio": "audio.mp3",
+ "duration": 10.94,
+ "cues": [
+  {
+   "start": 0.0,
+   "end": 0.1,
+   "shape": "X"
+  },
+  {
+   "start": 0.1,
+   "end": 0.2,
+   "shape": "C"
+  },
+  {
+   "start": 0.2,
+   "end": 0.45,
+   "shape": "D"
+  },
+  {
+   "start": 0.45,
+   "end": 0.64,
+   "shape": "C"
+  },
+  {
+   "start": 0.64,
+   "end": 0.91,
+   "shape": "X"
+  },
+  {
+   "start": 0.91,
+   "end": 1.03,
+   "shape": "D"
+  },
+  {
+   "start": 1.03,
+   "end": 1.12,
+   "shape": "A"
+  },
+  {
+   "start": 1.12,
+   "end": 1.21,
+   "shape": "B"
+  },
+  {
+   "start": 1.21,
+   "end": 1.38,
+   "shape": "D"
+  },
+  {
+   "start": 1.38,
+   "end": 1.45,
+   "shape": "B"
+  },
+  {
+   "start": 1.45,
+   "end": 1.55,
+   "shape": "E"
+  },
+  {
+   "start": 1.55,
+   "end": 1.64,
+   "shape": "C"
+  },
+  {
+   "start": 1.64,
+   "end": 1.87,
+   "shape": "B"
+  },
+  {
+   "start": 1.87,
+   "end": 2.42,
+   "shape": "X"
+  },
+  {
+   "start": 2.42,
+   "end": 2.53,
+   "shape": "F"
+  },
+  {
+   "start": 2.53,
+   "end": 2.63,
+   "shape": "C"
+  },
+  {
+   "start": 2.63,
+   "end": 2.68,
+   "shape": "H"
+  },
+  {
+   "start": 2.68,
+   "end": 2.76,
+   "shape": "B"
+  },
+  {
+   "start": 2.76,
+   "end": 2.81,
+   "shape": "C"
+  },
+  {
+   "start": 2.81,
+   "end": 2.91,
+   "shape": "A"
+  },
+  {
+   "start": 2.91,
+   "end": 2.99,
+   "shape": "B"
+  },
+  {
+   "start": 2.99,
+   "end": 3.07,
+   "shape": "F"
+  },
+  {
+   "start": 3.07,
+   "end": 3.27,
+   "shape": "E"
+  },
+  {
+   "start": 3.27,
+   "end": 3.37,
+   "shape": "A"
+  },
+  {
+   "start": 3.37,
+   "end": 3.47,
+   "shape": "B"
+  },
+  {
+   "start": 3.47,
+   "end": 3.56,
+   "shape": "E"
+  },
+  {
+   "start": 3.56,
+   "end": 3.72,
+   "shape": "B"
+  },
+  {
+   "start": 3.72,
+   "end": 3.94,
+   "shape": "X"
+  },
+  {
+   "start": 3.94,
+   "end": 4.01,
+   "shape": "F"
+  },
+  {
+   "start": 4.01,
+   "end": 4.1,
+   "shape": "C"
+  },
+  {
+   "start": 4.1,
+   "end": 4.15,
+   "shape": "B"
+  },
+  {
+   "start": 4.15,
+   "end": 4.21,
+   "shape": "C"
+  },
+  {
+   "start": 4.21,
+   "end": 4.3,
+   "shape": "F"
+  },
+  {
+   "start": 4.3,
+   "end": 4.47,
+   "shape": "D"
+  },
+  {
+   "start": 4.47,
+   "end": 4.51,
+   "shape": "B"
+  },
+  {
+   "start": 4.51,
+   "end": 4.64,
+   "shape": "E"
+  },
+  {
+   "start": 4.64,
+   "end": 4.71,
+   "shape": "B"
+  },
+  {
+   "start": 4.71,
+   "end": 4.8,
+   "shape": "D"
+  },
+  {
+   "start": 4.8,
+   "end": 4.86,
+   "shape": "E"
+  },
+  {
+   "start": 4.86,
+   "end": 5.04,
+   "shape": "X"
+  },
+  {
+   "start": 5.04,
+   "end": 5.22,
+   "shape": "D"
+  },
+  {
+   "start": 5.22,
+   "end": 5.29,
+   "shape": "H"
+  },
+  {
+   "start": 5.29,
+   "end": 5.34,
+   "shape": "F"
+  },
+  {
+   "start": 5.34,
+   "end": 5.49,
+   "shape": "C"
+  },
+  {
+   "start": 5.49,
+   "end": 5.57,
+   "shape": "B"
+  },
+  {
+   "start": 5.57,
+   "end": 5.63,
+   "shape": "E"
+  },
+  {
+   "start": 5.63,
+   "end": 5.73,
+   "shape": "C"
+  },
+  {
+   "start": 5.73,
+   "end": 5.96,
+   "shape": "B"
+  },
+  {
+   "start": 5.96,
+   "end": 6.05,
+   "shape": "F"
+  },
+  {
+   "start": 6.05,
+   "end": 6.14,
+   "shape": "H"
+  },
+  {
+   "start": 6.14,
+   "end": 6.3,
+   "shape": "B"
+  },
+  {
+   "start": 6.3,
+   "end": 6.36,
+   "shape": "C"
+  },
+  {
+   "start": 6.36,
+   "end": 6.45,
+   "shape": "B"
+  },
+  {
+   "start": 6.45,
+   "end": 7.16,
+   "shape": "X"
+  },
+  {
+   "start": 7.16,
+   "end": 7.24,
+   "shape": "H"
+  },
+  {
+   "start": 7.24,
+   "end": 7.31,
+   "shape": "C"
+  },
+  {
+   "start": 7.31,
+   "end": 7.6,
+   "shape": "B"
+  },
+  {
+   "start": 7.6,
+   "end": 7.68,
+   "shape": "F"
+  },
+  {
+   "start": 7.68,
+   "end": 7.73,
+   "shape": "C"
+  },
+  {
+   "start": 7.73,
+   "end": 7.78,
+   "shape": "B"
+  },
+  {
+   "start": 7.78,
+   "end": 7.83,
+   "shape": "F"
+  },
+  {
+   "start": 7.83,
+   "end": 7.94,
+   "shape": "B"
+  },
+  {
+   "start": 7.94,
+   "end": 8.0,
+   "shape": "C"
+  },
+  {
+   "start": 8.0,
+   "end": 8.07,
+   "shape": "B"
+  },
+  {
+   "start": 8.07,
+   "end": 8.14,
+   "shape": "G"
+  },
+  {
+   "start": 8.14,
+   "end": 8.32,
+   "shape": "D"
+  },
+  {
+   "start": 8.32,
+   "end": 8.52,
+   "shape": "B"
+  },
+  {
+   "start": 8.52,
+   "end": 9.21,
+   "shape": "X"
+  },
+  {
+   "start": 9.21,
+   "end": 9.28,
+   "shape": "B"
+  },
+  {
+   "start": 9.28,
+   "end": 9.39,
+   "shape": "C"
+  },
+  {
+   "start": 9.39,
+   "end": 9.47,
+   "shape": "A"
+  },
+  {
+   "start": 9.47,
+   "end": 9.54,
+   "shape": "C"
+  },
+  {
+   "start": 9.54,
+   "end": 9.69,
+   "shape": "G"
+  },
+  {
+   "start": 9.69,
+   "end": 9.74,
+   "shape": "H"
+  },
+  {
+   "start": 9.74,
+   "end": 9.94,
+   "shape": "C"
+  },
+  {
+   "start": 9.94,
+   "end": 10.12,
+   "shape": "B"
+  },
+  {
+   "start": 10.12,
+   "end": 10.18,
+   "shape": "F"
+  },
+  {
+   "start": 10.18,
+   "end": 10.22,
+   "shape": "A"
+  },
+  {
+   "start": 10.22,
+   "end": 10.37,
+   "shape": "B"
+  },
+  {
+   "start": 10.37,
+   "end": 10.5,
+   "shape": "C"
+  },
+  {
+   "start": 10.5,
+   "end": 10.62,
+   "shape": "B"
+  },
+  {
+   "start": 10.62,
+   "end": 10.94,
+   "shape": "X"
+  }
+ ],
+ "markers": [],
+ "emphasis": [
+  {
+   "time": 0.23,
+   "strength": 0.68
+  },
+  {
+   "time": 1.25,
+   "strength": 0.91
+  },
+  {
+   "time": 2.56,
+   "strength": 0.94
+  },
+  {
+   "time": 3.11,
+   "strength": 0.84
+  },
+  {
+   "time": 4.37,
+   "strength": 0.91
+  },
+  {
+   "time": 5.09,
+   "strength": 1
+  },
+  {
+   "time": 5.66,
+   "strength": 0.45
+  },
+  {
+   "time": 7.29,
+   "strength": 0.59
+  },
+  {
+   "time": 8.01,
+   "strength": 0.84
+  },
+  {
+   "time": 9.32,
+   "strength": 0.77
+  },
+  {
+   "time": 9.72,
+   "strength": 0.6
+  },
+  {
+   "time": 10.4,
+   "strength": 0.55
+  }
+ ],
+ "captions": [
+  {
+   "start": 0.0,
+   "end": 2.1,
+   "text": "Hi! I'm Tydras."
+  },
+  {
+   "start": 2.34,
+   "end": 3.68,
+   "text": "Welcome to Omiri,"
+  },
+  {
+   "start": 3.8,
+   "end": 6.78,
+   "text": "where the waters are always ready to listen."
+  },
+  {
+   "start": 7.08,
+   "end": 8.9,
+   "text": "Let\u2019s see what we can find!"
+  },
+  {
+   "start": 9.06,
+   "end": 10.9,
+   "text": "Tap a flag to begin."
+  }
+ ]
+}

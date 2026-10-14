@@ -356,9 +356,10 @@ class _NovaCharacterState extends State<NovaCharacter> {
     Widget wear(String name) => part('outfits/$outfitId/$name');
 
     final ol = outline ? '_outline' : '';
+    final headMove = Matrix4.translationValues(rig.look('headPx') * _lookX * s, (dip + rig.look('headPxY') * _lookY) * s, 0)
+      ..multiply(rotateAbout(rig.headPivot, sway + talkTilt + rig.look('headDegrees') * _lookX));
     final head = Transform(
-      transform: Matrix4.translationValues(rig.look('headPx') * _lookX * s, (dip + rig.look('headPxY') * _lookY) * s, 0)
-        ..multiply(rotateAbout(rig.headPivot, sway + talkTilt + rig.look('headDegrees') * _lookX)),
+      transform: headMove,
       child: Stack(children: outline
           ? [
               if (outfit.hatBack) wear('hat_back_outline'),
@@ -415,6 +416,9 @@ class _NovaCharacterState extends State<NovaCharacter> {
         Transform.translate(
           offset: Offset(0, upperY * s),
           child: Stack(children: [
+            // Head parts behind the body and arms (Tydras's hair) turn with the head
+            if (!outline && rig.headBehindLayers.isNotEmpty)
+              Transform(transform: headMove, child: Stack(children: [for (final l in rig.headBehindLayers) base(l)])),
             // A body piece behind the arms, like a cape
             if (outfit.bodyBack) wear('body_back$ol'),
             // Positive raises lift each arm outward, away from the body. Elbows bend inward.
@@ -422,18 +426,21 @@ class _NovaCharacterState extends State<NovaCharacter> {
                 transform: rotateAbout(outfit.armLeftPivot, _raiseLeft + swing),
                 child: outfit.hasElbows
                     ? Stack(children: [
-                        wear('arm_left$ol'),
+                        if (!outfit.forearmBehind) wear('arm_left$ol'),
                         Transform(
                             transform: rotateAbout(outfit.elbowLeftPivot!, -_bendLeft), child: wear('forearm_left$ol')),
+                        // (a forearm can sit behind the upper arm and its sleeve, as drawn)
+                        if (outfit.forearmBehind) wear('arm_left$ol'),
                       ])
                     : wear('arm_left$ol')),
             Transform(
                 transform: rotateAbout(outfit.armRightPivot, -_raiseRight - swing),
                 child: outfit.hasElbows
                     ? Stack(children: [
-                        wear('arm_right$ol'),
+                        if (!outfit.forearmBehind) wear('arm_right$ol'),
                         Transform(
                             transform: rotateAbout(outfit.elbowRightPivot!, _bendRight), child: wear('forearm_right$ol')),
+                        if (outfit.forearmBehind) wear('arm_right$ol'),
                       ])
                     : wear('arm_right$ol')),
             wear('body$ol'),

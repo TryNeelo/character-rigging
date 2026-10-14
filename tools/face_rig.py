@@ -55,16 +55,17 @@ def lid_parts(eyes, state, half_y):
             out += f'<g clip-path="url(#clip-eye-{side})">' + closed_g.replace(' style="display:none"', '') + '</g>'
     return out
 
-def mouth_shapes(smile, lip='#C8985A'):
+def mouth_shapes(smile, lip='#C8985A', dark=D):
     """The mouth shapes, Rhubarb Lip Sync naming (A-H, X) plus the idle smile, in Nova's
-    original coordinates. Returns ([(letter, svg)], clip paths). No teeth in this version."""
+    original coordinates. Returns ([(letter, svg)], clip paths). No teeth in this version.
+    dark: the inside of the mouth (Nova's dark brown unless a character's drawn mouth is another colour)."""
     clips = []
     def dshape(x0, x1, top, bot):
         w = x1 - x0
         return f'M{x0} {top} H{x1} C{x1} {top+(bot-top)*0.62:.1f} {CX+w*0.27:.1f} {bot} {CX} {bot} C{CX-w*0.27:.1f} {bot} {x0} {top+(bot-top)*0.62:.1f} {x0} {top}Z'
     def clipped(cid, d, inner):
         clips.append(f'<clipPath id="{cid}"><path d="{d}"/></clipPath>')
-        return f'<path d="{d}" fill="{D}"/><g clip-path="url(#{cid})">{inner}</g>'
+        return f'<path d="{d}" fill="{dark}"/><g clip-path="url(#{cid})">{inner}</g>'
     dB = dshape(204.5, 244.9, 508, 519.5)
     dC = dshape(200.2, 249.2, 508, 528)
     dD = dshape(196.8, 252.6, 507.8, 541)
@@ -72,14 +73,14 @@ def mouth_shapes(smile, lip='#C8985A'):
     dG = dshape(205.5, 243.9, 508, 517)
     dH = dshape(200.2, 249.2, 508, 528)
     shapes = [
-     ('X', f'<path d="M204 510.5 Q{CX} 523 245.4 510.5" stroke="{D}" stroke-width="4.2" fill="none" stroke-linecap="round"/>'),
-     ('A', f'<path d="M206 513 Q{CX} 518.5 243.4 513" stroke="{D}" stroke-width="5.6" fill="none" stroke-linecap="round"/>'),
-     ('B', f'<path d="{dB}" fill="{D}"/>'),
+     ('X', f'<path d="M204 510.5 Q{CX} 523 245.4 510.5" stroke="{dark}" stroke-width="4.2" fill="none" stroke-linecap="round"/>'),
+     ('A', f'<path d="M206 513 Q{CX} 518.5 243.4 513" stroke="{dark}" stroke-width="5.6" fill="none" stroke-linecap="round"/>'),
+     ('B', f'<path d="{dB}" fill="{dark}"/>'),
      ('C', clipped('mc-C', dC, f'<ellipse cx="{CX}" cy="530" rx="17" ry="8.5" fill="{T}"/>')),
      ('D', clipped('mc-D', dD, f'<ellipse cx="{CX}" cy="543" rx="20" ry="10.5" fill="{T}"/>')),
      ('E', clipped('mc-E', dE, f'<ellipse cx="{CX}" cy="533" rx="13" ry="7.5" fill="{T}"/>')),
-     ('F', f'<ellipse cx="{CX}" cy="516" rx="10.5" ry="11" fill="{D}" stroke="{lip}" stroke-width="3"/>'),
-     ('G', f'<path d="{dG}" fill="{D}"/>'),
+     ('F', f'<ellipse cx="{CX}" cy="516" rx="10.5" ry="11" fill="{dark}" stroke="{lip}" stroke-width="3"/>'),
+     ('G', f'<path d="{dG}" fill="{dark}"/>'),
      ('H', clipped('mc-H', dH, f'<ellipse cx="{CX}" cy="515" rx="13" ry="5.5" fill="{T}"/>')),
      ('smile', smile),
     ]
@@ -239,6 +240,59 @@ def arm_from_placements(rest_upper, rest_fore, straight_upper, straight_fore, si
         return math.degrees(math.atan2(out * c, d))   # the capsule's long axis, from vertical
     r1 = lambda p: (round(p[0], 2), round(p[1], 2))
     return r1(shoulder), r1(elbow), round(angle(rest_upper), 2), round(-out * bent, 2), round(angle(straight_upper), 2)
+
+def points(tag):
+    """A shape's defining points in the drawing, after its transform: a path's points and control
+    points, or a rect's corners. Two drawings of the same shape give matching lists."""
+    if tag.startswith('<rect'):
+        w, h = num(tag, 'width'), num(tag, 'height')
+        a, b, c, d, e, f = placement(tag)
+        return [(a * x + c * y + e, b * x + d * y + f) for x, y in ((0, 0), (w, 0), (0, h), (w, h))]
+    n = [float(v) for v in re.findall(r'-?\d*\.?\d+(?:e-?\d+)?', re.search(r'd="([^"]*)"', tag).group(1))]
+    return list(zip(n[0::2], n[1::2]))
+
+def rigid_fit(before, after):
+    """The rotation and shift that best carry one list of points onto another (as an affine), and
+    the largest distance left over, which shows whether the shape really just moved."""
+    n = len(before)
+    ax, ay = sum(p[0] for p in before) / n, sum(p[1] for p in before) / n
+    bx, by = sum(p[0] for p in after) / n, sum(p[1] for p in after) / n
+    sxy = sum((p[0] - ax) * (q[1] - by) - (p[1] - ay) * (q[0] - bx) for p, q in zip(before, after))
+    sxx = sum((p[0] - ax) * (q[0] - bx) + (p[1] - ay) * (q[1] - by) for p, q in zip(before, after))
+    t = math.atan2(sxy, sxx); c, s_ = math.cos(t), math.sin(t)
+    m = (c, s_, -s_, c, bx - c * ax + s_ * ay, by - s_ * ax - c * ay)
+    err = max(math.dist((m[0] * x + m[2] * y + m[4], m[1] * x + m[3] * y + m[5]), q) for (x, y), q in zip(before, after))
+    return m, err
+
+def arm_from_three(rest, raised, bent, upper, forearm, side):
+    """Shoulder and elbow pivots for a two-piece arm from three drawings of it: resting, raised
+    straight, and raised with the elbow bent. The shoulder is the point the upper arm (and anything
+    on it, like a sleeve) turns about between resting and raised; the elbow is the point the
+    forearm turns about between raised and bent. Angles: shoulder out from vertical, elbow bend
+    inward from straight (straight is the raised drawing), and the bent drawing's elbow and shoulder."""
+    out = 1 if side == 'right' else -1
+    lift, err = rigid_fit([p for i in upper for p in points(rest[i])], [p for i in upper for p in points(raised[i])])
+    assert err < 0.1, ('upper arm and sleeve do not move together', err)
+    shoulder, _ = turn(lift)
+    fore = [p for i in forearm for p in points(rest[i])]
+    raised_f, e1 = rigid_fit(fore, [p for i in forearm for p in points(raised[i])])
+    bent_f, e2 = rigid_fit(fore, [p for i in forearm for p in points(bent[i])])
+    assert max(e1, e2) < 0.1, ('forearm changed shape', e1, e2)
+    elbow_raised, _ = turn(compose(bent_f, inverse(raised_f)))           # raised straight -> bent, in the drawing
+    elbow = tuple(compose(inverse(lift), (1, 0, 0, 1, *elbow_raised))[4:])  # carried back to the resting arm
+    straighten = compose(inverse(lift), raised_f)                           # resting forearm -> straight, arm at rest
+    _, rest_turn = turn(straighten)
+    _, bend_turn = turn(compose(bent_f, inverse(raised_f)))
+    def angle(m):
+        a, b, c, d, e, f = m
+        return math.degrees(math.atan2(out * c, d))
+    cap = placement(rest[upper[0]])
+    r1 = lambda p: (round(p[0], 2), round(p[1], 2))
+    return dict(pivot=r1(shoulder), elbow=r1(elbow), rest=(round(angle(cap), 2), round(-out * rest_turn, 2)),
+                raised=round(angle(compose(lift, cap)), 2), bent=round(out * bend_turn, 2))
+
+def mirrored(p, axis):
+    return (round(2 * axis - p[0], 2), p[1])
 
 def path_box(tag):
     """Bounding box of a path with absolute commands (from its points and control points,

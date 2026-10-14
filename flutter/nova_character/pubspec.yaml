@@ -32,10 +32,14 @@ flutter:
     - assets/characters/skyrian/
     - assets/characters/skyrian/parts/base/
     - assets/characters/skyrian/parts/outfits/wizard/
+    - assets/characters/tydras/
+    - assets/characters/tydras/parts/base/
+    - assets/characters/tydras/parts/outfits/sea/
     - assets/lines/ftux_home/
     - assets/lines/ftux_home_return/
     - assets/lines/ftux_room/
     - assets/lines/ftux_w1/
     - assets/lines/ftux_w2/
+    - assets/lines/ftux_w3/
     - assets/lines/ftux_world_select/
     # END GENERATED ASSETS

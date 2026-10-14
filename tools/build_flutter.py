@@ -65,6 +65,7 @@ for path in sorted(glob.glob(os.path.join(ROOT, 'tools', 'characters', '*.json')
             **{k: src[k] for k in ('canvas', 'anchor', 'pivots', 'outfits', 'defaultOutfit', 'eyes')},
             **merged(settings, src['settings'])}
     crig['brows'] = dict(crig['brows'], pivots=src['browPivots'])
+    if src.get('headBehindLayers'): crig['headBehindLayers'] = src['headBehindLayers']
     json.dump(crig, open(os.path.join(out, 'rig.json'), 'w'), indent=1)
     characters.append(name)
 

@@ -47,6 +47,8 @@
     "brows": {"left": 52, "right": 53},
     "_lidColors": "Skin around each eye: her face is lighter on the screen-left half and darker on the right.",
     "lidColors": {"left": "#A15D38", "right": "#955532"},
+    "_mouthColor": "Inside of the talking mouths: the colour of her drawn mouth (deep red-brown).",
+    "mouthColor": "#6B1E12",
     "_lipColor": "Ring around the round mouth (F): it matches her face.",
     "lipColor": "#A15D38",
     "_minStroke": "Thinnest line for the rest and closed mouths (X, A) at her size, in canvas units.",

@@ -35,7 +35,8 @@ class NovaOutfitSpec {
       this.armRestLeft,
       this.armRestRight,
       this.armDownLeft = 0,
-      this.armDownRight = 0});
+      this.armDownRight = 0,
+      this.forearmBehind = false});
   final String label;
 
   /// Whether there is a hat (hat.svg). Obselda has none.
@@ -59,6 +60,9 @@ class NovaOutfitSpec {
   final double armDownLeft, armDownRight;
 
   bool get hasElbows => elbowLeftPivot != null;
+
+  /// Whether the forearms are drawn behind the upper arms and sleeves (Tydras).
+  final bool forearmBehind;
   final Offset armLeftPivot, armRightPivot;
 }
 
@@ -70,6 +74,7 @@ class NovaRig {
       : label = _j['label'] as String? ?? 'Nova',
         partsDir = _j['partsDir'] as String? ?? 'parts',
         headLayers = [for (final l in (_j['headLayers'] as List?) ?? _novaHead) l as String],
+        headBehindLayers = [for (final l in (_j['headBehindLayers'] as List?) ?? const []) l as String],
         width = _num(_j['canvas']['width']),
         height = _num(_j['canvas']['height']),
         anchorX = _num(_j['anchor']['x']),
@@ -89,7 +94,8 @@ class NovaRig {
                 armRestLeft: _pair(e.value['armRest']?['left']),
                 armRestRight: _pair(e.value['armRest']?['right']),
                 armDownLeft: (e.value['armDown']?['left'] as num?)?.toDouble() ?? 0,
-                armDownRight: (e.value['armDown']?['right'] as num?)?.toDouble() ?? 0)
+                armDownRight: (e.value['armDown']?['right'] as num?)?.toDouble() ?? 0,
+                forearmBehind: e.value['forearmBehind'] as bool? ?? false)
         },
         eyeCenters = [for (final c in _j['eyes']['centers'] as List) _offset(c)],
         eyeRadius = _num(_j['eyes']['radius']),
@@ -111,6 +117,10 @@ class NovaRig {
   /// The head's layers, back to front: part files in base/, or the face rig's moving pieces
   /// ("pupils", "lids", "brows", "mouth", "hat", "hat_back").
   final List<String> headLayers;
+
+  /// Head parts drawn behind the body and arms that still turn with the head, like Tydras's hair
+  /// (part files in base/).
+  final List<String> headBehindLayers;
   static const _novaHead = ['hat_back', 'head_back', 'pupils', 'lids', 'ears', 'brows', 'muzzle', 'mouth', 'nose', 'hat'];
   final double width, height, anchorX, eyeRadius;
   final Offset headPivot;
