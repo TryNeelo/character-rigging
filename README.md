@@ -9,6 +9,8 @@ art/
   Nova-outfit_1.svg             Full-body Figma export, outfit 1 (Hoodie). Never edited. The two magenta dots mark the shoulder pivots.
   Nova-outfit_2.svg             Full-body Figma export, outfit 2 (Aviator). Never edited. Same head, pivot dots and canvas.
   Nova-outfit_3.svg             Full-body Figma export, outfit 3 (Construction). Never edited. Its hard hat has a back piece behind the head.
+  Nova-outfit_4.svg             Full-body Figma export, outfit 4 (Diver), drawn with the head at 90%. Never edited. Glass helmet, air hoses behind the arms.
+  Nova-outfit_4-right-arm-up.svg  The same diver with his right arm raised (76.3°). Never edited. Sets the diver's shoulder pivots.
   Nova-rigged.svg               Current rig, built from Nova-outfit_1.svg: grouped parts, hat, eyelids and mouth shapes.
   Character.svg                 First flat Figma export (waist up, with hat). Never edited. Source of the hat and smile.
   Character-rigged.svg          First rig, kept for the prototyping project. Built by an earlier build_rig.py (see git history).
@@ -75,6 +77,8 @@ tools/
 | `arm-left`, `arm-right` | Fur arm, sleeve and a round sleeve cap | Shoulder: (194.4, 432.8) and (359.7, 433.5) |
 | `pants`, `torso` | Shorts; hood, neck, shirt and jacket | Move with `upper` |
 | `head` | Ears, face, `pupils`, `brows`, eyelids, mouth and `hat` | Base of the neck, (278.7, 392) |
+
+**Diver outfit.** Outfit 4 (Manaf, 2026-10-14). Its air hoses sit behind the arms (`body_back`, like a cape). The suit's sleeve tops hide under the collar, so the arms get no round sleeve cap; the shoulders are the points the arm turns about between the diver drawing and the raised-arm drawing, (381.1, 439.3) on the right and its mirror (174.5, 439.3) on the left, so `[right arm up 76]` matches the raised-arm drawing (checked with an overlay in the preview). The glass dome and collar are part of the body, so the head turns inside the helmet; the glare on the glass is the outfit's "hat", drawn over the face. The glass is see-through, so its white outline is a ring around the outside only, and the glare and the head get no outline (it would show through the glass as a pale halo; `headOutline: false`, which the app reads from `rig.json`).
 
 **Head size.** Nova's head, with his hat, is drawn at 90% of the art's size (Manaf, 2026-10-14; `headScale` in `nova.json`). It shrinks toward the bottom centre of his face, (278.7, 386), where the head fur ends above the collar, so the join with the neck doesn't move. The size change is baked into his head and hat part files, and inside the head group in the preview; the face rig shrinks with it. The white outline around the head and hat is drawn wider before shrinking, so it stays as wide as the body's. For the app, the head numbers in `assets/rig.json` shrink to match: eye centres and size, pupil rest and reach, brow pivots and brow lifts. Set the scale back to 1 to return to the art's size.
 

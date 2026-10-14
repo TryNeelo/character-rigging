@@ -17,6 +17,7 @@
   "hoodie": {
    "label": "Hoodie",
    "hatBack": false,
+   "bodyBack": false,
    "pivots": {
     "armLeft": [
      194.4,
@@ -31,6 +32,7 @@
   "aviator": {
    "label": "Aviator",
    "hatBack": false,
+   "bodyBack": false,
    "pivots": {
     "armLeft": [
      194.2,
@@ -45,6 +47,7 @@
   "construction": {
    "label": "Construction",
    "hatBack": true,
+   "bodyBack": false,
    "pivots": {
     "armLeft": [
      194.2,
@@ -53,6 +56,22 @@
     "armRight": [
      357.4,
      434.4
+    ]
+   }
+  },
+  "diver": {
+   "label": "Diver",
+   "hatBack": false,
+   "bodyBack": true,
+   "headOutline": false,
+   "pivots": {
+    "armLeft": [
+     174.5,
+     439.3
+    ],
+    "armRight": [
+     381.1,
+     439.3
     ]
    }
   }

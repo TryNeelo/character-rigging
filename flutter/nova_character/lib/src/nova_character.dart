@@ -363,7 +363,7 @@ class _NovaCharacterState extends State<NovaCharacter> {
       child: Stack(children: outline
           ? [
               if (outfit.hatBack) wear('hat_back_outline'),
-              base('head_outline'),
+              if (outfit.headOutline) base('head_outline'),
               if (outfit.hat) wear('hat_outline'),
             ]
           : [

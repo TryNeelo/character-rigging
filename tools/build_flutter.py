@@ -24,6 +24,9 @@ def pivot(id_):
 eyes = re.search(r'<clipPath id="clip-eyes">(.*?)</clipPath>', rigged).group(1)
 legs_line = re.search(r'<g id="legs">.*', rigged).group(0)  # one group per outfit
 settings = json.load(open(os.path.join(ROOT, 'tools', 'rig_settings.json')))
+# Outfits whose head has no white outline (the head is inside a see-through helmet)
+NO_HEAD_OUTLINE = {o for o, v in json.load(open(os.path.join(ROOT, 'tools', 'characters', 'nova.json')))['outfits'].items()
+                   if v.get('headOutline', True) is False}
 rig = {
     'canvas': {'width': 556, 'height': 837},
     'anchor': {'x': 278, 'y': 837},
@@ -32,6 +35,8 @@ rig = {
     'outfits': {
         o: {'label': label,
             'hatBack': os.path.exists(os.path.join(ROOT, 'art', 'parts', 'outfits', o, 'hat_back.svg')),
+            'bodyBack': os.path.exists(os.path.join(ROOT, 'art', 'parts', 'outfits', o, 'body_back.svg')),
+            **({'headOutline': False} if o in NO_HEAD_OUTLINE else {}),
             'pivots': {side: [float(v) for v in re.search(
                 rf'<g id="arm-{css}".*?data-outfit="{o}"[^>]*data-pivot="([^"]+)"', rigged, re.S).group(1).split()]
                 for side, css in (('armLeft', 'left'), ('armRight', 'right'))}}

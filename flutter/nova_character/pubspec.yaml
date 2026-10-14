@@ -25,6 +25,7 @@ flutter:
     - assets/parts/base/
     - assets/parts/outfits/aviator/
     - assets/parts/outfits/construction/
+    - assets/parts/outfits/diver/
     - assets/parts/outfits/hoodie/
     - assets/characters/obselda/
     - assets/characters/obselda/parts/base/
