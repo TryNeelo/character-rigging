@@ -87,6 +87,19 @@ Line id: `ftux_world_select`
 | 14.27 s | `highlight_enter` | Highlight the Enter button on the world selection screen: spotlight it and point the arrow at it. |
 | 15.88 s | `clear_highlight` | End the highlight: the spotlight and the arrow fade out together. |
 
+## FTUX: world select - deep link
+
+Line id: `ftux_world_select_deep_link`
+
+| Time | Event | What the app should do |
+|---|---|---|
+| 1.91 s | `start_world_rotation` | Start rotating the worlds on the world selection screen: slide to the next world, pause briefly, and repeat, at a pace the app chooses, until [Stop world rotation]. |
+| 6.16 s | `stop_world_rotation` | Stop rotating the worlds: finish the slide in progress and stay on that world. |
+| 6.85 s | `highlight_next_world_arrow` | Highlight the arrow that rotates to the next world ("Tap the arrow to keep traveling through worlds"): spotlight it and point the arrow at it. |
+| 8.38 s | `clear_highlight` | End the highlight: the spotlight and the arrow fade out together. |
+| 10.55 s | `highlight_enter` | Highlight the Enter button on the world selection screen: spotlight it and point the arrow at it. |
+| 12.12 s | `clear_highlight` | End the highlight: the spotlight and the arrow fade out together. |
+
 ## Planned (not in a line yet)
 
 Names agreed for the FTUX flow. They appear in a line once its audio is timed.

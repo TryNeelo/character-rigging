@@ -133,6 +133,7 @@ This version has the four Nova FTUX lines and Skyrian's world 1 line, all with t
 | `ftux_room` | Nova | Nova's room: sticker book, then the closet |
 | `ftux_home_return` | Nova | Back on the home map: the back arrow |
 | `ftux_world_select` | Nova | World selection: rotating worlds, next-world arrow, Enter |
+| `ftux_world_select_deep_link` | Nova | World selection for players arriving by a deep link: the same events as `ftux_world_select` |
 | `ftux_w1` | Skyrian | World 1: Skyrian's welcome (no events yet) |
 | `ftux_w2` | Obselda | World 2: Obselda's welcome (no events yet) |
 | `ftux_w3` | Tydras | World 3: Tydras's welcome (no events yet) |

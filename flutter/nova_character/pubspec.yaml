@@ -51,4 +51,5 @@ flutter:
     - assets/lines/ftux_w4/
     - assets/lines/ftux_w5/
     - assets/lines/ftux_world_select/
+    - assets/lines/ftux_world_select_deep_link/
     # END GENERATED ASSETS
