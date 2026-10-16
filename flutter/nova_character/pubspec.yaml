@@ -1,6 +1,6 @@
 name: nova_character
 description: Nova, Neelo's talking character. Lip-sync, blinks, idle motion, looks and app events, ready to drop into a screen.
-version: 0.4.0
+version: 0.4.1
 publish_to: none
 
 environment:

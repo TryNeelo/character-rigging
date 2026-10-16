@@ -63,6 +63,8 @@
    "label": "Diver",
    "hatBack": false,
    "bodyBack": true,
+   "hat": false,
+   "bodyFront": true,
    "headOutline": false,
    "pivots": {
     "armLeft": [

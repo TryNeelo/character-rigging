@@ -12,6 +12,14 @@ The other characters come in the same package and work the same way. Today that'
 pass `character: 'skyrian'`, `'obselda'`, `'tydras'`, `'voltis'` or `'tremu'` (see "Other characters").
 Nothing changes for code that only shows Nova.
 
+## What's new in 0.4.1
+
+Nothing to change in code written for 0.4.0.
+
+- A new Nova outfit, `'diver'`: a glass helmet (Nova's head turns inside it), air hoses, and a glare on the glass that stays still in front of his face.
+- The construction outfit now has a neck scarf.
+- A new Nova line, `ftux_world_select_deep_link`: the world selection line for players arriving by a deep link, with the same events as `ftux_world_select` (see EVENTS.md).
+
 ## What's new in 0.4.0
 
 Nothing to change in code written for 0.3.0.
