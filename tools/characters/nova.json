@@ -51,7 +51,15 @@
               "arm_left": [9, 10, [[11, 16]]], "arm_right": [2, 3, [[4, 9]]], "sleeveCap": false,
               "armUp": {"file": "Nova-outfit_4-right-arm-up.svg", "side": "right"},
               "body": [[36, 45], [67, 86]], "outlineRing": [39], "noOutline": [40],
-              "hat": [], "body_front": [[66, 67]], "headOutline": false}
+              "hat": [], "body_front": [[66, 67]], "headOutline": false},
+    "futurist": {"_note": "Outfit 5, the World 4 look (Manaf, 2026-10-16; working name). Drawn with the head at 90%. Jacket collar flaps behind the arms (body_back); arms are fur, the sleeve's cyan edge, the sleeve and the cuff, with no round cap (the sleeve tops hide under the vest), turning at the magenta dots. The hat is the visor and earpieces, already at the head's size.",
+                 "label": "Futurist", "file": "Nova-outfit_5.svg", "count": 71, "body_back": [[0, 2]], "legs": [[10, 20]],
+                 "arm_left": [6, 7, [[8, 10]]], "arm_right": [2, 3, [[4, 6]]], "sleeveCap": false,
+                 "body": [[20, 23], [25, 45]], "hat": [[66, 71]], "hatAtHeadSize": true},
+    "wayfarer": {"_note": "Outfit 6, the World 5 look (Manaf, 2026-10-16; working name). Drawn with the head at 90%. Arms are fur, the sleeve's shading, the sleeve and the cuff, with no round cap, turning at Manaf's moved magenta dots (193.6, 413) and (359, 413). No hat.",
+                 "label": "Wayfarer", "file": "Nova-outfit_6.svg", "count": 83, "legs": [[11, 35]],
+                 "arm_left": [0, 1, [[2, 4]]], "arm_right": [5, 6, [[7, 9]]], "sleeveCap": false,
+                 "body": [[10, 11], [35, 39], [60, 83]], "hat": []}
   },
   "defaultOutfit": "hoodie"
 }

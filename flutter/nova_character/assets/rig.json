@@ -76,6 +76,37 @@
      439.3
     ]
    }
+  },
+  "futurist": {
+   "label": "Futurist",
+   "hatBack": false,
+   "bodyBack": true,
+   "pivots": {
+    "armLeft": [
+     187.0,
+     431.0
+    ],
+    "armRight": [
+     370.0,
+     431.0
+    ]
+   }
+  },
+  "wayfarer": {
+   "label": "Wayfarer",
+   "hatBack": false,
+   "bodyBack": false,
+   "hat": false,
+   "pivots": {
+    "armLeft": [
+     193.574,
+     413.0
+    ],
+    "armRight": [
+     359.0,
+     413.0
+    ]
+   }
   }
  },
  "defaultOutfit": "hoodie",

@@ -26,7 +26,9 @@ flutter:
     - assets/parts/outfits/aviator/
     - assets/parts/outfits/construction/
     - assets/parts/outfits/diver/
+    - assets/parts/outfits/futurist/
     - assets/parts/outfits/hoodie/
+    - assets/parts/outfits/wayfarer/
     - assets/characters/obselda/
     - assets/characters/obselda/parts/base/
     - assets/characters/obselda/parts/outfits/explorer/

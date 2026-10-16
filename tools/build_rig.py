@@ -12,7 +12,7 @@ Usage: python3 tools/build_rig.py
 """
 import glob, json, math, os, re, shutil
 from face_rig import (ROOT, centre, clips_used, lid, lid_parts, mouth_group, mouth_shapes, part_writer,
-                      shapes_of, whiten, OUTLINE_PX, outline_points, path_d, placement, points, rigid_fit, turn)
+                      shapes_of, whiten, OUTLINE_PX, outline_points, path_d, placement, points, rigid_fit, round_rect_centre, turn)
 import build_character
 
 C = json.load(open(os.path.join(ROOT, 'tools', 'characters', 'nova.json')))
@@ -100,8 +100,9 @@ OUTFIT_DEFS = ''   # gradients etc. that outfit shapes refer to
 for name, o in OUTFITS.items():
     osrc = open(os.path.join(ROOT, 'art', o['file'])).read()
     oels = shapes_of(os.path.join(ROOT, 'art', o['file']), o['count'])
-    odots = sorted((float(m[0]), float(m[1])) for m in
-                   re.findall(r'<circle cx="([\d.]+)" cy="([\d.]+)" r="4" fill="#F006D8"/>', osrc))
+    # Magenta pivot dots (any size, with or without a transform), left to right
+    odots = sorted(tuple(round(v, 3) for v in round_rect_centre(e)[:2]) for e in oels if 'fill="#F006D8"' in e)
+    assert len(odots) == 2, (name, odots)
     pick = lambda ids: ''.join(oels[i] for i in ids)
     o['legs_svg'] = pick(R(o['legs']))
     o['body_back_svg'] = pick(R(o.get('body_back', [])))

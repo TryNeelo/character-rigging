@@ -60,7 +60,7 @@ NovaCharacter(
   framing: NovaFraming.waistUp,   // full, kneesUp, waistUp, closeUp
   align: NovaAlign.right,         // where he stands if the space is wide
   outline: true,                  // white sticker outline
-  outfit: 'aviator',              // 'hoodie' (default), 'aviator', 'construction' or 'diver'
+  outfit: 'aviator',              // 'hoodie' (default), 'aviator', 'construction', 'diver', 'futurist' or 'wayfarer'
 )
 
 // React to what he says. EVENTS.md lists every event and what it should do.
@@ -126,7 +126,7 @@ full-body framing is a little taller too.
 | `outline` | `true` | White sticker outline. It's drawn into the art (white copies of the outer parts), so it follows any pose and costs no blur. |
 | `idle` | `true` | Movement switch. Nova draws at 15 fps for idle motion, 30 while talking and 60 during arm and look moves (they last a moment). On: breathing and slight sway between lines, nods and brow lifts while talking. Off: he only blinks and lip-syncs, and doesn't redraw between blinks. |
 | `blink` | `true` | Random blinks every 2.5 to 5.5 s. |
-| `outfit` | `'hoodie'` | Which outfit Nova wears: `'hoodie'`, `'aviator'`, `'construction'` or `'diver'`. Change it any time; his face, lip-sync and motion carry over. |
+| `outfit` | `'hoodie'` | Which outfit Nova wears: `'hoodie'`, `'aviator'`, `'construction'`, `'diver'`, `'futurist'` or `'wayfarer'`. Change it any time; his face, lip-sync and motion carry over. |
 | `character` | `'nova'` | Which character to draw: `'nova'`, `'skyrian'`, `'obselda'`, `'tydras'`, `'voltis'` or `'tremu'`. Unknown ids fall back to Nova. Change it any time. |
 
 If the widget's height is unbounded, it sizes itself to the framing's proportions.

@@ -95,6 +95,8 @@ class _NovaDemoState extends State<NovaDemo> {
           ButtonSegment(value: 'aviator', label: Text('Aviator')),
           ButtonSegment(value: 'construction', label: Text('Construction')),
           ButtonSegment(value: 'diver', label: Text('Diver')),
+          ButtonSegment(value: 'futurist', label: Text('Futurist')),
+          ButtonSegment(value: 'wayfarer', label: Text('Wayfarer')),
         ],
         selected: {outfit},
         onSelectionChanged: (v) => setState(() => outfit = v.first),
