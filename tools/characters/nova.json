@@ -56,8 +56,8 @@
                  "label": "Futurist", "file": "Nova-outfit_5.svg", "count": 71, "body_back": [[0, 2]], "legs": [[10, 20]],
                  "arm_left": [6, 7, [[8, 10]]], "arm_right": [2, 3, [[4, 6]]], "sleeveCap": false,
                  "body": [[20, 23], [25, 45]], "hat": [[66, 71]], "hatAtHeadSize": true},
-    "wayfarer": {"_note": "Outfit 6, the World 5 look (Manaf, 2026-10-16; working name). Drawn with the head at 90%. Arms are fur, the sleeve's shading, the sleeve and the cuff, with no round cap, turning at Manaf's moved magenta dots (193.6, 413) and (359, 413). No hat.",
-                 "label": "Wayfarer", "file": "Nova-outfit_6.svg", "count": 83, "legs": [[11, 35]],
+    "woodlander": {"_note": "Outfit 6, the World 5 look (Manaf, 2026-10-16; name chosen by Manaf). Drawn with the head at 90%. Arms are fur, the sleeve's shading, the sleeve and the cuff, with no round cap, turning at Manaf's moved magenta dots (193.6, 413) and (359, 413). No hat.",
+                 "label": "Woodlander", "file": "Nova-outfit_6.svg", "count": 83, "legs": [[11, 35]],
                  "arm_left": [0, 1, [[2, 4]]], "arm_right": [5, 6, [[7, 9]]], "sleeveCap": false,
                  "body": [[10, 11], [35, 39], [60, 83]], "hat": []}
   },
