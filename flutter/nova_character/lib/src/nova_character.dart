@@ -445,6 +445,8 @@ class _NovaCharacterState extends State<NovaCharacter> {
                     : wear('arm_right$ol')),
             wear('body$ol'),
             head,
+            // A body piece in front of the head that doesn't move with it (the diver's glare)
+            if (!outline && outfit.bodyFront) wear('body_front'),
           ]),
         ),
       ]),

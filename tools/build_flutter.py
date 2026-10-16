@@ -36,6 +36,8 @@ rig = {
         o: {'label': label,
             'hatBack': os.path.exists(os.path.join(ROOT, 'art', 'parts', 'outfits', o, 'hat_back.svg')),
             'bodyBack': os.path.exists(os.path.join(ROOT, 'art', 'parts', 'outfits', o, 'body_back.svg')),
+            **({'hat': False} if not os.path.exists(os.path.join(ROOT, 'art', 'parts', 'outfits', o, 'hat.svg')) else {}),
+            **({'bodyFront': True} if os.path.exists(os.path.join(ROOT, 'art', 'parts', 'outfits', o, 'body_front.svg')) else {}),
             **({'headOutline': False} if o in NO_HEAD_OUTLINE else {}),
             'pivots': {side: [float(v) for v in re.search(
                 rf'<g id="arm-{css}".*?data-outfit="{o}"[^>]*data-pivot="([^"]+)"', rigged, re.S).group(1).split()]

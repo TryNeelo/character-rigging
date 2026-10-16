@@ -31,6 +31,7 @@ class NovaOutfitSpec {
       this.hatBack = false,
       this.bodyBack = false,
       this.headOutline = true,
+      this.bodyFront = false,
       this.elbowLeftPivot,
       this.elbowRightPivot,
       this.armRestLeft,
@@ -52,6 +53,10 @@ class NovaOutfitSpec {
   /// Whether the head gets its white outline. Off for Nova's diver outfit: his head is inside a
   /// glass helmet, which has the outline instead.
   final bool headOutline;
+
+  /// Whether the body has a piece in front of the head (body_front.svg) that stays still while the
+  /// head moves, like the glare on Nova's diving helmet. It has no outline.
+  final bool bodyFront;
 
   /// Elbows, for arms that bend (forearm_<side>.svg turns about them). Null for arms without elbows.
   final Offset? elbowLeftPivot, elbowRightPivot;
@@ -95,6 +100,7 @@ class NovaRig {
                 hatBack: e.value['hatBack'] as bool? ?? false,
                 bodyBack: e.value['bodyBack'] as bool? ?? false,
                 headOutline: e.value['headOutline'] as bool? ?? true,
+                bodyFront: e.value['bodyFront'] as bool? ?? false,
                 elbowLeftPivot: e.value['pivots']['elbowLeft'] == null ? null : _offset(e.value['pivots']['elbowLeft']),
                 elbowRightPivot: e.value['pivots']['elbowRight'] == null ? null : _offset(e.value['pivots']['elbowRight']),
                 armRestLeft: _pair(e.value['armRest']?['left']),

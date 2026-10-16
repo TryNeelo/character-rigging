@@ -106,6 +106,8 @@ for name, o in OUTFITS.items():
     o['legs_svg'] = pick(R(o['legs']))
     o['body_back_svg'] = pick(R(o.get('body_back', [])))
     o['body_svg'] = pick(R(o['body']))
+    # A body piece in front of the head that stays still with the body (the glare on the diver's glass)
+    o['body_front_svg'] = pick(R(o.get('body_front', [])))
     o['hat_svg'] = CAP if o['hat'] == 'cap' else pick(R(o['hat']))
     if o.get('hatAtHeadSize'):
         # (drawn with the head already at its size: undo the head's size change, which the hat gets too)
@@ -165,6 +167,8 @@ J = lambda a, b: ''.join(els[a:b])
 legs = '<g id="legs">' + per_outfit('legs_svg') + '</g>'                    # legs and shoes
 d = OUTFITS[DEFAULT_OUTFIT]
 HAS_BODY_BACK = any(o['body_back_svg'] for o in OUTFITS.values())
+HAS_BODY_FRONT = any(o['body_front_svg'] for o in OUTFITS.values())
+body_front = ('\n<g id="body-front">' + per_outfit('body_front_svg') + '</g>') if HAS_BODY_FRONT else ''
 body_back = ('<g id="body-back">' + per_outfit('body_back_svg') + '</g>\n') if HAS_BODY_BACK else ''
 arms = ''.join(f'<g id="arm-{side}" class="part" data-pivot="{d["pivot_" + side][0]} {d["pivot_" + side][1]}">'
                + per_outfit(f'arm_{side}_svg', f'pivot_{side}') + '</g>' for side in ('left', 'right'))
@@ -210,7 +214,7 @@ clips = ('<clipPath id="clip-eyes">' + ''.join(f'<ellipse cx="{x}" cy="{y}" rx="
 svg = (f'<svg id="nova" width="{W}" height="{H}" viewBox="0 0 {W} {H}" fill="none" xmlns="http://www.w3.org/2000/svg">\n'
        f'<defs>{clips}{OUTFIT_DEFS}</defs>\n'
        '<g id="character">\n'
-       f'{outline}\n{legs}\n<g id="upper">\n{body_back}{arms}\n{body}\n{head}\n</g>\n'
+       f'{outline}\n{legs}\n<g id="upper">\n{body_back}{arms}\n{body}\n{head}{body_front}\n</g>\n'
        '</g>\n</svg>\n')
 open(OUT, 'w').write(svg)
 print('wrote', OUT, len(svg), 'bytes; arm pivots', {n: (o['pivot_left'], o['pivot_right']) for n, o in OUTFITS.items()})
@@ -228,6 +232,8 @@ def part(name, body, defs=''):
     _part(name, scaled(body) if name.startswith('base/') or '/hat' in name else body, defs)
 lids = lambda state: f'<g transform="{OFF}">' + lid_parts([(side, cx, cy, R_EYE, fur) for side, cx, cy, fur in LIDS], state, 15) + '</g>'
 for name, o in OUTFITS.items():
+    if o['body_front_svg']:
+        part(f'outfits/{name}/body_front', o['body_front_svg'])   # (no outline: it sits on the glass)
     for k in ('legs', 'body_back', 'arm_left', 'arm_right', 'body', 'hat', 'hat_back'):
         if o[f'{k}_svg']:
             part(f'outfits/{name}/{k}', o[f'{k}_svg'], o.get('defs', '') if k.startswith('hat') else '')

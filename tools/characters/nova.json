@@ -46,12 +46,12 @@
                      "label": "Construction", "file": "Nova-outfit_3.svg", "count": 63, "legs": [[0, 14]],
                      "arm_left": [14, 15, []], "arm_right": [16, 17, []], "body": [[18, 24], [26, 39]],
                      "hat": [[59, 63]], "hat_back": [[39, 40]], "hatAtHeadSize": true},
-    "diver": {"_note": "Outfit 4 (Manaf, 2026-10-14), drawn with the head already at 90%. Air hoses behind the arms (body_back). Each arm: the dark glove and forearm, the suit sleeve over it, the wrist gauge and the sleeve stripes; the sleeve's top hides under the collar, so it gets no round cap (sleeveCap false). The shoulder pivot is the point the right arm turns about between this drawing and armUp (the same Nova with his right arm raised); the left is its mirror. Body: suit trousers, the glass dome, collar, neck, suit, belt and chest gauge, then the collar's front. The dome is see-through, so its outline is a white ring around the outside only (outlineRing), and the inner glass gets none. The hat is the glare on the glass, drawn over the face; it is already at the head's size, so it isn't shrunk again, and it has no outline (it would show through the glass). Nor does the head (headOutline false): it is inside the glass, and its outline would show through as a pale halo.",
+    "diver": {"_note": "Outfit 4 (Manaf, 2026-10-14), drawn with the head already at 90%. Air hoses behind the arms (body_back). Each arm: the dark glove and forearm, the suit sleeve over it, the wrist gauge and the sleeve stripes; the sleeve's top hides under the collar, so it gets no round cap (sleeveCap false). The shoulder pivot is the point the right arm turns about between this drawing and armUp (the same Nova with his right arm raised); the left is its mirror. Body: suit trousers, the glass dome, collar, neck, suit, belt and chest gauge, then the collar's front. The dome is see-through, so its outline is a white ring around the outside only (outlineRing), and the inner glass gets none. No hat. The glare on the glass is a front layer (body_front): drawn over the face, it stays still with the helmet while the head moves inside, and has no outline (it would show through the glass). Nor does the head (headOutline false): it is inside the glass, and its outline would show through as a pale halo.",
               "label": "Diver", "file": "Nova-outfit_4.svg", "count": 86, "legs": [[16, 36]], "body_back": [[0, 2]],
               "arm_left": [9, 10, [[11, 16]]], "arm_right": [2, 3, [[4, 9]]], "sleeveCap": false,
               "armUp": {"file": "Nova-outfit_4-right-arm-up.svg", "side": "right"},
               "body": [[36, 45], [67, 86]], "outlineRing": [39], "noOutline": [40],
-              "hat": [[66, 67]], "hatAtHeadSize": true, "hatOutline": false, "headOutline": false}
+              "hat": [], "body_front": [[66, 67]], "headOutline": false}
   },
   "defaultOutfit": "hoodie"
 }
