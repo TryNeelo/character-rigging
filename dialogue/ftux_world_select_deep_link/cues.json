@@ -526,20 +526,6 @@
    "note": "Script cue: [right arm up 32]"
   },
   {
-   "time": 1.91,
-   "type": "event",
-   "name": "start_world_rotation",
-   "source": "script",
-   "note": "Script cue: [Start world rotation]"
-  },
-  {
-   "time": 6.16,
-   "type": "event",
-   "name": "stop_world_rotation",
-   "source": "script",
-   "note": "Script cue: [Stop world rotation]"
-  },
-  {
    "time": 6.85,
    "type": "event",
    "name": "highlight_next_world_arrow",
@@ -569,6 +555,13 @@
    "name": "clear_highlight",
    "source": "script",
    "note": "Script cue: [Stop highlight]"
+  },
+  {
+   "time": 8.38,
+   "type": "event",
+   "name": "show_next_world",
+   "source": "script",
+   "note": "Script cue: [Show next world]"
   },
   {
    "time": 10.55,

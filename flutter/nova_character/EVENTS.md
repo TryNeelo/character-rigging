@@ -92,10 +92,9 @@ Line id: `ftux_world_select_deep_link`
 
 | Time | Event | What the app should do |
 |---|---|---|
-| 1.91 s | `start_world_rotation` | Start rotating the worlds on the world selection screen: slide to the next world, pause briefly, and repeat, at a pace the app chooses, until [Stop world rotation]. |
-| 6.16 s | `stop_world_rotation` | Stop rotating the worlds: finish the slide in progress and stay on that world. |
 | 6.85 s | `highlight_next_world_arrow` | Highlight the arrow that rotates to the next world ("Tap the arrow to keep traveling through worlds"): spotlight it and point the arrow at it. |
 | 8.38 s | `clear_highlight` | End the highlight: the spotlight and the arrow fade out together. |
+| 8.38 s | `show_next_world` | Slide the world selection screen to the next world once, as if the child had tapped the arrow, and stay there. |
 | 10.55 s | `highlight_enter` | Highlight the Enter button on the world selection screen: spotlight it and point the arrow at it. |
 | 12.12 s | `clear_highlight` | End the highlight: the spotlight and the arrow fade out together. |
 

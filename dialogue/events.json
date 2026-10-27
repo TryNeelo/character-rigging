@@ -66,22 +66,6 @@
     ],
     "scene": "World select"
   },
-  "start_world_rotation": {
-    "does": "Start rotating the worlds on the world selection screen: slide to the next world, pause briefly, and repeat, at a pace the app chooses, until [Stop world rotation].",
-    "cues": [
-      "Start world rotation",
-      "Rotate the worlds"
-    ],
-    "scene": "World select"
-  },
-  "stop_world_rotation": {
-    "does": "Stop rotating the worlds: finish the slide in progress and stay on that world.",
-    "cues": [
-      "Stop world rotation",
-      "Stop rotating the worlds"
-    ],
-    "scene": "World select"
-  },
   "clear_highlight": {
     "does": "End the highlight: the spotlight and the arrow fade out together.",
     "cues": [
