@@ -12,6 +12,12 @@ The other characters come in the same package and work the same way. Today that'
 pass `character: 'skyrian'`, `'obselda'`, `'tydras'`, `'voltis'` or `'tremu'` (see "Other characters").
 Nothing changes for code that only shows Nova.
 
+## What's new in 0.4.2
+
+- Two new Nova outfits: `'futurist'` (the World 4 look) and `'woodlander'` (the World 5 look).
+- World rotation now happens once: a new event, `show_next_world`, slides the world selection screen to the next world once, right after "Tap the arrow to see the next world!" in `ftux_world_select` and `ftux_world_select_deep_link`. `start_world_rotation` and `stop_world_rotation` are retired: no line sends them any more, so replace them with `show_next_world` (see EVENTS.md).
+- `ftux_home`: `highlight_home` now fires on "let's head inside your home", a little earlier than before.
+
 ## What's new in 0.4.1
 
 Nothing to change in code written for 0.4.0.
