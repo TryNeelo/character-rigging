@@ -57,6 +57,15 @@
     ],
     "scene": "World select"
   },
+  "show_next_world": {
+    "does": "Slide the world selection screen to the next world once, as if the child had tapped the arrow, and stay there.",
+    "cues": [
+      "Show next world",
+      "Rotate world",
+      "Rotate to the next world"
+    ],
+    "scene": "World select"
+  },
   "start_world_rotation": {
     "does": "Start rotating the worlds on the world selection screen: slide to the next world, pause briefly, and repeat, at a pace the app chooses, until [Stop world rotation].",
     "cues": [

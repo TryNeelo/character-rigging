@@ -733,19 +733,19 @@
    "note": "Script cue: [right arm up 32]"
   },
   {
-   "time": 11.83,
+   "time": 12.61,
+   "type": "event",
+   "name": "highlight_home",
+   "source": "script",
+   "note": "Script cue: [Highlight the home]"
+  },
+  {
+   "time": 12.61,
    "end": 14.15,
    "type": "look",
    "direction": "up-right",
    "source": "script",
    "note": "Script cue: [look up-right]"
-  },
-  {
-   "time": 13.45,
-   "type": "event",
-   "name": "highlight_home",
-   "source": "script",
-   "note": "Script cue: [Highlight the home]"
   },
   {
    "time": 17.3,

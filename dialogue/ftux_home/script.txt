@@ -4,6 +4,6 @@ There's lots to explore. [arms down]
 [look right] [right arm up 32] [Highlight the shops] See those shops?
 As you earn coins, you'll be able to buy
 [look ahead] cool clothes, hats, and other fun things! [right arm down]
-[look up-right] But first, let's head inside your [Highlight the home] home.
+But first, [look up-right] [Highlight the home] let's head inside your home.
 [look ahead] I'll show you around,
 and you can make your avatar look the way you want. [Stop spotlight]

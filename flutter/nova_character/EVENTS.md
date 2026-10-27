@@ -22,7 +22,7 @@ Line id: `ftux_home`
 | Time | Event | What the app should do |
 |---|---|---|
 | 5.65 s | `highlight_shops` | Highlight the shops on the home map ("See those shops?"): spotlight it and point the arrow at it. |
-| 13.45 s | `highlight_home` | Highlight the home on the map: spotlight it and point the arrow at it. |
+| 12.61 s | `highlight_home` | Highlight the home on the map: spotlight it and point the arrow at it. |
 | 17.30 s | `clear_spotlight` | End only the spotlight: the spotlight fades, the arrow stays and blinks until the child taps the item (or until a later [Stop highlight]). |
 
 ## FTUX: home return
@@ -80,10 +80,9 @@ Line id: `ftux_world_select`
 
 | Time | Event | What the app should do |
 |---|---|---|
-| 2.95 s | `start_world_rotation` | Start rotating the worlds on the world selection screen: slide to the next world, pause briefly, and repeat, at a pace the app chooses, until [Stop world rotation]. |
-| 7.76 s | `stop_world_rotation` | Stop rotating the worlds: finish the slide in progress and stay on that world. |
 | 9.21 s | `highlight_next_world_arrow` | Highlight the arrow that rotates to the next world ("Tap the arrow to keep traveling through worlds"): spotlight it and point the arrow at it. |
 | 10.84 s | `clear_highlight` | End the highlight: the spotlight and the arrow fade out together. |
+| 10.84 s | `show_next_world` | Slide the world selection screen to the next world once, as if the child had tapped the arrow, and stay there. |
 | 14.27 s | `highlight_enter` | Highlight the Enter button on the world selection screen: spotlight it and point the arrow at it. |
 | 15.88 s | `clear_highlight` | End the highlight: the spotlight and the arrow fade out together. |
 

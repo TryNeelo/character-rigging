@@ -1,5 +1,5 @@
 [left arm up 32] [right arm up 32] We made it! [left arm down] [right arm down]
-[Start world rotation] Neelo has different worlds to explore.
-Each one is packed with stories and games! [Stop world rotation]
-[look right] [right arm up 32] [Highlight the right button] Tap the arrow to see the next world! [right arm down] [look ahead] [Stop highlight]
+Neelo has different worlds to explore.
+Each one is packed with stories and games!
+[Highlight the right button] [right arm up 32] [look right] Tap the arrow to see the next world! [right arm down] [look ahead] [Stop highlight] [Show next world]
 When you find a world you like, [look up-right] [Highlight the enter button] tap Enter to start exploring! [Stop highlight] [look ahead]
